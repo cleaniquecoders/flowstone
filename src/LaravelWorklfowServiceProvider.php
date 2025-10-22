@@ -5,6 +5,7 @@ namespace CleaniqueCoders\LaravelWorklfow;
 use CleaniqueCoders\LaravelWorklfow\Commands\LaravelWorklfowCommand;
 use Spatie\LaravelPackageTools\Package;
 use Spatie\LaravelPackageTools\PackageServiceProvider;
+use Symfony\Component\Workflow\Registry;
 
 class LaravelWorklfowServiceProvider extends PackageServiceProvider
 {
@@ -21,5 +22,15 @@ class LaravelWorklfowServiceProvider extends PackageServiceProvider
             ->hasViews()
             ->hasMigration('create_laravel_worklfow_table')
             ->hasCommand(LaravelWorklfowCommand::class);
+    }
+
+    public function register(): void
+    {
+        parent::register();
+
+        // Register Symfony Workflow Registry in the container
+        $this->app->singleton(Registry::class, function () {
+            return new Registry;
+        });
     }
 }

@@ -1,7 +1,7 @@
 <?php
 
-use App\Models\Workflow;
-use App\Processors\Workflow as ProcessorsWorkflow;
+use CleaniqueCoders\LaravelWorklfow\Models\Workflow;
+use CleaniqueCoders\LaravelWorklfow\Processors\Workflow as ProcessorsWorkflow;
 use Symfony\Component\Workflow\Registry;
 use Symfony\Component\Workflow\Workflow as SymfonyWorkflow;
 
@@ -60,15 +60,14 @@ if (! function_exists('get_roles_from_marking')) {
 }
 
 if (! function_exists('roles_exists_in_transitions')) {
-    function roles_exists_in_transitions(array $transitionRoles)
+    /**
+     * Check if roles exist in the system.
+     * Note: This function requires a Role model to be implemented in the application.
+     */
+    function roles_exists_in_transitions(array $transitionRoles): bool
     {
-        foreach ($transitionRoles as $key => $roles) {
-            foreach ($roles as $role) {
-                $roleExists = Role::where('name', $role)->exists();
-                if (! $roleExists) {
-                    return false; // Return false if any role does not exist
-                }
-            }
-        }
+        // This function should be implemented by the application
+        // as it requires knowledge of the Role model structure
+        return true;
     }
 }

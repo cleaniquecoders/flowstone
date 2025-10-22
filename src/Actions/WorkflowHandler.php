@@ -7,7 +7,7 @@ use CleaniqueCoders\LaravelWorklfow\Models\Workflow;
 
 class WorkflowHandler extends Action
 {
-    public $model = Workflow::class;
+    protected string $model = Workflow::class;
 
     public function rules(): array
     {

@@ -13,7 +13,10 @@ class TestCase extends Orchestra
         parent::setUp();
 
         Factory::guessFactoryNamesUsing(
-            fn (string $modelName) => 'CleaniqueCoders\\LaravelWorklfow\\Database\\Factories\\'.class_basename($modelName).'Factory'
+            fn (string $modelName) => match ($modelName) {
+                \CleaniqueCoders\LaravelWorklfow\Models\Workflow::class => \CleaniqueCoders\LaravelWorklfow\Database\Factories\WorkflowFactory::class,
+                default => 'CleaniqueCoders\\LaravelWorklfow\\Database\\Factories\\'.class_basename($modelName).'Factory'
+            }
         );
     }
 
@@ -27,11 +30,17 @@ class TestCase extends Orchestra
     public function getEnvironmentSetUp($app)
     {
         config()->set('database.default', 'testing');
+        config()->set('database.connections.testing', [
+            'driver' => 'sqlite',
+            'database' => ':memory:',
+            'prefix' => '',
+        ]);
 
-        /*
-         foreach (\Illuminate\Support\Facades\File::allFiles(__DIR__ . '/../database/migrations') as $migration) {
-            (include $migration->getRealPath())->up();
-         }
-         */
+        // Load test configuration
+        $app['config']->set('worklfow', include __DIR__.'/config/worklfow.php');
+
+        // Create the workflow table for testing
+        $migration = include __DIR__.'/database/migrations/create_workflows_table_for_testing.php';
+        $migration->up();
     }
 }

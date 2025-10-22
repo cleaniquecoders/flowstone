@@ -55,9 +55,13 @@ trait InteractsWithWorkflow
 
     public function getWorkflowKey(): string
     {
-        return str(get_called_class())->lower()->replace('\\', '-')->toString().(
-            method_exists($this, 'getKeyName') ? '-'.$this->{$this->getKeyName()} : ''
-        );
+        $baseKey = str(get_called_class())->lower()->replace('\\', '-')->toString();
+
+        if (method_exists($this, 'getKeyName') && $this->{$this->getKeyName()}) {
+            return $baseKey.'-'.$this->{$this->getKeyName()};
+        }
+
+        return $baseKey;
     }
 
     public function getMarking(): string
