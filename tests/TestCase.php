@@ -2,9 +2,9 @@
 
 namespace CleaniqueCoders\LaravelWorklfow\Tests;
 
+use CleaniqueCoders\LaravelWorklfow\LaravelWorklfowServiceProvider;
 use Illuminate\Database\Eloquent\Factories\Factory;
 use Orchestra\Testbench\TestCase as Orchestra;
-use CleaniqueCoders\LaravelWorklfow\LaravelWorklfowServiceProvider;
 
 class TestCase extends Orchestra
 {

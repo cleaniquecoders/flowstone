@@ -2,9 +2,9 @@
 
 namespace CleaniqueCoders\LaravelWorklfow;
 
+use CleaniqueCoders\LaravelWorklfow\Commands\LaravelWorklfowCommand;
 use Spatie\LaravelPackageTools\Package;
 use Spatie\LaravelPackageTools\PackageServiceProvider;
-use CleaniqueCoders\LaravelWorklfow\Commands\LaravelWorklfowCommand;
 
 class LaravelWorklfowServiceProvider extends PackageServiceProvider
 {
