@@ -1,12 +1,12 @@
 <?php
 
-namespace VendorName\Skeleton\Commands;
+namespace CleaniqueCoders\LaravelWorklfow\Commands;
 
 use Illuminate\Console\Command;
 
-class SkeletonCommand extends Command
+class LaravelWorklfowCommand extends Command
 {
-    public $signature = 'skeleton';
+    public $signature = 'laravel-worklfow';
 
     public $description = 'My command';
 
