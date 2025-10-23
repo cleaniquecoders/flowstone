@@ -4,7 +4,7 @@ return [
     'default' => [
         'type' => 'state_machine',
         'supports' => [
-            \CleaniqueCoders\Flowstone\Models\Workflow::class,
+            \CleaniqueCoders\Flowstone\Tests\Models\Article::class,
         ],
         'places' => null, // Auto-generated from Status enum
         'transitions' => null, // Auto-generated default transitions
@@ -21,7 +21,7 @@ return [
         'test_workflow' => [
             'type' => 'state_machine',
             'supports' => [
-                \CleaniqueCoders\Flowstone\Models\Workflow::class,
+                \CleaniqueCoders\Flowstone\Tests\Models\Article::class,
             ],
             'places' => [
                 'draft' => null,

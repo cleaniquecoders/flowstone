@@ -65,23 +65,24 @@ describe('Workflow Performance Tests', function () {
     });
 
     it('efficiently processes workflow configuration lookups', function () {
-        // Create workflows with different types
-        $types = ['article', 'task', 'order', 'project', 'review'];
+        // Create workflows with different names
+        $names = ['article', 'task', 'order', 'project', 'review'];
 
-        foreach ($types as $type) {
+        foreach ($names as $name) {
             WorkflowFactory::new()->create([
-                'type' => $type,
+                'type' => 'state_machine',
+                'name' => $name,
                 'config' => [
-                    'metadata' => ['type' => ['value' => $type]],
+                    'metadata' => ['type' => ['value' => $name]],
                 ],
             ]);
         }
 
         $startTime = microtime(true);
 
-        // Lookup each type
-        foreach ($types as $type) {
-            $config = get_workflow_config($type, 'type');
+        // Lookup each name
+        foreach ($names as $name) {
+            $config = get_workflow_config($name, 'name');
             expect($config)->toBeArray();
         }
 
@@ -91,7 +92,7 @@ describe('Workflow Performance Tests', function () {
     });
 
     it('handles concurrent workflow access efficiently', function () {
-        $workflow = WorkflowFactory::new()->create();
+        $workflow = WorkflowFactory::new()->withPlacesAndTransitions()->create();
 
         $results = [];
         $startTime = microtime(true);
@@ -131,7 +132,7 @@ describe('Workflow Performance Tests', function () {
 
     it('efficiently processes role lookups from transitions', function () {
         $workflow = WorkflowFactory::new()->create([
-            'workflow' => [
+            'config' => [
                 'transitions' => array_fill(0, 100, [
                     'from' => ['state_a'],
                     'to' => 'state_b',

@@ -5,10 +5,6 @@ describe('Architecture Tests', function () {
         ->expect(['dd', 'dump', 'ray'])
         ->each->not->toBeUsed();
 
-    it('ensures models implement workflow contract correctly')
-        ->expect('CleaniqueCoders\Flowstone\Models')
-        ->toImplement('CleaniqueCoders\Flowstone\Contracts\Workflow');
-
     it('ensures concerns are traits')
         ->expect('CleaniqueCoders\Flowstone\Concerns')
         ->toBeTrait();
@@ -49,9 +45,9 @@ describe('Architecture Tests', function () {
         ->expect('CleaniqueCoders\Flowstone\Processors')
         ->classes->not->toBeFinal();
 
-    it('ensures workflow trait is used correctly')
+    it('ensures workflow configuration models have proper structure')
         ->expect('CleaniqueCoders\Flowstone\Models\Workflow')
-        ->toUse('CleaniqueCoders\Flowstone\Concerns\InteractsWithWorkflow');
+        ->toUse('CleaniqueCoders\Traitify\Concerns\InteractsWithUuid');
 
     it('ensures proper exception handling')
         ->expect('CleaniqueCoders\Flowstone')

@@ -61,22 +61,10 @@ return new class extends Migration
             $table->index(['workflow_id', 'to_place']);
             $table->index(['workflow_id', 'name']);
         });
-
-        // Test articles table for workflow integration testing
-        Schema::create('articles', function (Blueprint $table) {
-            $table->id();
-            $table->string('title');
-            $table->text('content')->nullable();
-            $table->string('marking')->default('draft');
-            $table->string('workflow_type')->default('article-workflow');
-            $table->json('workflow')->nullable(); // Cached workflow configuration
-            $table->timestamps();
-        });
     }
 
     public function down()
     {
-        Schema::dropIfExists('articles');
         Schema::dropIfExists('workflow_transitions');
         Schema::dropIfExists('workflow_places');
         Schema::dropIfExists('workflows');

@@ -18,23 +18,18 @@ describe('Workflow Model', function () {
     it('has fillable attributes', function () {
         $workflow = new Workflow;
 
-        expect($workflow->getFillable())->toContain('type');
         expect($workflow->getFillable())->toContain('name');
         expect($workflow->getFillable())->toContain('description');
-        expect($workflow->getFillable())->toContain('config');
-        expect($workflow->getFillable())->toContain('marking');
-        expect($workflow->getFillable())->toContain('workflow');
+        expect($workflow->getFillable())->toContain('type');
+        expect($workflow->getFillable())->toContain('initial_marking');
         expect($workflow->getFillable())->toContain('is_enabled');
+        expect($workflow->getFillable())->toContain('meta');
     });
 
     it('has correct casts', function () {
         $casts = $this->workflow->getCasts();
 
-        expect($casts)->toHaveKey('config', 'array');
-        expect($casts)->toHaveKey('is_enabled', 'bool');
-        expect($casts)->toHaveKey('created_by', 'array');
-        expect($casts)->toHaveKey('updated_by', 'array');
-        expect($casts)->toHaveKey('deleted_by', 'array');
+        expect($casts)->toHaveKey('is_enabled', 'boolean');
         expect($casts)->toHaveKey('meta', 'array');
     });
 
@@ -45,12 +40,12 @@ describe('Workflow Model', function () {
         expect(Str::isUuid((string) $workflow->uuid))->toBeTrue();
     });
 
-    it('can be created with specific marking', function () {
+    it('can be created with specific initial marking', function () {
         $workflow = WorkflowFactory::new()
-            ->withMarking(Status::PENDING)
+            ->withInitialMarking(Status::PENDING)
             ->create();
 
-        expect($workflow->marking)->toBe(Status::PENDING->value);
+        expect($workflow->initial_marking)->toBe(Status::PENDING->value);
     });
 
     it('can be enabled and disabled', function () {
@@ -61,16 +56,12 @@ describe('Workflow Model', function () {
         expect($disabledWorkflow->is_enabled)->toBeFalse();
     });
 
-    it('has workflow type attribute accessor', function () {
-        expect($this->workflow->workflow_type)->toBe($this->workflow->type);
-    });
+    it('has workflow type as enum values', function () {
+        $workflow = WorkflowFactory::new()->create(['type' => 'state_machine']);
+        expect($workflow->type)->toBe('state_machine');
 
-    it('has workflow type field attribute accessor', function () {
-        expect($this->workflow->workflow_type_field)->toBe('type');
-    });
-
-    it('can get marking', function () {
-        expect($this->workflow->getMarking())->toBe($this->workflow->marking);
+        $workflow = WorkflowFactory::new()->create(['type' => 'workflow']);
+        expect($workflow->type)->toBe('workflow');
     });
 
     it('can scope enabled workflows', function () {
@@ -83,22 +74,29 @@ describe('Workflow Model', function () {
         expect($enabledWorkflows->every(fn ($workflow) => $workflow->is_enabled))->toBeTrue();
     });
 
-    it('stores config as json', function () {
-        $config = [
-            'type' => 'state_machine',
-            'places' => ['draft', 'published'],
-            'transitions' => [
-                'publish' => [
-                    'from' => ['draft'],
-                    'to' => 'published',
-                ],
-            ],
-        ];
+    it('has relationships to places and transitions', function () {
+        $workflow = WorkflowFactory::new()->withPlacesAndTransitions()->create();
 
-        $workflow = WorkflowFactory::new()->create(['config' => $config]);
+        expect($workflow->places)->toHaveCount(4);
+        expect($workflow->transitions)->toHaveCount(3);
+        expect($workflow->places->first())->toBeInstanceOf(\CleaniqueCoders\Flowstone\Models\WorkflowPlace::class);
+        expect($workflow->transitions->first())->toBeInstanceOf(\CleaniqueCoders\Flowstone\Models\WorkflowTransition::class);
+    });
 
-        expect($workflow->config)->toEqual($config);
-        expect($workflow->getAttributes()['config'])->toBeString();
+    it('generates symfony workflow config', function () {
+        $workflow = WorkflowFactory::new()->withPlacesAndTransitions()->create();
+        $config = $workflow->getSymfonyConfig();
+
+        expect($config)->toHaveKey('type');
+        expect($config)->toHaveKey('places');
+        expect($config)->toHaveKey('transitions');
+        expect($config)->toHaveKey('initial_marking');
+        expect($config)->toHaveKey('metadata');
+
+        expect($config['type'])->toBe('state_machine');
+        expect($config['places'])->toBeArray();
+        expect($config['transitions'])->toBeArray();
+        expect($config['initial_marking'])->toBe(Status::DRAFT->value);
     });
 
     it('stores meta as json', function () {
@@ -112,19 +110,6 @@ describe('Workflow Model', function () {
 
         expect($workflow->meta)->toEqual($meta);
         expect($workflow->getAttributes()['meta'])->toBeString();
-    });
-
-    it('stores created_by as json', function () {
-        $createdBy = [
-            'id' => 123,
-            'name' => 'John Doe',
-            'email' => 'john@example.com',
-        ];
-
-        $workflow = WorkflowFactory::new()->create(['created_by' => $createdBy]);
-
-        expect($workflow->created_by)->toEqual($createdBy);
-        expect($workflow->getAttributes()['created_by'])->toBeString();
     });
 
     it('can be soft deleted', function () {

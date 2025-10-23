@@ -81,12 +81,13 @@ describe('Helper Functions', function () {
             ];
 
             WorkflowFactory::new()->create([
-                'type' => 'test-workflow',
+                'type' => 'state_machine',
+                'name' => 'test-workflow',
                 'config' => $config,
                 'is_enabled' => true,
             ]);
 
-            $result = get_workflow_config('test-workflow', 'type');
+            $result = get_workflow_config('test-workflow', 'name');
 
             expect($result)->toEqual($config);
         });
@@ -109,7 +110,8 @@ describe('Helper Functions', function () {
 
             // Create older workflow
             WorkflowFactory::new()->create([
-                'type' => 'test-workflow',
+                'type' => 'state_machine',
+                'name' => 'test-workflow',
                 'config' => array_merge($olderConfig, [
                     'metadata' => ['type' => ['value' => 'test-workflow']],
                 ]),
@@ -119,7 +121,8 @@ describe('Helper Functions', function () {
 
             // Create newer workflow
             WorkflowFactory::new()->create([
-                'type' => 'test-workflow',
+                'type' => 'state_machine',
+                'name' => 'test-workflow',
                 'config' => array_merge($newerConfig, [
                     'metadata' => ['type' => ['value' => 'test-workflow']],
                 ]),
@@ -127,21 +130,22 @@ describe('Helper Functions', function () {
                 'created_at' => now(),
             ]);
 
-            $result = get_workflow_config('test-workflow', 'type');
+            $result = get_workflow_config('test-workflow', 'name');
 
             expect($result['version'])->toBe(2);
         });
 
         it('ignores disabled workflows', function () {
             WorkflowFactory::new()->create([
-                'type' => 'test-workflow',
+                'type' => 'state_machine',
+                'name' => 'test-workflow',
                 'config' => [
                     'metadata' => ['type' => ['value' => 'test-workflow']],
                 ],
                 'is_enabled' => false,
             ]);
 
-            $result = get_workflow_config('test-workflow', 'type');
+            $result = get_workflow_config('test-workflow', 'name');
 
             // Should return default config since no enabled workflow exists
             expect($result)->toHaveKey('type');

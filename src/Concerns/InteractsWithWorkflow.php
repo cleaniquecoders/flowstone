@@ -10,12 +10,12 @@ trait InteractsWithWorkflow
 {
     public function setWorkflow(): self
     {
-        if (! empty(data_get($this, 'workflow'))) {
+        if (! empty(data_get($this, 'config'))) {
             return $this;
         }
 
         $this->update([
-            'workflow' => get_workflow_config(
+            'config' => get_workflow_config(
                 $this->workflow_type,
                 $this->workflow_type_field
             ),
@@ -42,14 +42,14 @@ trait InteractsWithWorkflow
 
     public function getWorkflow(): Workflow
     {
-        if (empty($this->workflow)) {
+        if (empty($this->config)) {
             $this->setWorkflow();
         }
 
         return Cache::remember(
             $this->getWorkflowKey(),
             config('app.debug') ? 3 : config('cache.duration'), function () {
-                return create_workflow($this->workflow);
+                return create_workflow($this->config);
             });
     }
 
@@ -94,7 +94,7 @@ trait InteractsWithWorkflow
     public function getRolesFromTransition($marking = null, $type = 'to'): array
     {
         return get_roles_from_transition(
-            $this->workflow,
+            $this->config ?? [],
             empty($marking) ? $this->getMarking() : $marking,
             $type
         );

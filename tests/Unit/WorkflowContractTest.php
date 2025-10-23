@@ -2,6 +2,7 @@
 
 use CleaniqueCoders\Flowstone\Contracts\Workflow as WorkflowContract;
 use CleaniqueCoders\Flowstone\Models\Workflow;
+use CleaniqueCoders\Flowstone\Tests\Models\Article;
 use Illuminate\Database\Eloquent\Casts\Attribute;
 
 describe('Workflow Contract', function () {
@@ -27,10 +28,13 @@ describe('Workflow Contract', function () {
         }
     });
 
-    it('is implemented by workflow model', function () {
-        $workflow = new Workflow;
+    it('is implemented by models that use workflows', function () {
+        // Both Workflow and Article models should implement the WorkflowContract
+        $article = new Article;
+        expect($article instanceof WorkflowContract)->toBeTrue();
 
-        expect($workflow)->toBeInstanceOf(WorkflowContract::class);
+        $workflow = new Workflow;
+        expect($workflow instanceof WorkflowContract)->toBeTrue();
     });
 
     it('contract methods have correct return types', function () {

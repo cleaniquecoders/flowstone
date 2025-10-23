@@ -13,52 +13,12 @@ class WorkflowFactory extends Factory
     public function definition(): array
     {
         return [
-            'type' => $this->faker->randomElement(['article', 'task', 'order', 'project']),
             'name' => $this->faker->sentence(3),
             'description' => $this->faker->paragraph(),
-            'config' => [
-                'type' => 'state_machine',
-                'supports' => [Workflow::class],
-                'places' => [
-                    Status::DRAFT->value => null,
-                    Status::PENDING->value => null,
-                    Status::IN_PROGRESS->value => null,
-                    Status::COMPLETED->value => null,
-                ],
-                'transitions' => [
-                    'submit' => [
-                        'from' => [Status::DRAFT->value],
-                        'to' => Status::PENDING->value,
-                    ],
-                    'start' => [
-                        'from' => [Status::PENDING->value],
-                        'to' => Status::IN_PROGRESS->value,
-                    ],
-                    'complete' => [
-                        'from' => [Status::IN_PROGRESS->value],
-                        'to' => Status::COMPLETED->value,
-                    ],
-                ],
-                'marking_store' => [
-                    'property' => 'marking',
-                ],
-                'metadata' => [
-                    'type' => [
-                        'value' => 'test-workflow',
-                    ],
-                ],
-            ],
+            'type' => 'state_machine',
+            'initial_marking' => Status::DRAFT->value,
             'marking' => Status::DRAFT->value,
-            'workflow' => null, // Will be set by the trait
             'is_enabled' => true,
-            'created_by' => [
-                'id' => $this->faker->numberBetween(1, 100),
-                'name' => $this->faker->name(),
-            ],
-            'updated_by' => [
-                'id' => $this->faker->numberBetween(1, 100),
-                'name' => $this->faker->name(),
-            ],
             'meta' => [
                 'priority' => $this->faker->randomElement(['low', 'medium', 'high']),
                 'department' => $this->faker->randomElement(['IT', 'HR', 'Finance']),
@@ -80,10 +40,64 @@ class WorkflowFactory extends Factory
         ]);
     }
 
-    public function withMarking(Status $status): static
+    public function withInitialMarking(Status $status): static
     {
         return $this->state(fn (array $attributes) => [
-            'marking' => $status->value,
+            'initial_marking' => $status->value,
         ]);
+    }
+
+    public function withPlacesAndTransitions(): static
+    {
+        return $this->afterCreating(function (Workflow $workflow) {
+            // Create places
+            $workflow->places()->createMany([
+                [
+                    'name' => Status::DRAFT->value,
+                    'sort_order' => 1,
+                    'meta' => ['title' => 'Draft', 'color' => '#6c757d'],
+                ],
+                [
+                    'name' => Status::PENDING->value,
+                    'sort_order' => 2,
+                    'meta' => ['title' => 'Pending', 'color' => '#ffc107'],
+                ],
+                [
+                    'name' => Status::IN_PROGRESS->value,
+                    'sort_order' => 3,
+                    'meta' => ['title' => 'In Progress', 'color' => '#0dcaf0'],
+                ],
+                [
+                    'name' => Status::COMPLETED->value,
+                    'sort_order' => 4,
+                    'meta' => ['title' => 'Completed', 'color' => '#198754'],
+                ],
+            ]);
+
+            // Create transitions
+            $workflow->transitions()->createMany([
+                [
+                    'name' => 'submit',
+                    'from_place' => Status::DRAFT->value,
+                    'to_place' => Status::PENDING->value,
+                    'sort_order' => 1,
+                    'meta' => ['title' => 'Submit for Review'],
+                ],
+                [
+                    'name' => 'start',
+                    'from_place' => Status::PENDING->value,
+                    'to_place' => Status::IN_PROGRESS->value,
+                    'sort_order' => 2,
+                    'meta' => ['title' => 'Start Work'],
+                ],
+                [
+                    'name' => 'complete',
+                    'from_place' => Status::IN_PROGRESS->value,
+                    'to_place' => Status::COMPLETED->value,
+                    'sort_order' => 3,
+                    'meta' => ['title' => 'Mark as Complete'],
+                ],
+            ]);
+        });
     }
 }

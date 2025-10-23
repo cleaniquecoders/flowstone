@@ -2,6 +2,7 @@
 
 namespace CleaniqueCoders\Flowstone;
 
+use CleaniqueCoders\Flowstone\Commands\CreateWorkflowCommand;
 use CleaniqueCoders\Flowstone\Commands\FlowstoneCommand;
 use Spatie\LaravelPackageTools\Package;
 use Spatie\LaravelPackageTools\PackageServiceProvider;
@@ -20,8 +21,11 @@ class FlowstoneServiceProvider extends PackageServiceProvider
             ->name('flowstone')
             ->hasConfigFile()
             ->hasViews()
-            ->hasMigration('create_flowstone_table')
-            ->hasCommand(FlowstoneCommand::class);
+            ->hasMigration('create_workflows_table')
+            ->hasCommands([
+                FlowstoneCommand::class,
+                CreateWorkflowCommand::class,
+            ]);
     }
 
     public function register(): void

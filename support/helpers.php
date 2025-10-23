@@ -2,6 +2,7 @@
 
 use CleaniqueCoders\Flowstone\Models\Workflow;
 use CleaniqueCoders\Flowstone\Processors\Workflow as ProcessorsWorkflow;
+use Illuminate\Support\Facades\Cache;
 use Symfony\Component\Workflow\Registry;
 use Symfony\Component\Workflow\Workflow as SymfonyWorkflow;
 
@@ -17,17 +18,22 @@ if (! function_exists('create_workflow')) {
 }
 
 if (! function_exists('get_workflow_config')) {
-    function get_workflow_config(string $value, string $field): array
+    function get_workflow_config(string $name, string $field = 'name'): array
     {
-        $metadataField = 'config->metadata->'.$field.'->value';
-        $workflow = Workflow::query()
-            ->isEnabled()
-            ->whereJsonContains(
-                $metadataField,
-                $value
-            )->latest()->first();
+        return Cache::remember(
+            "workflow.config.{$name}",
+            3600,
+            function () use ($name, $field) {
+                $workflow = Workflow::query()
+                    ->isEnabled()
+                    ->where($field, $name)
+                    ->with(['places', 'transitions'])
+                    ->latest()
+                    ->first();
 
-        return data_get($workflow, 'config', ProcessorsWorkflow::getDefaultWorkflow());
+                return $workflow ? $workflow->config : ProcessorsWorkflow::getDefaultWorkflow();
+            }
+        );
     }
 }
 

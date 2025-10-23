@@ -42,5 +42,17 @@ class TestCase extends Orchestra
         // Create the workflow table for testing
         $migration = include __DIR__.'/database/migrations/create_workflows_table_for_testing.php';
         $migration->up();
+
+        // Create articles table for testing workflow trait
+        \Illuminate\Support\Facades\Schema::dropIfExists('articles');
+        \Illuminate\Support\Facades\Schema::create('articles', function ($table) {
+            $table->id();
+            $table->string('title');
+            $table->text('content');
+            $table->string('marking')->nullable();
+            $table->string('workflow_type')->nullable();
+            $table->json('config')->nullable();
+            $table->timestamps();
+        });
     }
 }

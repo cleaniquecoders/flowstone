@@ -13,7 +13,7 @@ describe('Workflow Integration', function () {
     it('can create a complete workflow and perform transitions', function () {
         // Create a workflow with all necessary configuration
         $workflow = WorkflowFactory::new()->create([
-            'type' => 'article',
+            'type' => 'state_machine',
             'marking' => Status::DRAFT->value,
             'config' => [
                 'type' => 'state_machine',
@@ -63,7 +63,7 @@ describe('Workflow Integration', function () {
 
         // Set workflow configuration
         $workflow->setWorkflow();
-        expect($workflow->workflow)->not->toBeNull();
+        expect($workflow->config)->not->toBeNull();
 
         // Get the Symfony workflow instance
         $symphonyWorkflow = $workflow->getWorkflow();
@@ -132,11 +132,12 @@ describe('Workflow Integration', function () {
         ];
 
         WorkflowFactory::new()->create([
-            'type' => 'blog-post',
+            'type' => 'state_machine',
+            'name' => 'blog-post',
             'config' => $config,
         ]);
 
-        $retrievedConfig = get_workflow_config('blog-post', 'type');
+        $retrievedConfig = get_workflow_config('blog-post', 'name');
 
         expect($retrievedConfig)->toEqual($config);
     });
@@ -158,7 +159,7 @@ describe('Workflow Integration', function () {
     it('can work with multiple workflow types simultaneously', function () {
         // Create different workflow types
         $articleWorkflow = WorkflowFactory::new()->create([
-            'type' => 'article',
+            'type' => 'state_machine',
             'name' => 'Article Workflow',
             'config' => [
                 'metadata' => ['type' => ['value' => 'article']],
@@ -166,15 +167,15 @@ describe('Workflow Integration', function () {
         ]);
 
         $taskWorkflow = WorkflowFactory::new()->create([
-            'type' => 'task',
+            'type' => 'workflow',
             'name' => 'Task Workflow',
             'config' => [
                 'metadata' => ['type' => ['value' => 'task']],
             ],
         ]);
 
-        expect($articleWorkflow->workflow_type)->toBe('article');
-        expect($taskWorkflow->workflow_type)->toBe('task');
+        expect($articleWorkflow->workflow_type)->toBe('state_machine');
+        expect($taskWorkflow->workflow_type)->toBe('workflow');
 
         // Both should be able to get their workflows
         expect($articleWorkflow->getWorkflow())->toBeInstanceOf(\Symfony\Component\Workflow\Workflow::class);
@@ -186,32 +187,34 @@ describe('Workflow Integration', function () {
 
     it('can handle enabled/disabled workflows correctly', function () {
         $enabledWorkflow = WorkflowFactory::new()->enabled()->create([
-            'type' => 'enabled-type',
+            'type' => 'state_machine',
+            'name' => 'Enabled Workflow',
             'config' => [
                 'metadata' => ['type' => ['value' => 'enabled-type']],
             ],
         ]);
 
         $disabledWorkflow = WorkflowFactory::new()->disabled()->create([
-            'type' => 'disabled-type',
+            'type' => 'workflow',
+            'name' => 'Disabled Workflow',
             'config' => [
                 'metadata' => ['type' => ['value' => 'disabled-type']],
             ],
         ]);
 
         // Only enabled workflow should be found by get_workflow_config
-        $enabledConfig = get_workflow_config('enabled-type', 'type');
+        $enabledConfig = get_workflow_config('Enabled Workflow', 'name');
         expect($enabledConfig)->toEqual($enabledWorkflow->config);
 
         // Disabled workflow should fall back to default
-        $disabledConfig = get_workflow_config('disabled-type', 'type');
+        $disabledConfig = get_workflow_config('Disabled Workflow', 'name');
         expect($disabledConfig)->not->toEqual($disabledWorkflow->config);
     });
 
     it('can get all transition roles for current state', function () {
         $workflow = WorkflowFactory::new()->create([
             'marking' => Status::UNDER_REVIEW->value,
-            'workflow' => [
+            'config' => [
                 'transitions' => [
                     'approve' => [
                         'from' => [Status::UNDER_REVIEW->value],

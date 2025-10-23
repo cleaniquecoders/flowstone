@@ -15,7 +15,7 @@ describe('Workflow Edge Cases and Error Handling', function () {
 
         // Should still be able to set workflow
         $workflow->setWorkflow();
-        expect($workflow->workflow)->not->toBeNull();
+        expect($workflow->getWorkflow())->not->toBeNull();
     });
 
     it('handles null workflow configuration', function () {
@@ -23,16 +23,18 @@ describe('Workflow Edge Cases and Error Handling', function () {
             'config' => null,
         ]);
 
-        expect($workflow->config)->toBeNull();
+        // Config accessor should return fallback config, not null
+        expect($workflow->config)->not->toBeNull();
+        expect($workflow->config)->toBeArray();
 
         // Should still be able to set workflow
         $workflow->setWorkflow();
-        expect($workflow->workflow)->not->toBeNull();
+        expect($workflow->getWorkflow())->not->toBeNull();
     });
 
     it('handles malformed transition configurations', function () {
         $workflow = WorkflowFactory::new()->create([
-            'workflow' => [
+            'config' => [
                 'transitions' => [
                     'malformed' => [
                         // Missing 'from' and 'to'
@@ -48,7 +50,7 @@ describe('Workflow Edge Cases and Error Handling', function () {
 
     it('handles empty transitions array', function () {
         $workflow = WorkflowFactory::new()->create([
-            'workflow' => [
+            'config' => [
                 'transitions' => [],
             ],
         ]);
@@ -59,7 +61,7 @@ describe('Workflow Edge Cases and Error Handling', function () {
 
     it('handles workflow without metadata roles', function () {
         $workflow = WorkflowFactory::new()->create([
-            'workflow' => [
+            'config' => [
                 'transitions' => [
                     'submit' => [
                         'from' => ['draft'],
@@ -183,13 +185,16 @@ describe('Workflow Edge Cases and Error Handling', function () {
     })->skip('Database mocking complex for this test environment');
 
     it('handles extremely long workflow type names', function () {
-        $longTypeName = str_repeat('a', 1000);
+        // Use valid enum type but test long workflow name instead
+        $longWorkflowName = str_repeat('a', 1000);
 
         $workflow = WorkflowFactory::new()->create([
-            'type' => $longTypeName,
+            'type' => 'state_machine', // Use valid enum value
+            'name' => $longWorkflowName,
         ]);
 
-        expect($workflow->workflow_type)->toBe($longTypeName);
+        expect($workflow->workflow_type)->toBe('state_machine');
+        expect($workflow->name)->toBe($longWorkflowName);
         // The workflow key is based on class name + ID, not type, so it should be reasonable length
         expect(strlen($workflow->getWorkflowKey()))->toBeGreaterThan(10);
         expect(strlen($workflow->getWorkflowKey()))->toBeLessThan(200);
