@@ -8,7 +8,7 @@ return new class extends Migration
 {
     public function up()
     {
-        Schema::create('flowstone_table', function (Blueprint $table) {
+        Schema::create('workflows', function (Blueprint $table) {
             $table->id();
             $table->uuid()->unique()->index();
 
