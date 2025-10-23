@@ -4,7 +4,7 @@ return [
     'default' => [
         'type' => 'state_machine',
         'supports' => [
-            \CleaniqueCoders\LaravelWorklfow\Models\Workflow::class,
+            \CleaniqueCoders\Flowstone\Models\Workflow::class,
         ],
         'places' => null, // Auto-generated from Status enum
         'transitions' => null, // Auto-generated default transitions
@@ -21,7 +21,7 @@ return [
         'test_workflow' => [
             'type' => 'state_machine',
             'supports' => [
-                \CleaniqueCoders\LaravelWorklfow\Models\Workflow::class,
+                \CleaniqueCoders\Flowstone\Models\Workflow::class,
             ],
             'places' => [
                 'draft' => null,

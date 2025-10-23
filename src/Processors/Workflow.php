@@ -1,8 +1,8 @@
 <?php
 
-namespace CleaniqueCoders\LaravelWorklfow\Processors;
+namespace CleaniqueCoders\Flowstone\Processors;
 
-use CleaniqueCoders\LaravelWorklfow\Enums\Status;
+use CleaniqueCoders\Flowstone\Enums\Status;
 use Symfony\Component\Workflow\Definition;
 use Symfony\Component\Workflow\MarkingStore\MethodMarkingStore;
 use Symfony\Component\Workflow\Registry;
@@ -14,7 +14,7 @@ class Workflow
 {
     public static function getDefaultWorkflow()
     {
-        $config = config('worklfow.default');
+        $config = config('flowstone.default');
 
         // Auto-generate places from Status enum if not specified
         if ($config['places'] === null) {
@@ -33,7 +33,7 @@ class Workflow
 
     public static function getCustomWorkflow(string $name)
     {
-        $config = config("worklfow.custom.{$name}");
+        $config = config("flowstone.custom.{$name}");
 
         if (! $config) {
             throw new \InvalidArgumentException("Custom workflow '{$name}' not found in configuration.");

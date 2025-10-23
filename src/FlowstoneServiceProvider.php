@@ -1,13 +1,13 @@
 <?php
 
-namespace CleaniqueCoders\LaravelWorklfow;
+namespace CleaniqueCoders\Flowstone;
 
-use CleaniqueCoders\LaravelWorklfow\Commands\LaravelWorklfowCommand;
+use CleaniqueCoders\Flowstone\Commands\FlowstoneCommand;
 use Spatie\LaravelPackageTools\Package;
 use Spatie\LaravelPackageTools\PackageServiceProvider;
 use Symfony\Component\Workflow\Registry;
 
-class LaravelWorklfowServiceProvider extends PackageServiceProvider
+class FlowstoneServiceProvider extends PackageServiceProvider
 {
     public function configurePackage(Package $package): void
     {
@@ -17,11 +17,11 @@ class LaravelWorklfowServiceProvider extends PackageServiceProvider
          * More info: https://github.com/spatie/laravel-package-tools
          */
         $package
-            ->name('laravel-worklfow')
+            ->name('flowstone')
             ->hasConfigFile()
             ->hasViews()
-            ->hasMigration('create_laravel_worklfow_table')
-            ->hasCommand(LaravelWorklfowCommand::class);
+            ->hasMigration('create_flowstone_table')
+            ->hasCommand(FlowstoneCommand::class);
     }
 
     public function register(): void

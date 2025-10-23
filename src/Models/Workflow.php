@@ -1,10 +1,10 @@
 <?php
 
-namespace CleaniqueCoders\LaravelWorklfow\Models;
+namespace CleaniqueCoders\Flowstone\Models;
 
-use CleaniqueCoders\LaravelWorklfow\Concerns\InteractsWithWorkflow;
-use CleaniqueCoders\LaravelWorklfow\Contracts\Workflow as WorkflowContract;
-use CleaniqueCoders\LaravelWorklfow\Database\Factories\WorkflowFactory;
+use CleaniqueCoders\Flowstone\Concerns\InteractsWithWorkflow;
+use CleaniqueCoders\Flowstone\Contracts\Workflow as WorkflowContract;
+use CleaniqueCoders\Flowstone\Database\Factories\WorkflowFactory;
 use CleaniqueCoders\Traitify\Concerns\InteractsWithUuid;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;

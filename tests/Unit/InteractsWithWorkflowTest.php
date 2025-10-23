@@ -1,8 +1,8 @@
 <?php
 
-use CleaniqueCoders\LaravelWorklfow\Database\Factories\WorkflowFactory;
-use CleaniqueCoders\LaravelWorklfow\Enums\Status;
-use CleaniqueCoders\LaravelWorklfow\Models\Workflow;
+use CleaniqueCoders\Flowstone\Database\Factories\WorkflowFactory;
+use CleaniqueCoders\Flowstone\Enums\Status;
+use CleaniqueCoders\Flowstone\Models\Workflow;
 use Illuminate\Support\Facades\Cache;
 use Symfony\Component\Workflow\Workflow as SymfonyWorkflow;
 
@@ -97,7 +97,7 @@ describe('InteractsWithWorkflow Trait', function () {
 
         expect($key)->toBeString();
         expect($key)->toContain('cleaniquecoder');
-        expect($key)->toContain('laravelworklfow');
+        expect($key)->toContain('flowstone');
         expect($key)->toContain('models');
         expect($key)->toContain('workflow');
         expect($key)->toContain((string) $this->workflow->id);

@@ -1,22 +1,22 @@
 <?php
 
-use CleaniqueCoders\LaravelWorklfow\LaravelWorklfowServiceProvider;
+use CleaniqueCoders\Flowstone\FlowstoneServiceProvider;
 use Illuminate\Support\Facades\App;
 
-describe('LaravelWorkflowServiceProvider', function () {
+describe('FlowstoneServiceProvider', function () {
     it('registers service provider correctly', function () {
         $providers = App::getLoadedProviders();
 
-        expect($providers)->toHaveKey(LaravelWorklfowServiceProvider::class);
+        expect($providers)->toHaveKey(FlowstoneServiceProvider::class);
     });
 
     it('publishes config file', function () {
-        $provider = new LaravelWorklfowServiceProvider(app());
+        $provider = new FlowstoneServiceProvider(app());
 
         // Test that config is published
-        expect(config()->has('worklfow'))->toBeTrue();
-        expect(config('worklfow.default'))->toBeArray();
-        expect(config('worklfow.default.type'))->toBe('state_machine');
+        expect(config()->has('flowstone'))->toBeTrue();
+        expect(config('flowstone.default'))->toBeArray();
+        expect(config('flowstone.default.type'))->toBe('state_machine');
     });
 
     it('registers workflow registry in container', function () {
@@ -27,7 +27,7 @@ describe('LaravelWorkflowServiceProvider', function () {
     });
 
     it('provides expected services', function () {
-        $provider = new LaravelWorklfowServiceProvider(app());
+        $provider = new FlowstoneServiceProvider(app());
 
         $provides = $provider->provides();
 
@@ -38,11 +38,11 @@ describe('LaravelWorkflowServiceProvider', function () {
 
     it('has correct package tag name', function () {
         // Verify the package uses consistent naming
-        expect(config('worklfow'))->not->toBeNull();
+        expect(config('flowstone'))->not->toBeNull();
     });
 
     it('loads default configuration correctly', function () {
-        $config = config('worklfow.default');
+        $config = config('flowstone.default');
 
         expect($config)->toHaveKey('type');
         expect($config)->toHaveKey('supports');
@@ -57,7 +57,7 @@ describe('LaravelWorkflowServiceProvider', function () {
 
     it('allows custom workflow configurations', function () {
         config([
-            'worklfow.custom.test_workflow' => [
+            'flowstone.custom.test_workflow' => [
                 'type' => 'workflow',
                 'places' => ['start', 'end'],
                 'transitions' => [
@@ -69,7 +69,7 @@ describe('LaravelWorkflowServiceProvider', function () {
             ],
         ]);
 
-        $customConfig = config('worklfow.custom.test_workflow');
+        $customConfig = config('flowstone.custom.test_workflow');
 
         expect($customConfig)->toBeArray();
         expect($customConfig['type'])->toBe('workflow');

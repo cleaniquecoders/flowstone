@@ -1,6 +1,6 @@
 <?php
 
-namespace CleaniqueCoders\LaravelWorklfow\Concerns;
+namespace CleaniqueCoders\Flowstone\Concerns;
 
 use Illuminate\Database\Eloquent\Casts\Attribute;
 use Illuminate\Support\Facades\Cache;

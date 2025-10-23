@@ -1,8 +1,8 @@
 <?php
 
-use CleaniqueCoders\LaravelWorklfow\Database\Factories\WorkflowFactory;
-use CleaniqueCoders\LaravelWorklfow\Enums\Status;
-use CleaniqueCoders\LaravelWorklfow\Models\Workflow;
+use CleaniqueCoders\Flowstone\Database\Factories\WorkflowFactory;
+use CleaniqueCoders\Flowstone\Enums\Status;
+use CleaniqueCoders\Flowstone\Models\Workflow;
 use Symfony\Component\Workflow\Registry;
 use Symfony\Component\Workflow\Workflow as SymfonyWorkflow;
 

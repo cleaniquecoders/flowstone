@@ -1,5 +1,5 @@
 <?php
 
-use CleaniqueCoders\LaravelWorklfow\Tests\TestCase;
+use CleaniqueCoders\Flowstone\Tests\TestCase;
 
 uses(TestCase::class)->in(__DIR__);

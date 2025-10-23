@@ -1,9 +1,9 @@
 <?php
 
-use CleaniqueCoders\LaravelWorklfow\Enums\Status;
-use CleaniqueCoders\LaravelWorklfow\Models\Workflow;
+use CleaniqueCoders\Flowstone\Enums\Status;
+use CleaniqueCoders\Flowstone\Models\Workflow;
 
-// config for CleaniqueCoders/LaravelWorklfow
+// config for CleaniqueCoders/Flowstone
 return [
     /*
     |--------------------------------------------------------------------------
@@ -149,6 +149,6 @@ return [
         'paths' => [
             app_path('Models'),
         ],
-        'trait' => 'CleaniqueCoders\LaravelWorklfow\Concerns\InteractsWithWorkflow',
+        'trait' => 'CleaniqueCoders\Flowstone\Concerns\InteractsWithWorkflow',
     ],
 ];

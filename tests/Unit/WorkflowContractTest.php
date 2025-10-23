@@ -1,7 +1,7 @@
 <?php
 
-use CleaniqueCoders\LaravelWorklfow\Contracts\Workflow as WorkflowContract;
-use CleaniqueCoders\LaravelWorklfow\Models\Workflow;
+use CleaniqueCoders\Flowstone\Contracts\Workflow as WorkflowContract;
+use CleaniqueCoders\Flowstone\Models\Workflow;
 use Illuminate\Database\Eloquent\Casts\Attribute;
 
 describe('Workflow Contract', function () {

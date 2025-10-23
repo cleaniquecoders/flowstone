@@ -1,6 +1,6 @@
 <?php
 
-namespace CleaniqueCoders\LaravelWorklfow\Contracts;
+namespace CleaniqueCoders\Flowstone\Contracts;
 
 use Illuminate\Database\Eloquent\Casts\Attribute;
 use Symfony\Component\Workflow\Workflow as SymfonyWorkflow;

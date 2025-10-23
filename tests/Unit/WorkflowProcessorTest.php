@@ -1,7 +1,7 @@
 <?php
 
-use CleaniqueCoders\LaravelWorklfow\Enums\Status;
-use CleaniqueCoders\LaravelWorklfow\Processors\Workflow;
+use CleaniqueCoders\Flowstone\Enums\Status;
+use CleaniqueCoders\Flowstone\Processors\Workflow;
 use Symfony\Component\Workflow\Registry;
 use Symfony\Component\Workflow\Workflow as SymfonyWorkflow;
 
@@ -18,7 +18,7 @@ describe('Workflow Processor', function () {
     });
 
     it('auto-generates places from Status enum', function () {
-        config(['worklfow.default.places' => null]);
+        config(['flowstone.default.places' => null]);
 
         $config = Workflow::getDefaultWorkflow();
 
@@ -36,7 +36,7 @@ describe('Workflow Processor', function () {
     });
 
     it('auto-generates default transitions when null', function () {
-        config(['worklfow.default.transitions' => null]);
+        config(['flowstone.default.transitions' => null]);
 
         $config = Workflow::getDefaultWorkflow();
 
@@ -73,7 +73,7 @@ describe('Workflow Processor', function () {
 
     it('can get custom workflow configuration', function () {
         config([
-            'worklfow.custom.test_workflow' => [
+            'flowstone.custom.test_workflow' => [
                 'type' => 'workflow',
                 'places' => [
                     'start' => null,
@@ -99,7 +99,7 @@ describe('Workflow Processor', function () {
 
     it('auto-generates places for custom workflow when null', function () {
         config([
-            'worklfow.custom.test_workflow' => [
+            'flowstone.custom.test_workflow' => [
                 'type' => 'state_machine',
                 'places' => null, // Will be auto-generated
                 'transitions' => [
@@ -127,7 +127,7 @@ describe('Workflow Processor', function () {
     it('can create symfony workflow instance', function () {
         $config = [
             'type' => 'state_machine',
-            'supports' => [\CleaniqueCoders\LaravelWorklfow\Models\Workflow::class],
+            'supports' => [\CleaniqueCoders\Flowstone\Models\Workflow::class],
             'places' => [
                 Status::DRAFT->value => null,
                 Status::PENDING->value => null,
@@ -157,7 +157,7 @@ describe('Workflow Processor', function () {
     it('creates transitions correctly in symfony workflow', function () {
         $config = [
             'type' => 'state_machine',
-            'supports' => [\CleaniqueCoders\LaravelWorklfow\Models\Workflow::class],
+            'supports' => [\CleaniqueCoders\Flowstone\Models\Workflow::class],
             'places' => [
                 'draft' => null,
                 'published' => null,

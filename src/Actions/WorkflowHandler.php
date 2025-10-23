@@ -1,11 +1,11 @@
 <?php
 
-namespace CleaniqueCoders\LaravelWorklfow\Actions;
+namespace CleaniqueCoders\Flowstone\Actions;
 
-use CleaniqueCoders\LaravelAction\ResourceAction as Action;
-use CleaniqueCoders\LaravelWorklfow\Models\Workflow;
+use CleaniqueCoders\LaravelAction\ResourceAction;
+use CleaniqueCoders\Flowstone\Models\Workflow;
 
-class WorkflowHandler extends Action
+class WorkflowHandler extends ResourceAction
 {
     protected string $model = Workflow::class;
 

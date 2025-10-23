@@ -1,6 +1,6 @@
 <?php
 
-namespace CleaniqueCoders\LaravelWorklfow\Enums;
+namespace CleaniqueCoders\Flowstone\Enums;
 
 use CleaniqueCoders\Traitify\Concerns\InteractsWithEnum;
 use CleaniqueCoders\Traitify\Contracts\Enum as Contract;

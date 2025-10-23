@@ -1,9 +1,9 @@
 <?php
 
-use CleaniqueCoders\LaravelWorklfow\Database\Factories\WorkflowFactory;
-use CleaniqueCoders\LaravelWorklfow\Enums\Status;
-use CleaniqueCoders\LaravelWorklfow\Models\Workflow;
-use CleaniqueCoders\LaravelWorklfow\Processors\Workflow as WorkflowProcessor;
+use CleaniqueCoders\Flowstone\Database\Factories\WorkflowFactory;
+use CleaniqueCoders\Flowstone\Enums\Status;
+use CleaniqueCoders\Flowstone\Models\Workflow;
+use CleaniqueCoders\Flowstone\Processors\Workflow as WorkflowProcessor;
 
 describe('Workflow Edge Cases and Error Handling', function () {
     it('handles empty workflow configuration gracefully', function () {
@@ -147,7 +147,7 @@ describe('Workflow Edge Cases and Error Handling', function () {
 
         // Should not end with a hyphen followed by an ID when no ID is present
         expect($key)->not->toEndWith('-'); // Should NOT end with hyphen when no ID is present
-        expect($key)->toContain('cleaniquecoders-laravelworklfow-models-workflow');
+        expect($key)->toContain('cleaniquecoders-flowstone-models-workflow');
 
         // Create a saved model to compare
         $savedWorkflow = WorkflowFactory::new()->create();

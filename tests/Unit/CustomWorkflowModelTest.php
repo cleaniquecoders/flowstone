@@ -1,7 +1,7 @@
 <?php
 
-use CleaniqueCoders\LaravelWorklfow\Concerns\InteractsWithWorkflow;
-use CleaniqueCoders\LaravelWorklfow\Contracts\Workflow as WorkflowContract;
+use CleaniqueCoders\Flowstone\Concerns\InteractsWithWorkflow;
+use CleaniqueCoders\Flowstone\Contracts\Workflow as WorkflowContract;
 use CleaniqueCoders\Traitify\Concerns\InteractsWithUuid;
 use Illuminate\Database\Eloquent\Casts\Attribute;
 use Illuminate\Database\Eloquent\Model;

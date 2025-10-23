@@ -6,35 +6,35 @@ describe('Architecture Tests', function () {
         ->each->not->toBeUsed();
 
     it('ensures models implement workflow contract correctly')
-        ->expect('CleaniqueCoders\LaravelWorklfow\Models')
-        ->toImplement('CleaniqueCoders\LaravelWorklfow\Contracts\Workflow');
+        ->expect('CleaniqueCoders\Flowstone\Models')
+        ->toImplement('CleaniqueCoders\Flowstone\Contracts\Workflow');
 
     it('ensures concerns are traits')
-        ->expect('CleaniqueCoders\LaravelWorklfow\Concerns')
+        ->expect('CleaniqueCoders\Flowstone\Concerns')
         ->toBeTrait();
 
     it('ensures contracts are interfaces')
-        ->expect('CleaniqueCoders\LaravelWorklfow\Contracts')
+        ->expect('CleaniqueCoders\Flowstone\Contracts')
         ->toBeInterface();
 
     it('ensures enums are enums')
-        ->expect('CleaniqueCoders\LaravelWorklfow\Enums')
+        ->expect('CleaniqueCoders\Flowstone\Enums')
         ->toBeEnum();
 
     it('ensures processors are classes')
-        ->expect('CleaniqueCoders\LaravelWorklfow\Processors')
+        ->expect('CleaniqueCoders\Flowstone\Processors')
         ->toBeClasses();
 
     it('ensures models extend Eloquent model')
-        ->expect('CleaniqueCoders\LaravelWorklfow\Models')
+        ->expect('CleaniqueCoders\Flowstone\Models')
         ->toExtend('Illuminate\Database\Eloquent\Model');
 
     it('ensures service providers extend Laravel service provider')
-        ->expect('CleaniqueCoders\LaravelWorklfow\LaravelWorklfowServiceProvider')
+        ->expect('CleaniqueCoders\Flowstone\FlowstoneServiceProvider')
         ->toExtend('Illuminate\Support\ServiceProvider');
 
     it('ensures facades extend Laravel facade')
-        ->expect('CleaniqueCoders\LaravelWorklfow\Facades')
+        ->expect('CleaniqueCoders\Flowstone\Facades')
         ->toExtend('Illuminate\Support\Facades\Facade');
 
     it('ensures no class uses die or exit')
@@ -42,23 +42,23 @@ describe('Architecture Tests', function () {
         ->each->not->toBeUsed();
 
     it('ensures models use proper naming convention')
-        ->expect('CleaniqueCoders\LaravelWorklfow\Models')
+        ->expect('CleaniqueCoders\Flowstone\Models')
         ->toHaveSuffix('');
 
     it('ensures processors have proper naming')
-        ->expect('CleaniqueCoders\LaravelWorklfow\Processors')
+        ->expect('CleaniqueCoders\Flowstone\Processors')
         ->classes->not->toBeFinal();
 
     it('ensures workflow trait is used correctly')
-        ->expect('CleaniqueCoders\LaravelWorklfow\Models\Workflow')
-        ->toUse('CleaniqueCoders\LaravelWorklfow\Concerns\InteractsWithWorkflow');
+        ->expect('CleaniqueCoders\Flowstone\Models\Workflow')
+        ->toUse('CleaniqueCoders\Flowstone\Concerns\InteractsWithWorkflow');
 
     it('ensures proper exception handling')
-        ->expect('CleaniqueCoders\LaravelWorklfow')
+        ->expect('CleaniqueCoders\Flowstone')
         ->not->toUse(['trigger_error', 'error_reporting']);
 
     it('ensures package follows PSR-4 autoloading')
-        ->expect('CleaniqueCoders\LaravelWorklfow')
+        ->expect('CleaniqueCoders\Flowstone')
         ->toHaveMethod('__construct')
         ->or->not->toHaveMethod('__construct');
 });

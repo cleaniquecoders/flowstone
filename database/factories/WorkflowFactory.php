@@ -1,9 +1,9 @@
 <?php
 
-namespace CleaniqueCoders\LaravelWorklfow\Database\Factories;
+namespace CleaniqueCoders\Flowstone\Database\Factories;
 
-use CleaniqueCoders\LaravelWorklfow\Enums\Status;
-use CleaniqueCoders\LaravelWorklfow\Models\Workflow;
+use CleaniqueCoders\Flowstone\Enums\Status;
+use CleaniqueCoders\Flowstone\Models\Workflow;
 use Illuminate\Database\Eloquent\Factories\Factory;
 
 class WorkflowFactory extends Factory

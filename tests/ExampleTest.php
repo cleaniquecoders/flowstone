@@ -1,7 +1,7 @@
 <?php
 
-use CleaniqueCoders\LaravelWorklfow\Database\Factories\WorkflowFactory;
-use CleaniqueCoders\LaravelWorklfow\Enums\Status;
+use CleaniqueCoders\Flowstone\Database\Factories\WorkflowFactory;
+use CleaniqueCoders\Flowstone\Enums\Status;
 
 describe('Laravel Workflow Package', function () {
     it('can create workflows using factory', function () {
@@ -20,7 +20,7 @@ describe('Laravel Workflow Package', function () {
     });
 
     it('can work with workflow configuration', function () {
-        $config = config('worklfow.default');
+        $config = config('flowstone.default');
 
         expect($config)->toBeArray();
         expect($config['type'])->toBe('state_machine');

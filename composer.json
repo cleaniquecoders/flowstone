@@ -1,12 +1,14 @@
 {
-    "name": "cleaniquecoders/laravel-worklfow",
-    "description": "This is my package laravel-worklfow",
+    "name": "cleaniquecoders/flowstone",
+    "description": "Flowstone - Laravel Workflow Engine with Symfony Workflow Integration",
     "keywords": [
         "Cleanique Coders",
         "laravel",
-        "laravel-worklfow"
+        "flowstone",
+        "workflow",
+        "state machine"
     ],
-    "homepage": "https://github.com/cleaniquecoders/laravel-worklfow",
+    "homepage": "https://github.com/cleaniquecoders/flowstone",
     "license": "MIT",
     "authors": [
         {
@@ -37,8 +39,8 @@
     },
     "autoload": {
         "psr-4": {
-            "CleaniqueCoders\\LaravelWorklfow\\": "src/",
-            "CleaniqueCoders\\LaravelWorklfow\\Database\\Factories\\": "database/factories/"
+            "CleaniqueCoders\\Flowstone\\": "src/",
+            "CleaniqueCoders\\Flowstone\\Database\\Factories\\": "database/factories/"
         },
         "files": [
             "support/helpers.php"
@@ -46,7 +48,7 @@
     },
     "autoload-dev": {
         "psr-4": {
-            "CleaniqueCoders\\LaravelWorklfow\\Tests\\": "tests/",
+            "CleaniqueCoders\\Flowstone\\Tests\\": "tests/",
             "Workbench\\App\\": "workbench/app/"
         }
     },
@@ -68,10 +70,10 @@
     "extra": {
         "laravel": {
             "providers": [
-                "CleaniqueCoders\\LaravelWorklfow\\LaravelWorklfowServiceProvider"
+                "CleaniqueCoders\\Flowstone\\FlowstoneServiceProvider"
             ],
             "aliases": {
-                "LaravelWorklfow": "CleaniqueCoders\\LaravelWorklfow\\Facades\\LaravelWorklfow"
+                "Flowstone": "CleaniqueCoders\\Flowstone\\Facades\\Flowstone"
             }
         }
     },

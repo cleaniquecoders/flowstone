@@ -1,8 +1,8 @@
 <?php
 
-namespace CleaniqueCoders\LaravelWorklfow\Tests;
+namespace CleaniqueCoders\Flowstone\Tests;
 
-use CleaniqueCoders\LaravelWorklfow\LaravelWorklfowServiceProvider;
+use CleaniqueCoders\Flowstone\FlowstoneServiceProvider;
 use Illuminate\Database\Eloquent\Factories\Factory;
 use Orchestra\Testbench\TestCase as Orchestra;
 
@@ -14,8 +14,8 @@ class TestCase extends Orchestra
 
         Factory::guessFactoryNamesUsing(
             fn (string $modelName) => match ($modelName) {
-                \CleaniqueCoders\LaravelWorklfow\Models\Workflow::class => \CleaniqueCoders\LaravelWorklfow\Database\Factories\WorkflowFactory::class,
-                default => 'CleaniqueCoders\\LaravelWorklfow\\Database\\Factories\\'.class_basename($modelName).'Factory'
+                \CleaniqueCoders\Flowstone\Models\Workflow::class => \CleaniqueCoders\Flowstone\Database\Factories\WorkflowFactory::class,
+                default => 'CleaniqueCoders\\Flowstone\\Database\\Factories\\'.class_basename($modelName).'Factory'
             }
         );
     }
@@ -23,7 +23,7 @@ class TestCase extends Orchestra
     protected function getPackageProviders($app)
     {
         return [
-            LaravelWorklfowServiceProvider::class,
+            FlowstoneServiceProvider::class,
         ];
     }
 
@@ -37,7 +37,7 @@ class TestCase extends Orchestra
         ]);
 
         // Load test configuration
-        $app['config']->set('worklfow', include __DIR__.'/config/worklfow.php');
+        $app['config']->set('flowstone', include __DIR__.'/config/flowstone.php');
 
         // Create the workflow table for testing
         $migration = include __DIR__.'/database/migrations/create_workflows_table_for_testing.php';

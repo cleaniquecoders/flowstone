@@ -1,7 +1,7 @@
 <?php
 
-use CleaniqueCoders\LaravelWorklfow\Models\Workflow;
-use CleaniqueCoders\LaravelWorklfow\Processors\Workflow as ProcessorsWorkflow;
+use CleaniqueCoders\Flowstone\Models\Workflow;
+use CleaniqueCoders\Flowstone\Processors\Workflow as ProcessorsWorkflow;
 use Symfony\Component\Workflow\Registry;
 use Symfony\Component\Workflow\Workflow as SymfonyWorkflow;
 

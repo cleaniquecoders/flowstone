@@ -1,7 +1,7 @@
 <?php
 
-use CleaniqueCoders\LaravelWorklfow\Database\Factories\WorkflowFactory;
-use CleaniqueCoders\LaravelWorklfow\Models\Workflow;
+use CleaniqueCoders\Flowstone\Database\Factories\WorkflowFactory;
+use CleaniqueCoders\Flowstone\Models\Workflow;
 use Illuminate\Support\Facades\Cache;
 
 describe('Workflow Performance Tests', function () {

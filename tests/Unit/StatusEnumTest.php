@@ -1,6 +1,6 @@
 <?php
 
-use CleaniqueCoders\LaravelWorklfow\Enums\Status;
+use CleaniqueCoders\Flowstone\Enums\Status;
 
 describe('Status Enum', function () {
     it('has all expected status cases', function () {
