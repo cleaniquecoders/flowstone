@@ -145,20 +145,20 @@ class Workflow
 
     public static function createWorkflow(array $config, Registry $registry): SymfonyWorkflow
     {
-        $places = array_keys($config['places']);
+        $places = array_keys($config['places'] ?? []);
 
         $transitions = [];
-        foreach ($config['transitions'] as $name => $transition) {
+        foreach (($config['transitions'] ?? []) as $name => $transition) {
             $transitions[] = new Transition($name, $transition['from'], $transition['to']);
         }
 
         $definition = new Definition($places, $transitions);
 
-        $markingStore = new MethodMarkingStore(true, $config['marking_store']['property']);
+        $markingStore = new MethodMarkingStore(true, $config['marking_store']['property'] ?? 'marking');
 
         $workflow = new SymfonyWorkflow($definition, $markingStore);
 
-        foreach ($config['supports'] as $supportClass) {
+        foreach (($config['supports'] ?? []) as $supportClass) {
             $supportStrategy = new InstanceOfSupportStrategy($supportClass);
             $registry->addWorkflow($workflow, $supportStrategy);
         }

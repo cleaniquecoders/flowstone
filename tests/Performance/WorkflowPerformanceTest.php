@@ -110,7 +110,7 @@ describe('Workflow Performance Tests', function () {
     });
 
     it('efficiently generates workflow cache keys', function () {
-        $workflows = WorkflowFactory::new()->count(1000)->make();
+        $workflows = WorkflowFactory::new()->count(1000)->create();
 
         $startTime = microtime(true);
 
@@ -124,7 +124,7 @@ describe('Workflow Performance Tests', function () {
         expect(count($keys))->toBe(1000);
         expect($keyGenerationTime)->toBeLessThan(1.0); // Should complete within 1 second
 
-        // All keys should be unique
+        // All keys should be unique since they have different IDs
         $uniqueKeys = array_unique($keys);
         expect(count($uniqueKeys))->toBe(1000);
     });

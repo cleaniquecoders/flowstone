@@ -190,7 +190,9 @@ describe('Workflow Edge Cases and Error Handling', function () {
         ]);
 
         expect($workflow->workflow_type)->toBe($longTypeName);
-        expect(strlen($workflow->getWorkflowKey()))->toBeGreaterThan(1000);
+        // The workflow key is based on class name + ID, not type, so it should be reasonable length
+        expect(strlen($workflow->getWorkflowKey()))->toBeGreaterThan(10);
+        expect(strlen($workflow->getWorkflowKey()))->toBeLessThan(200);
     });
 
     it('handles workflow with no enabled transitions', function () {

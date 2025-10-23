@@ -57,8 +57,10 @@ describe('Architecture Tests', function () {
         ->expect('CleaniqueCoders\Flowstone')
         ->not->toUse(['trigger_error', 'error_reporting']);
 
-    it('ensures package follows PSR-4 autoloading')
-        ->expect('CleaniqueCoders\Flowstone')
-        ->toHaveMethod('__construct')
-        ->or->not->toHaveMethod('__construct');
+    it('ensures package follows PSR-4 autoloading', function () {
+        // Simple check that classes exist in the expected namespace
+        expect(class_exists('CleaniqueCoders\Flowstone\Models\Workflow'))->toBeTrue();
+        expect(class_exists('CleaniqueCoders\Flowstone\Enums\Status'))->toBeTrue();
+        expect(class_exists('CleaniqueCoders\Flowstone\Processors\Workflow'))->toBeTrue();
+    });
 });

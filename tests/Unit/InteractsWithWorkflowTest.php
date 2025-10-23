@@ -151,31 +151,19 @@ describe('InteractsWithWorkflow Trait', function () {
     });
 
     it('can check if has enabled to transitions', function () {
-        $workflow = WorkflowFactory::new()->withMarking(Status::DRAFT)->create();
-
-        // Mock empty transitions
-        $mockWorkflow = \Mockery::mock(SymfonyWorkflow::class);
-        $mockWorkflow->shouldReceive('getEnabledTransitions')
-            ->with($workflow)
-            ->andReturn([]);
-
-        Cache::shouldReceive('remember')
-            ->andReturn($mockWorkflow);
-
-        expect($workflow->hasEnabledToTransitions())->toBeFalse();
-
-        // Mock with transitions
-        $mockTransition = \Mockery::mock(\Symfony\Component\Workflow\Transition::class);
-        $mockTransition->shouldReceive('getTos')->andReturn([Status::PENDING->value]);
-
-        $mockWorkflow->shouldReceive('getEnabledTransitions')
-            ->with($workflow)
-            ->andReturn([$mockTransition]);
-
-        Cache::shouldReceive('remember')
-            ->andReturn($mockWorkflow);
+        // Create workflow in DRAFT state (should have outgoing transitions)
+        $workflow = WorkflowFactory::new()->create([
+            'marking' => Status::DRAFT->value,
+        ]);
 
         expect($workflow->hasEnabledToTransitions())->toBeTrue();
+
+        // Create workflow in final state with no outgoing transitions
+        $workflowInFinalState = WorkflowFactory::new()->create([
+            'marking' => Status::ARCHIVED->value, // Final state
+        ]);
+
+        expect($workflowInFinalState->hasEnabledToTransitions())->toBeFalse();
     });
 
     it('can get roles from transition', function () {
