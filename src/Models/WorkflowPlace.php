@@ -3,6 +3,7 @@
 namespace CleaniqueCoders\Flowstone\Models;
 
 use CleaniqueCoders\Flowstone\Database\Factories\WorkflowPlaceFactory;
+use CleaniqueCoders\Traitify\Concerns\InteractsWithMeta;
 use CleaniqueCoders\Traitify\Concerns\InteractsWithUuid;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
@@ -10,7 +11,7 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
 class WorkflowPlace extends Model
 {
-    use HasFactory, InteractsWithUuid;
+    use HasFactory, InteractsWithMeta, InteractsWithUuid;
 
     protected $fillable = [
         'workflow_id',

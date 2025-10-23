@@ -5,6 +5,7 @@ namespace CleaniqueCoders\Flowstone\Models;
 use CleaniqueCoders\Flowstone\Concerns\InteractsWithWorkflow;
 use CleaniqueCoders\Flowstone\Contracts\Workflow as WorkflowContract;
 use CleaniqueCoders\Flowstone\Database\Factories\WorkflowFactory;
+use CleaniqueCoders\Traitify\Concerns\InteractsWithMeta;
 use CleaniqueCoders\Traitify\Concerns\InteractsWithUuid;
 use Illuminate\Database\Eloquent\Casts\Attribute;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
@@ -14,7 +15,7 @@ use Illuminate\Database\Eloquent\SoftDeletes;
 
 class Workflow extends Model implements WorkflowContract
 {
-    use HasFactory, InteractsWithUuid, InteractsWithWorkflow, SoftDeletes;
+    use HasFactory, InteractsWithMeta, InteractsWithUuid, InteractsWithWorkflow, SoftDeletes;
 
     protected $fillable = [
         'name',
