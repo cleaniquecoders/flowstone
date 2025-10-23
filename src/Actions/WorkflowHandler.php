@@ -2,8 +2,8 @@
 
 namespace CleaniqueCoders\Flowstone\Actions;
 
-use CleaniqueCoders\LaravelAction\ResourceAction;
 use CleaniqueCoders\Flowstone\Models\Workflow;
+use CleaniqueCoders\LaravelAction\ResourceAction;
 
 class WorkflowHandler extends ResourceAction
 {
