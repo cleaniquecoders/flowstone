@@ -31,3 +31,5 @@ testbench.yaml
 /coverage
 todo.md
 .github/copilot-instructions.md
+
+node_modules
