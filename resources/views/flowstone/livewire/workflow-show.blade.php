@@ -3,12 +3,10 @@
         <div class="bg-white border rounded p-2">
             <div
                 id="flowstone-canvas"
-                class="h-[560px] bg-gray-50 rounded border flex items-center justify-center"
-                x-init="
-                    $el.innerHTML = '<pre class=\'text-xs p-4 overflow-auto w-full h-full\'>'
-                        + JSON.stringify(@js($graph), null, 2)
-                        + '</pre>'
-                "
+                class="h-[560px] bg-gray-50 rounded border"
+                x-data
+                x-init="window.FlowstoneUI && window.FlowstoneUI.mount($el, @js($graph))"
+                x-on:flowstone:graph:update.window="window.FlowstoneUI && window.FlowstoneUI.mount($el, $event.detail.graph)"
             ></div>
         </div>
     </div>
