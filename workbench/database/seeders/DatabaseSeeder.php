@@ -5,7 +5,6 @@ namespace Workbench\Database\Seeders;
 use CleaniqueCoders\Flowstone\Enums\Status;
 use CleaniqueCoders\Flowstone\Models\Workflow;
 use Illuminate\Database\Seeder;
-use Workbench\Database\Factories\UserFactory;
 
 class DatabaseSeeder extends Seeder
 {
