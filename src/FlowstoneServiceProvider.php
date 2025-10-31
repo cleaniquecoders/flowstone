@@ -4,6 +4,7 @@ namespace CleaniqueCoders\Flowstone;
 
 use CleaniqueCoders\Flowstone\Commands\CreateWorkflowCommand;
 use CleaniqueCoders\Flowstone\Commands\FlowstoneCommand;
+use CleaniqueCoders\Flowstone\Commands\PublishAssetsCommand;
 use CleaniqueCoders\Flowstone\Livewire\Dashboard;
 use CleaniqueCoders\Flowstone\Livewire\WorkflowShow;
 use CleaniqueCoders\Flowstone\Livewire\WorkflowsIndex;
@@ -31,6 +32,7 @@ class FlowstoneServiceProvider extends PackageServiceProvider
             ->hasCommands([
                 FlowstoneCommand::class,
                 CreateWorkflowCommand::class,
+                PublishAssetsCommand::class,
             ])
             ->hasRoute('flowstone');
     }
@@ -51,6 +53,7 @@ class FlowstoneServiceProvider extends PackageServiceProvider
         $this->registerUiRoutes();
         $this->registerLivewireComponents();
         $this->registerBladeComponents();
+        $this->registerAssetPublishing();
     }
 
     protected function registerUiAuthorization(): void
@@ -81,6 +84,17 @@ class FlowstoneServiceProvider extends PackageServiceProvider
     {
         // Register package Blade component namespace for <x-flowstone::... /> usage
         Blade::componentNamespace('CleaniqueCoders\\Flowstone\\View\\Components', 'flowstone');
+    }
+
+    protected function registerAssetPublishing(): void
+    {
+        // Allow publishing built UI assets to the host app's public/vendor/flowstone
+        $dist = __DIR__.'/../dist';
+        if (is_dir($dist)) {
+            $this->publishes([
+                $dist => public_path('vendor/flowstone'),
+            ], 'flowstone-ui-assets');
+        }
     }
 
     /**
