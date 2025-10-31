@@ -56,5 +56,7 @@
 
     {{-- Flowstone UI bundle (exposes window.FlowstoneUI.mount) --}}
     <script src="{{ (class_exists(\Illuminate\Support\Facades\Vite::class) && $hasViteManifest) ? Vite::asset('vendor/flowstone/flowstone-ui.js') : asset($flowstoneJs) }}" defer></script>
+
+    @stack('scripts')
 </body>
 </html>

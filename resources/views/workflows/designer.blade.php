@@ -33,7 +33,7 @@
     document.addEventListener('DOMContentLoaded', function() {
         const designerElement = document.getElementById('workflow-designer');
         const saveButton = document.getElementById('save-workflow');
-
+        
         if (window.FlowstoneUI && window.FlowstoneUI.mountDesigner) {
             // Load existing workflow config
             const workflowConfig = @json($workflow->config && !empty($workflow->config) ? $workflow->config : null);
