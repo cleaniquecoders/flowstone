@@ -5,6 +5,7 @@ namespace CleaniqueCoders\Flowstone;
 use CleaniqueCoders\Flowstone\Commands\CreateWorkflowCommand;
 use CleaniqueCoders\Flowstone\Commands\FlowstoneCommand;
 use CleaniqueCoders\Flowstone\Commands\PublishAssetsCommand;
+use CleaniqueCoders\Flowstone\Livewire\CreateWorkflow;
 use CleaniqueCoders\Flowstone\Livewire\Dashboard;
 use CleaniqueCoders\Flowstone\Livewire\WorkflowShow;
 use CleaniqueCoders\Flowstone\Livewire\WorkflowsIndex;
@@ -82,6 +83,7 @@ class FlowstoneServiceProvider extends PackageServiceProvider
         Livewire::component('flowstone.dashboard', Dashboard::class);
         Livewire::component('flowstone.workflows-index', WorkflowsIndex::class);
         Livewire::component('flowstone.workflow-show', WorkflowShow::class);
+        Livewire::component('flowstone.create-workflow', CreateWorkflow::class);
     }
 
     protected function registerBladeComponents(): void

@@ -6,8 +6,10 @@ use CleaniqueCoders\Flowstone\Models\Workflow;
 use CleaniqueCoders\Flowstone\Models\WorkflowPlace;
 use CleaniqueCoders\Flowstone\Models\WorkflowTransition;
 use Illuminate\Contracts\View\View;
+use Livewire\Attributes\Layout;
 use Livewire\Component;
 
+#[Layout('flowstone::components.layout')]
 class Dashboard extends Component
 {
     public int $workflows = 0;

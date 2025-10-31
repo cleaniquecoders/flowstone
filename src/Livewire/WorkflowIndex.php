@@ -4,10 +4,12 @@ namespace CleaniqueCoders\Flowstone\Livewire;
 
 use CleaniqueCoders\Flowstone\Models\Workflow;
 use Illuminate\Contracts\View\View;
+use Livewire\Attributes\Layout;
 use Livewire\Component;
 use Livewire\WithPagination;
 
-class WorkflowsIndex extends Component
+#[Layout('flowstone::components.layout')]
+class WorkflowIndex extends Component
 {
     use WithPagination;
 
@@ -40,7 +42,7 @@ class WorkflowsIndex extends Component
             $query->where('is_enabled', (bool) $this->enabled);
         }
 
-        return view('flowstone::livewire.workflows-index', [
+        return view('flowstone::livewire.workflow-index', [
             'workflows' => $query->orderBy('name')->paginate(10),
         ]);
     }

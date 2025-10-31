@@ -2,6 +2,9 @@
 
 use CleaniqueCoders\Flowstone\Http\Controllers\FlowstoneApiController;
 use CleaniqueCoders\Flowstone\Http\Controllers\FlowstoneAssetController;
+use CleaniqueCoders\Flowstone\Livewire\Dashboard;
+use CleaniqueCoders\Flowstone\Livewire\WorkflowIndex;
+use CleaniqueCoders\Flowstone\Livewire\WorkflowShow;
 use CleaniqueCoders\Flowstone\Models\Workflow;
 use Illuminate\Support\Facades\Route;
 
@@ -17,14 +20,15 @@ Route::group([
     // Authorization gate for UI access
     Route::middleware(['can:'.config('flowstone.ui.gate')])->group(function () {
         // Dashboard
-        Route::get('/', function () {
-            return view('flowstone::dashboard');
-        })->name('flowstone.dashboard');
+        Route::get('/', Dashboard::class)
+            ->name('flowstone.dashboard');
 
         // Workflows list
-        Route::get('/workflows', function () {
-            return view('flowstone::workflows.index');
-        })->name('flowstone.workflows.index');
+        Route::get('/workflows', WorkflowIndex::class)
+            ->name('flowstone.workflows.index');
+
+        Route::get('/workflows/{workflow}/details', WorkflowShow::class)
+            ->name('flowstone.workflows.show');
 
         // Workflow designer
         Route::get('/workflows/{workflow}/designer', function (Workflow $workflow) {

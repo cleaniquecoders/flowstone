@@ -1,1 +1,0 @@
-<livewire:flowstone.workflows-index />
