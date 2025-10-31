@@ -1,6 +1,7 @@
 import React from 'react';
 import { createRoot, Root } from 'react-dom/client';
 import { ReactFlowCanvas, type GraphPayload } from './ReactFlowCanvas';
+import '../../css/flowstone.css';
 
 // Expose a global mount function under window.FlowstoneUI
 // Build will bundle React + ReactFlow into a single UMD file.

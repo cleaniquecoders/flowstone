@@ -13,12 +13,34 @@ export function ReactFlowCanvas({ graph }: { graph: GraphPayload }) {
   const edges = useMemo(() => graph?.edges ?? [], [graph]);
 
   return (
-    <div style={{ width: '100%', height: '100%' }}>
+    <div className="w-full h-full rounded-lg overflow-hidden border border-gray-200 shadow-sm bg-gray-50">
       <ReactFlowProvider>
-        <ReactFlow nodes={nodes} edges={edges} fitView>
-          <Background variant="dots" />
-          <Controls />
-          <MiniMap />
+        <ReactFlow
+          nodes={nodes}
+          edges={edges}
+          fitView
+          className="bg-white"
+          defaultEdgeOptions={{
+            style: { strokeWidth: 2 },
+            type: 'smoothstep',
+          }}
+        >
+          <Background
+            gap={16}
+            size={1}
+            className="bg-gray-50"
+          />
+          <Controls
+            className="bg-white border border-gray-200 shadow-md rounded-lg"
+            showZoom={true}
+            showFitView={true}
+            showInteractive={true}
+          />
+          <MiniMap
+            className="bg-white border border-gray-200 shadow-md rounded-lg"
+            nodeColor="#0ea5e9"
+            maskColor="rgba(0, 0, 0, 0.05)"
+          />
         </ReactFlow>
       </ReactFlowProvider>
     </div>

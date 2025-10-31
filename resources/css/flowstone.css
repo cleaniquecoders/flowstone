@@ -1,0 +1,29 @@
+@import "tailwindcss";
+
+@theme {
+  /* Custom Flowstone color palette */
+  --color-flowstone-50: #f0f9ff;
+  --color-flowstone-100: #e0f2fe;
+  --color-flowstone-200: #bae6fd;
+  --color-flowstone-300: #7dd3fc;
+  --color-flowstone-400: #38bdf8;
+  --color-flowstone-500: #0ea5e9;
+  --color-flowstone-600: #0284c7;
+  --color-flowstone-700: #0369a1;
+  --color-flowstone-800: #075985;
+  --color-flowstone-900: #0c4a6e;
+  --color-flowstone-950: #082f49;
+}
+
+/* Custom styles for React Flow canvas */
+.react-flow__node {
+  @apply rounded-lg shadow-md border border-gray-200;
+}
+
+.react-flow__edge-path {
+  @apply stroke-flowstone-500;
+}
+
+.react-flow__handle {
+  @apply bg-flowstone-500 border-2 border-white;
+}
