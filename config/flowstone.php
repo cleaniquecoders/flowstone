@@ -151,4 +151,37 @@ return [
         ],
         'trait' => 'CleaniqueCoders\Flowstone\Concerns\InteractsWithWorkflow',
     ],
+
+    /*
+        |--------------------------------------------------------------------------
+        | UI (Admin) Settings
+        |--------------------------------------------------------------------------
+        |
+        | Telescope-like admin UI to visualize and manage workflows.
+        |
+        */
+    'ui' => [
+        'enabled' => env('FLOWSTONE_UI_ENABLED', false),
+
+        // UI base path and optional domain
+        'path' => env('FLOWSTONE_UI_PATH', 'flowstone'),
+        'domain' => env('FLOWSTONE_UI_DOMAIN', null),
+
+        // Middleware stack for all UI routes
+        'middleware' => [
+            'web',
+            'auth',
+        ],
+
+        // Gate used to authorize viewing the UI (like Telescope)
+        'gate' => env('FLOWSTONE_UI_GATE', 'viewFlowstone'),
+
+        // Allow-list fallback when not local (emails, ids, etc.)
+        'allowed' => [
+            // 'admin@example.com',
+        ],
+
+        // Asset base URL if you ship compiled JS/CSS
+        'asset_url' => env('FLOWSTONE_UI_ASSET_URL', '/vendor/flowstone'),
+    ],
 ];
