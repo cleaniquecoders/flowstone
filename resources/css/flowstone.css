@@ -15,15 +15,54 @@
   --color-flowstone-950: #082f49;
 }
 
-/* Custom styles for React Flow canvas */
+/* React Flow Canvas Customization */
+.react-flow {
+  background: transparent;
+}
+
 .react-flow__node {
-  @apply rounded-lg shadow-md border border-gray-200;
+  cursor: pointer;
+}
+
+.react-flow__edge {
+  cursor: pointer;
 }
 
 .react-flow__edge-path {
-  @apply stroke-flowstone-500;
+  stroke-width: 2;
+  transition: stroke-width 0.2s ease;
+}
+
+.react-flow__edge:hover .react-flow__edge-path {
+  stroke-width: 3;
+}
+
+.react-flow__edge-text {
+  font-size: 12px;
+  font-weight: 600;
 }
 
 .react-flow__handle {
-  @apply bg-flowstone-500 border-2 border-white;
+  width: 8px;
+  height: 8px;
+  background: #0ea5e9;
+  border: 2px solid white;
+}
+
+.react-flow__controls {
+  box-shadow: 0 4px 6px -1px rgb(0 0 0 / 0.1);
+}
+
+.react-flow__minimap {
+  box-shadow: 0 4px 6px -1px rgb(0 0 0 / 0.1);
+}
+
+/* Animations */
+@keyframes pulse {
+  0%, 100% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0.5;
+  }
 }
