@@ -28,6 +28,6 @@ class WorkflowShow extends Component
 
     public function render(): View
     {
-        return view('flowstone.livewire.workflow-show');
+        return view('flowstone::livewire.workflow-show');
     }
 }

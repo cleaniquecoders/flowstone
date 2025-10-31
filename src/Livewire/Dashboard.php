@@ -28,6 +28,6 @@ class Dashboard extends Component
 
     public function render(): View
     {
-        return view('flowstone.livewire.dashboard');
+        return view('flowstone::livewire.dashboard');
     }
 }

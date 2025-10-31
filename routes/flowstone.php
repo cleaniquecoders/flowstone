@@ -13,17 +13,17 @@ Route::group([
     Route::middleware(['can:'.config('flowstone.ui.gate')])->group(function () {
         // Dashboard
         Route::get('/', function () {
-            return view('flowstone.dashboard');
+            return view('flowstone::dashboard');
         })->name('flowstone.dashboard');
 
         // Workflows list
         Route::get('/workflows', function () {
-            return view('flowstone.workflows.index');
+            return view('flowstone::workflows.index');
         })->name('flowstone.workflows.index');
 
         // Workflow detail
         Route::get('/workflows/{workflow}', function (Workflow $workflow) {
-            return view('flowstone.workflows.show', compact('workflow'));
+            return view('flowstone::workflows.show', compact('workflow'));
         })->name('flowstone.workflows.show');
 
         // JSON API

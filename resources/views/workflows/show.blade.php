@@ -5,7 +5,7 @@
     </div>
 
     @if (class_exists(\Livewire\Livewire::class))
-        <livewire:flowstone.workflow-show :workflow="$workflow" />
+        @include('flowstone::partials.livewire.workflows.show')
     @else
         <div class="p-4 bg-yellow-50 border border-yellow-200 rounded">
             Livewire is not installed. Please install Livewire to use the Flowstone UI.

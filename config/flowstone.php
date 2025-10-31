@@ -161,7 +161,7 @@ return [
         |
         */
     'ui' => [
-        'enabled' => env('FLOWSTONE_UI_ENABLED', false),
+        'enabled' => env('FLOWSTONE_UI_ENABLED', true),
 
         // UI base path and optional domain
         'path' => env('FLOWSTONE_UI_PATH', 'flowstone'),
@@ -170,7 +170,6 @@ return [
         // Middleware stack for all UI routes
         'middleware' => [
             'web',
-            'auth',
         ],
 
         // Gate used to authorize viewing the UI (like Telescope)

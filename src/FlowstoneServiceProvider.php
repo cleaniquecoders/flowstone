@@ -71,7 +71,11 @@ class FlowstoneServiceProvider extends PackageServiceProvider
 
     protected function registerLivewireComponents(): void
     {
-        if (! class_exists(Livewire::class)) {
+        // Only attempt to register Livewire components when the class exists
+        // AND the Livewire container binding is available. This prevents
+        // failures during CLI contexts (e.g., composer scripts/Testbench) where
+        // the Livewire service provider may not be booted yet.
+        if (! class_exists(Livewire::class) || ! app()->bound('livewire')) {
             return;
         }
 

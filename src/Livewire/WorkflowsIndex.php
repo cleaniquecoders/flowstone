@@ -40,7 +40,7 @@ class WorkflowsIndex extends Component
             $query->where('is_enabled', (bool) $this->enabled);
         }
 
-        return view('flowstone.livewire.workflows-index', [
+        return view('flowstone::livewire.workflows-index', [
             'workflows' => $query->orderBy('name')->paginate(10),
         ]);
     }

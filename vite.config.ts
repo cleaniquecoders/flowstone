@@ -1,10 +1,20 @@
+/// <reference types="node" />
 import { defineConfig } from 'vite';
 import react from '@vitejs/plugin-react';
 import path from 'path';
+import { fileURLToPath } from 'url';
+
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
 
 // Build a UMD library exposing window.FlowstoneUI
 export default defineConfig({
   plugins: [react()],
+  define: {
+    'process.env.NODE_ENV': JSON.stringify(process.env.NODE_ENV || 'production'),
+    // Some libs check `global` in UMD environments
+    global: 'window',
+  },
   build: {
     lib: {
       entry: path.resolve(__dirname, 'resources/js/flowstone-ui/init.ts'),
@@ -16,13 +26,7 @@ export default defineConfig({
     emptyOutDir: true,
     sourcemap: true,
     rollupOptions: {
-      // Keep React and ReactDOM external to reduce bundle size; provide as UMD globals
-      external: ['react', 'react-dom'],
       output: {
-        globals: {
-          react: 'React',
-          'react-dom': 'ReactDOM',
-        },
         assetFileNames: (assetInfo: any) => {
           if (assetInfo.name && assetInfo.name.endsWith('.css')) {
             return 'flowstone-ui.css';

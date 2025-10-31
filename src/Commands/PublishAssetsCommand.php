@@ -18,6 +18,7 @@ class PublishAssetsCommand extends Command
         ]);
 
         $this->info('Flowstone UI assets published.');
+
         return self::SUCCESS;
     }
 }
