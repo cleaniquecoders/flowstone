@@ -1,8 +1,13 @@
 <?php
 
 use CleaniqueCoders\Flowstone\Http\Controllers\FlowstoneApiController;
+use CleaniqueCoders\Flowstone\Http\Controllers\FlowstoneAssetController;
 use CleaniqueCoders\Flowstone\Models\Workflow;
 use Illuminate\Support\Facades\Route;
+
+Route::get('/vendor/flowstone/{asset}', [FlowstoneAssetController::class, 'serve'])
+    ->where('asset', '.*')
+    ->name('flowstone.asset');
 
 Route::group([
     'domain' => config('flowstone.ui.domain'),

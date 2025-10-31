@@ -182,5 +182,18 @@ return [
 
         // Asset base URL if you ship compiled JS/CSS
         'asset_url' => env('FLOWSTONE_UI_ASSET_URL', '/vendor/flowstone'),
+
+        /*
+        |--------------------------------------------------------------------------
+        | Inline Assets
+        |--------------------------------------------------------------------------
+        |
+        | Determines whether assets should be inlined in the HTML or served
+        | as separate files. Inlining is useful for packages, while separate
+        | files are better for caching and debugging.
+        |
+        */
+
+        'inline_assets' => env('FLOWSTONE_INLINE_ASSETS', true),
     ],
 ];
