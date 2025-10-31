@@ -194,10 +194,10 @@ COMPOSER_MEMORY_LIMIT=-1 composer require cleaniquecoders/flowstone
 
 Now that Flowstone is installed:
 
-1. **Read the [Quick Start](quick-start.md) guide** to create your first workflow
-2. **Explore the [Configuration](configuration.md)** options
+1. **Read the [Quick Start](02-quick-start.md) guide** to create your first workflow
+2. **Explore the [Configuration](../02-configuration/01-configuration.md)** options
 3. **Check out [Examples](examples.md)** for common patterns
-4. **Review the [Usage Guide](usage-guide.md)** for detailed usage
+4. **Review the [Usage Guide](../03-usage/01-usage-guide.md)** for detailed usage
 
 ## Alternative Installation Methods
 

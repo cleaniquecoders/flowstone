@@ -4,16 +4,12 @@ Welcome to the comprehensive documentation for **Flowstone** - A Laravel Workflo
 
 ## Table of Contents
 
-1. [Installation](installation.md)
-2. [Configuration](configuration.md)
-3. [Quick Start](quick-start.md)
-4. [Usage Guide](usage-guide.md)
-5. [Database Workflows](database-workflows.md)
-6. [API Reference](api-reference.md)
-7. [Advanced Usage](advanced-usage.md)
-8. [Examples](examples.md)
-9. [Troubleshooting](troubleshooting.md)
-10. [Contributing](contributing.md)
+1. [Getting Started](01-getting-started/)
+   - [Installation](01-getting-started/01-installation.md)
+   - [Quick Start](01-getting-started/02-quick-start.md)
+2. [Configuration](02-configuration/01-configuration.md)
+3. [Usage Guide](03-usage/01-usage-guide.md)
+4. [API Reference](04-api/01-api-reference.md)
 
 ## Overview
 
@@ -30,25 +26,30 @@ Flowstone is a powerful Laravel package that integrates the robust Symfony Workf
 ## Key Features
 
 ### 🔄 Workflow Types
+
 - **State Machine**: Single marking, exclusive states
 - **Workflow**: Multiple markings, parallel processes
 
 ### 📊 Predefined Status Enum
+
 - Draft → Pending → In Progress → Under Review
 - Approved / Rejected / On Hold / Cancelled
 - Completed / Failed / Paused / Archived
 
 ### 🗄️ Database-Driven Configuration
+
 - Store workflow definitions in the database
 - Runtime configuration updates
 - Multiple workflow types per application
 
 ### 🔐 Role-Based Transitions
+
 - Control who can perform specific transitions
 - Metadata-driven permission system
 - Integration-ready with authorization systems
 
 ### ⚡ Performance Optimized
+
 - Workflow configuration caching
 - Efficient database queries
 - Minimal overhead
@@ -87,10 +88,10 @@ $workflow->apply($document, 'submit_for_review');
 
 ## Next Steps
 
-1. Start with [Installation](installation.md) to set up Flowstone in your project
-2. Follow the [Quick Start](quick-start.md) guide for immediate use
-3. Explore [Examples](examples.md) for common workflow patterns
-4. Check [API Reference](api-reference.md) for detailed method documentation
+1. Start with [Installation](01-getting-started/01-installation.md) to set up Flowstone in your project
+2. Follow the [Quick Start](01-getting-started/02-quick-start.md) guide for immediate use
+3. Explore [Examples](../examples/) for common workflow patterns
+4. Check [API Reference](04-api/01-api-reference.md) for detailed method documentation
 
 ## Support & Community
 

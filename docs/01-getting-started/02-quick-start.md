@@ -498,7 +498,7 @@ Congratulations! You've implemented a basic workflow. Now you can:
 1. **Explore [Database Workflows](database-workflows.md)** for dynamic configuration
 2. **Learn about [Advanced Usage](advanced-usage.md)** for complex scenarios
 3. **Check [Examples](examples.md)** for more workflow patterns
-4. **Review [API Reference](api-reference.md)** for detailed documentation
+4. **Review [API Reference](../04-api/01-api-reference.md)** for detailed documentation
 
 ## Troubleshooting
 

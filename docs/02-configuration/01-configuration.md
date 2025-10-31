@@ -421,6 +421,6 @@ public function boot()
 ## Next Steps
 
 - Learn about [Database Workflows](database-workflows.md) for dynamic configurations
-- Explore [Usage Guide](usage-guide.md) for implementation details
+- Explore [Usage Guide](../03-usage/01-usage-guide.md) for implementation details
 - Check [Examples](examples.md) for real-world patterns
-- Review [API Reference](api-reference.md) for method documentation
+- Review [API Reference](../04-api/01-api-reference.md) for method documentation

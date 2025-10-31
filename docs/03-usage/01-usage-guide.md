@@ -613,6 +613,6 @@ public function workflowType(): Attribute
 ## Next Steps
 
 - Explore the [Examples](../examples/) for real-world implementations
-- Check the [API Reference](api-reference.md) for detailed method documentation
+- Check the [API Reference](../04-api/01-api-reference.md) for detailed method documentation
 - Learn about [Advanced Usage](advanced-usage.md) for complex scenarios
 - Review [Database Workflows](database-workflows.md) for dynamic configurations
