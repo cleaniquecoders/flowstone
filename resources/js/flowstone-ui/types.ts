@@ -24,6 +24,9 @@ export type WorkflowConfig = {
     string,
     { from: string[]; to: string; metadata?: Record<string, unknown> }
   >;
+  initial_marking?: string;
+  marking_store?: unknown;
+  supports?: unknown;
   metadata?: Record<string, unknown>;
 };
 

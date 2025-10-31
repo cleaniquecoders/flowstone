@@ -54,9 +54,28 @@ export function parseWorkflowToGraph(config: WorkflowConfig): { nodes: Node[]; e
   const nodes: Node[] = [];
   const edges: Edge[] = [];
 
-  Object.entries(config.places || {}).forEach(([key, meta], idx) => {
+  // Handle places - they can be in different formats
+  const places = config.places || {};
+  Object.entries(places).forEach(([key, placeConfig], idx) => {
     const id = `place-${key}`;
     placeIdByKey.set(key, id);
+
+    // Handle different place config formats
+    let meta: any = {};
+    let isInitial = false;
+
+    if (typeof placeConfig === 'object' && placeConfig !== null) {
+      // Check if it has metadata nested (seeder format)
+      if ('metadata' in placeConfig) {
+        meta = (placeConfig as any).metadata || {};
+        isInitial = key === config.initial_marking; // Use initial_marking from config
+      } else {
+        // Direct metadata format
+        meta = placeConfig;
+        isInitial = !!(placeConfig as any).isInitial;
+      }
+    }
+
     nodes.push({
       id,
       type: 'place',
@@ -65,14 +84,23 @@ export function parseWorkflowToGraph(config: WorkflowConfig): { nodes: Node[]; e
         kind: 'place',
         key,
         label: key,
-        isInitial: (meta as any)?.isInitial,
-        meta: { ...(meta as any), isInitial: undefined }
+        isInitial,
+        meta
       },
     });
   });
 
-  Object.entries(config.transitions || {}).forEach(([tKey, def], idx) => {
+  // Handle transitions
+  const transitions = config.transitions || {};
+  Object.entries(transitions).forEach(([tKey, def], idx) => {
     const tId = `transition-${tKey}`;
+
+    // Handle transition metadata
+    let meta: any = {};
+    if (typeof def === 'object' && def !== null && 'metadata' in def) {
+      meta = (def as any).metadata || {};
+    }
+
     nodes.push({
       id: tId,
       type: 'transition',
@@ -81,11 +109,15 @@ export function parseWorkflowToGraph(config: WorkflowConfig): { nodes: Node[]; e
         kind: 'transition',
         key: tKey,
         label: tKey,
-        meta: def.metadata ?? {}
+        meta
       },
     });
 
-    def.from.forEach((pKey: string) => {
+    // Handle from/to connections
+    const fromPlaces = (def as any).from || [];
+    const toPlace = (def as any).to;
+
+    fromPlaces.forEach((pKey: string) => {
       const pId = placeIdByKey.get(pKey);
       if (pId) {
         edges.push({
@@ -99,16 +131,18 @@ export function parseWorkflowToGraph(config: WorkflowConfig): { nodes: Node[]; e
       }
     });
 
-    const toId = placeIdByKey.get(def.to);
-    if (toId) {
-      edges.push({
-        id: `e-${tId}-${toId}`,
-        source: tId,
-        target: toId,
-        label: '',
-        data: { arc: 'out' },
-        type: 'smoothstep',
-      });
+    if (toPlace) {
+      const toId = placeIdByKey.get(toPlace);
+      if (toId) {
+        edges.push({
+          id: `e-${tId}-${toId}`,
+          source: tId,
+          target: toId,
+          label: '',
+          data: { arc: 'out' },
+          type: 'smoothstep',
+        });
+      }
     }
   });
 

@@ -1,7 +1,13 @@
 <x-flowstone::layout>
     <div class="flex items-center justify-between mb-4">
         <h1 class="text-2xl font-semibold">Workflow: {{ $workflow->name }}</h1>
-        <a href="{{ route('flowstone.workflows.index') }}" class="text-sm text-gray-600 hover:text-gray-900">Back</a>
+        <div class="flex space-x-2">
+            <a href="{{ route('flowstone.workflows.designer', $workflow) }}"
+               class="inline-flex items-center px-4 py-2 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-blue-600 hover:bg-blue-700">
+                Open Designer
+            </a>
+            <a href="{{ route('flowstone.workflows.index') }}" class="text-sm text-gray-600 hover:text-gray-900">Back</a>
+        </div>
     </div>
 
     @if (class_exists(\Livewire\Livewire::class))

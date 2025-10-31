@@ -36,7 +36,7 @@
 
         if (window.FlowstoneUI && window.FlowstoneUI.mountDesigner) {
             // Load existing workflow config
-            const workflowConfig = @json($workflow->config ?? []);
+            const workflowConfig = @json($workflow->config && !empty($workflow->config) ? $workflow->config : null);
 
             window.FlowstoneUI.mountDesigner(designerElement, workflowConfig, function(updatedConfig) {
                 console.log('Workflow updated:', updatedConfig);
