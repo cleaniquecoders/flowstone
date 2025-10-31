@@ -39,8 +39,22 @@ class FlowstoneApiController extends Controller
         ]);
     }
 
-    public function graph(Workflow $workflow, WorkflowGraphBuilder $builder)
+    public function update(Workflow $workflow)
     {
-        return response()->json($builder->build($workflow));
+        $validated = request()->validate([
+            'config' => 'required|array',
+            'config.type' => 'required|string|in:state_machine,workflow',
+            'config.places' => 'required|array',
+            'config.transitions' => 'required|array',
+        ]);
+
+        $workflow->update([
+            'config' => $validated['config'],
+        ]);
+
+        return response()->json([
+            'success' => true,
+            'data' => $workflow->fresh(),
+        ]);
     }
 }

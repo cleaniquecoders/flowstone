@@ -32,7 +32,7 @@
                     <td class="px-4 py-2">{{ $wf->places_count }}</td>
                     <td class="px-4 py-2">{{ $wf->transitions_count }}</td>
                     <td class="px-4 py-2 text-right">
-                        <a href="{{ route('flowstone.workflows.show', $wf) }}" class="text-indigo-600 hover:text-indigo-800">View</a>
+                        <a href="{{ route('flowstone.workflows.designer', $wf) }}" class="text-indigo-600 hover:text-indigo-800">View</a>
                     </td>
                 </tr>
             @endforeach

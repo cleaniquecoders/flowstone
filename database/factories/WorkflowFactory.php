@@ -100,4 +100,36 @@ class WorkflowFactory extends Factory
             ]);
         });
     }
+
+    public function withConfig(): static
+    {
+        return $this->state(fn (array $attributes) => [
+            'config' => [
+                'type' => 'state_machine',
+                'places' => [
+                    'draft' => ['isInitial' => true, 'color' => '#6b7280'],
+                    'pending' => ['color' => '#eab308'],
+                    'in_progress' => ['color' => '#a855f7'],
+                    'completed' => ['color' => '#22c55e'],
+                ],
+                'transitions' => [
+                    'submit' => [
+                        'from' => ['draft'],
+                        'to' => 'pending',
+                        'metadata' => ['roles' => ['user']],
+                    ],
+                    'start' => [
+                        'from' => ['pending'],
+                        'to' => 'in_progress',
+                        'metadata' => ['roles' => ['manager']],
+                    ],
+                    'complete' => [
+                        'from' => ['in_progress'],
+                        'to' => 'completed',
+                        'metadata' => ['roles' => ['user']],
+                    ],
+                ],
+            ],
+        ]);
+    }
 }

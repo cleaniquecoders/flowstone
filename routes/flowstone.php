@@ -21,15 +21,16 @@ Route::group([
             return view('flowstone::workflows.index');
         })->name('flowstone.workflows.index');
 
-        // Workflow detail
-        Route::get('/workflows/{workflow}', function (Workflow $workflow) {
-            return view('flowstone::workflows.show', compact('workflow'));
-        })->name('flowstone.workflows.show');
+        // Workflow designer
+        Route::get('/workflows/{workflow}/designer', function (Workflow $workflow) {
+            return view('flowstone::workflows.designer', compact('workflow'));
+        })->name('flowstone.workflows.designer');
 
         // JSON API
         Route::prefix('api')->group(function () {
             Route::get('/workflows', [FlowstoneApiController::class, 'index']);
             Route::get('/workflows/{workflow}', [FlowstoneApiController::class, 'show']);
+            Route::patch('/workflows/{workflow}', [FlowstoneApiController::class, 'update']);
             Route::get('/workflows/{workflow}/graph', [FlowstoneApiController::class, 'graph']);
         });
     });
