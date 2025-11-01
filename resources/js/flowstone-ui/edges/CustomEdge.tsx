@@ -40,7 +40,13 @@ export function CustomEdge({
 
     return (
       <>
-        <BaseEdge id={id} path={edgePath} markerEnd={markerEnd} style={style} />
+        <BaseEdge
+          id={id}
+          path={edgePath}
+          markerEnd={markerEnd}
+          style={style}
+          interactionWidth={20}
+        />
         {label && (
           <EdgeLabelRenderer>
             <div
@@ -53,7 +59,7 @@ export function CustomEdge({
                 pointerEvents: 'all',
               }}
             >
-              <div className="px-2.5 py-1 rounded-md text-xs font-semibold shadow-sm bg-white text-gray-700 border border-gray-300">
+              <div className="px-2.5 py-1 rounded-md text-xs font-semibold shadow-sm bg-white text-gray-700 border border-gray-300 cursor-pointer hover:bg-gray-50 transition-colors">
                 {label}
               </div>
             </div>

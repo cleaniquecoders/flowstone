@@ -56,6 +56,14 @@ function WorkflowDesignerInner({ initialConfig, initialDesigner, onChange, workf
   const [editingNode, setEditingNode] = useState<Node | null>(null);
   const [isModalOpen, setIsModalOpen] = useState(false);
 
+  // Modal state for editing edge labels
+  const [editingEdge, setEditingEdge] = useState<Edge | null>(null);
+  const [isEdgeModalOpen, setIsEdgeModalOpen] = useState(false);
+
+  // State for pending connection (when creating new edge)
+  const [pendingConnection, setPendingConnection] = useState<Connection | null>(null);
+  const [isNewEdgeModalOpen, setIsNewEdgeModalOpen] = useState(false);
+
   // Store instance globally for fullscreen handler
   const handleInit = useCallback((instance: any) => {
     setReactFlowInstance(instance);
@@ -156,33 +164,29 @@ function WorkflowDesignerInner({ initialConfig, initialDesigner, onChange, workf
 
   const onConnect = useCallback((params: Connection) => {
     if (isValidConnection(params)) {
-      const sourceNode = nodesById.get(params.source!);
-      const targetNode = nodesById.get(params.target!);
-
-      // For state machine, prompt for transition name
-      let edgeLabel = '';
+      // For state machine, show modal for transition name
       if (workflowType === 'state_machine') {
-        // Direct place to place connection
-        const transitionName = prompt('Enter transition name:', `transition_${edges.length + 1}`);
-        if (!transitionName) return; // User cancelled
-        edgeLabel = transitionName;
+        // Store the pending connection and open modal
+        setPendingConnection(params);
+        setIsNewEdgeModalOpen(true);
+      } else {
+        // For regular workflow, add edge without label
+        setEdges((eds) => addEdge({
+          ...params,
+          type: 'custom',
+          animated: true,
+          label: '',
+          data: {
+            transitionKey: undefined,
+          },
+          style: {
+            strokeWidth: 2.5,
+            stroke: '#64748b',
+          },
+        }, eds));
       }
-
-      setEdges((eds) => addEdge({
-        ...params,
-        type: 'custom',
-        animated: true,
-        label: edgeLabel,
-        data: {
-          transitionKey: edgeLabel || undefined,
-        },
-        style: {
-          strokeWidth: 2.5,
-          stroke: '#64748b',
-        },
-      }, eds));
     }
-  }, [setEdges, isValidConnection, nodesById, workflowType, edges]);  // Add new node
+  }, [setEdges, isValidConnection, workflowType]);  // Add new node
   const addNode = useCallback((type: 'place' | 'transition', position: { x: number; y: number }) => {
     const id = `${type}-${Date.now()}`;
     const key = `${type}_${nodes.filter(n => (n.data as DesignerNodeData)?.kind === type).length + 1}`;
@@ -214,6 +218,12 @@ function WorkflowDesignerInner({ initialConfig, initialDesigner, onChange, workf
     setIsModalOpen(true);
   }, []);
 
+  // Handle double click to edit edge label - opens modal
+  const onEdgeDoubleClick = useCallback((event: React.MouseEvent, edge: Edge) => {
+    setEditingEdge(edge);
+    setIsEdgeModalOpen(true);
+  }, []);
+
   // Handle saving new label from modal
   const handleSaveLabel = useCallback((newLabel: string) => {
     if (editingNode && newLabel.trim()) {
@@ -241,6 +251,63 @@ function WorkflowDesignerInner({ initialConfig, initialDesigner, onChange, workf
   const handleCancelEdit = useCallback(() => {
     setIsModalOpen(false);
     setEditingNode(null);
+  }, []);
+
+  // Handle saving new edge label from modal
+  const handleSaveEdgeLabel = useCallback((newLabel: string) => {
+    if (editingEdge && newLabel.trim()) {
+      const trimmedLabel = newLabel.trim();
+      setEdges((eds) =>
+        eds.map((e) =>
+          e.id === editingEdge.id
+            ? {
+                ...e,
+                label: trimmedLabel,
+                data: {
+                  ...e.data,
+                  transitionKey: trimmedLabel,
+                }
+              }
+            : e
+        )
+      );
+    }
+    setIsEdgeModalOpen(false);
+    setEditingEdge(null);
+  }, [editingEdge, setEdges]);
+
+  // Handle canceling edge modal
+  const handleCancelEdgeEdit = useCallback(() => {
+    setIsEdgeModalOpen(false);
+    setEditingEdge(null);
+  }, []);
+
+  // Handle saving new edge (from connection)
+  const handleSaveNewEdge = useCallback((newLabel: string) => {
+    if (pendingConnection && newLabel.trim()) {
+      const trimmedLabel = newLabel.trim();
+      setEdges((eds) => addEdge({
+        ...pendingConnection,
+        type: 'custom',
+        animated: true,
+        label: trimmedLabel,
+        data: {
+          transitionKey: trimmedLabel,
+        },
+        style: {
+          strokeWidth: 2.5,
+          stroke: '#64748b',
+        },
+      }, eds));
+    }
+    setIsNewEdgeModalOpen(false);
+    setPendingConnection(null);
+  }, [pendingConnection, setEdges]);
+
+  // Handle canceling new edge modal
+  const handleCancelNewEdge = useCallback(() => {
+    setIsNewEdgeModalOpen(false);
+    setPendingConnection(null);
   }, []);
 
   // Delete selected nodes and edges
@@ -310,6 +377,7 @@ function WorkflowDesignerInner({ initialConfig, initialDesigner, onChange, workf
         onEdgesChange={onEdgesChange}
         onConnect={onConnect}
         onNodeDoubleClick={onNodeDoubleClick}
+        onEdgeDoubleClick={onEdgeDoubleClick}
         onNodesDelete={onNodesDelete}
         onEdgesDelete={onEdgesDelete}
         onInit={handleInit}
@@ -491,7 +559,7 @@ function WorkflowDesignerInner({ initialConfig, initialDesigner, onChange, workf
         </Panel>
       </ReactFlow>
 
-      {/* Edit Label Modal */}
+      {/* Edit Label Modal for Nodes */}
       {editingNode && (
         <EditLabelModal
           isOpen={isModalOpen}
@@ -499,6 +567,28 @@ function WorkflowDesignerInner({ initialConfig, initialDesigner, onChange, workf
           nodeType={(editingNode.data as DesignerNodeData).kind}
           onSave={handleSaveLabel}
           onCancel={handleCancelEdit}
+        />
+      )}
+
+      {/* Edit Label Modal for Edges (Transitions) */}
+      {editingEdge && (
+        <EditLabelModal
+          isOpen={isEdgeModalOpen}
+          currentLabel={editingEdge.label as string || ''}
+          nodeType="transition"
+          onSave={handleSaveEdgeLabel}
+          onCancel={handleCancelEdgeEdit}
+        />
+      )}
+
+      {/* New Edge Modal for State Machine Transitions */}
+      {pendingConnection && (
+        <EditLabelModal
+          isOpen={isNewEdgeModalOpen}
+          currentLabel={`transition_${edges.length + 1}`}
+          nodeType="transition"
+          onSave={handleSaveNewEdge}
+          onCancel={handleCancelNewEdge}
         />
       )}
     </div>
