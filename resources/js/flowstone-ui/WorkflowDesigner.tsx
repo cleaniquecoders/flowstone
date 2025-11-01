@@ -15,6 +15,7 @@ import {
   useReactFlow,
   NodeTypes,
   MarkerType,
+  ConnectionLineType,
 } from 'reactflow';
 import 'reactflow/dist/style.css';
 
@@ -94,7 +95,7 @@ function WorkflowDesignerInner({ initialConfig, onChange }: WorkflowDesignerProp
     if (isValidConnection(params)) {
       setEdges((eds) => addEdge({
         ...params,
-        type: 'smoothstep',
+        type: 'default', // Use default bezier curves
         data: { arc: (nodesById.get(params.source!)?.data as DesignerNodeData)?.kind === 'place' ? 'in' : 'out' },
       }, eds));
     }
@@ -181,7 +182,7 @@ function WorkflowDesignerInner({ initialConfig, onChange }: WorkflowDesignerProp
         minZoom={0.1}
         maxZoom={2}
         defaultEdgeOptions={{
-          type: 'smoothstep',
+          type: 'default', // Bezier curves naturally avoid overlap better
           markerEnd: {
             type: MarkerType.ArrowClosed,
             width: 20,
@@ -203,6 +204,7 @@ function WorkflowDesignerInner({ initialConfig, onChange }: WorkflowDesignerProp
           strokeWidth: 2,
           stroke: '#64748b',
         }}
+        connectionLineType={ConnectionLineType.Bezier}
         className="bg-linear-to-br from-slate-50 via-gray-50 to-slate-100"
       >
         <Background

@@ -147,7 +147,7 @@ export function parseWorkflowToGraph(config: WorkflowConfig): { nodes: Node[]; e
           target: tId,
           label: '',
           data: { arc: 'in' },
-          type: 'smoothstep',
+          type: 'default', // Use default bezier for smoother curves
           style: {
             strokeWidth: 2,
             stroke: '#64748b',
@@ -165,7 +165,7 @@ export function parseWorkflowToGraph(config: WorkflowConfig): { nodes: Node[]; e
           target: toId,
           label: '',
           data: { arc: 'out' },
-          type: 'smoothstep',
+          type: 'default', // Use default bezier for smoother curves
           style: {
             strokeWidth: 2,
             stroke: '#64748b',
