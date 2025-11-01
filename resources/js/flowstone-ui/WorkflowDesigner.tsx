@@ -1,4 +1,4 @@
-import React, { useCallback, useMemo, useRef, useState } from 'react';
+import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import {
   ReactFlow,
   Node,
@@ -37,6 +37,12 @@ function WorkflowDesignerInner({ initialConfig, onChange }: WorkflowDesignerProp
   const reactFlowWrapper = useRef<HTMLDivElement>(null);
   const [reactFlowInstance, setReactFlowInstance] = useState<any>(null);
 
+  // Store instance globally for fullscreen handler
+  const handleInit = useCallback((instance: any) => {
+    setReactFlowInstance(instance);
+    (window as any).reactFlowInstance = instance;
+  }, []);
+
   // Initialize nodes and edges from config
   const initialGraph = useMemo(() => {
     if (initialConfig) {
@@ -47,6 +53,21 @@ function WorkflowDesignerInner({ initialConfig, onChange }: WorkflowDesignerProp
 
   const [nodes, setNodes, onNodesChange] = useNodesState(initialGraph.nodes);
   const [edges, setEdges, onEdgesChange] = useEdgesState(initialGraph.edges);
+
+  // Handle window resize to reposition panels and fit view
+  useEffect(() => {
+    const handleResize = () => {
+      if (reactFlowInstance) {
+        // Small delay to ensure layout has settled
+        setTimeout(() => {
+          reactFlowInstance.fitView({ padding: 0.3, duration: 300 });
+        }, 100);
+      }
+    };
+
+    window.addEventListener('resize', handleResize);
+    return () => window.removeEventListener('resize', handleResize);
+  }, [reactFlowInstance]);
 
   // Create a map for quick node lookup
   const nodesById = useMemo(() => {
@@ -150,7 +171,7 @@ function WorkflowDesignerInner({ initialConfig, onChange }: WorkflowDesignerProp
         onConnect={onConnect}
         onNodesDelete={onNodesDelete}
         onEdgesDelete={onEdgesDelete}
-        onInit={setReactFlowInstance}
+        onInit={handleInit}
         onDrop={onDrop}
         onDragOver={onDragOver}
         nodeTypes={nodeTypes}
@@ -161,25 +182,45 @@ function WorkflowDesignerInner({ initialConfig, onChange }: WorkflowDesignerProp
         maxZoom={2}
         defaultEdgeOptions={{
           type: 'smoothstep',
-          markerEnd: { type: MarkerType.ArrowClosed },
-          animated: true,
+          markerEnd: {
+            type: MarkerType.ArrowClosed,
+            width: 20,
+            height: 20,
+            color: '#64748b',
+          },
+          animated: false,
+          style: {
+            strokeWidth: 2,
+            stroke: '#64748b',
+          },
         }}
         nodesDraggable={true}
         nodesConnectable={true}
         elementsSelectable={true}
         snapToGrid={true}
-        snapGrid={[20, 20]}
-        className="bg-gray-50"
+        snapGrid={[15, 15]}
+        connectionLineStyle={{
+          strokeWidth: 2,
+          stroke: '#64748b',
+        }}
+        className="bg-linear-to-br from-slate-50 via-gray-50 to-slate-100"
       >
-        <Background gap={20} size={1} color="#e5e7eb" />
-        <Controls />
+        <Background
+          gap={16}
+          size={1}
+          color="#cbd5e1"
+          style={{ opacity: 0.4 }}
+        />
+        <Controls position="top-right" />
         <MiniMap
+          position="bottom-left"
           nodeColor={(node) => {
             const kind = (node.data as DesignerNodeData)?.kind;
             return kind === 'place' ? '#3b82f6' : '#f97316';
           }}
           maskColor="rgba(0, 0, 0, 0.08)"
           nodeStrokeWidth={3}
+          style={{ marginBottom: '8px', marginLeft: '8px' }}
           className="bg-white! border! border-gray-200! rounded-lg! shadow-lg!"
         />
 
@@ -240,21 +281,27 @@ function WorkflowDesignerInner({ initialConfig, onChange }: WorkflowDesignerProp
         </Panel>
 
         {/* Keyboard Shortcuts Info */}
-        <Panel position="bottom-right" className="bg-white/95 backdrop-blur-sm px-3 py-2 rounded-lg shadow-lg border border-gray-200 text-xs">
-          <div className="space-y-1 text-gray-600">
-            <div className="font-semibold text-gray-700 mb-2">Keyboard Shortcuts</div>
-            <div className="flex items-center gap-2">
-              <kbd className="px-1.5 py-0.5 bg-gray-100 border border-gray-300 rounded text-xs font-mono">Delete</kbd>
-              <span>Remove selected</span>
+        <Panel position="bottom-right" className="bg-white/95 backdrop-blur-sm px-4 py-3 rounded-lg shadow-lg border border-gray-200 text-xs mb-2 mr-2">
+          <div className="space-y-1.5 text-gray-600 min-w-[180px]">
+            <div className="font-semibold text-gray-700 mb-2 flex items-center gap-2">
+              <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+              </svg>
+              Shortcuts
             </div>
             <div className="flex items-center gap-2">
-              <kbd className="px-1.5 py-0.5 bg-gray-100 border border-gray-300 rounded text-xs font-mono">Esc</kbd>
+              <kbd className="px-2 py-1 bg-gray-100 border border-gray-300 rounded text-xs font-mono font-semibold">Del</kbd>
+              <span>Remove</span>
+            </div>
+            <div className="flex items-center gap-2">
+              <kbd className="px-2 py-1 bg-gray-100 border border-gray-300 rounded text-xs font-mono font-semibold">Esc</kbd>
               <span>Exit fullscreen</span>
             </div>
-            <div className="flex items-center gap-2">
-              <kbd className="px-1.5 py-0.5 bg-gray-100 border border-gray-300 rounded text-xs font-mono">Ctrl</kbd>
+            <div className="flex items-center gap-1.5">
+              <kbd className="px-2 py-1 bg-gray-100 border border-gray-300 rounded text-xs font-mono font-semibold">⌘</kbd>
               <span>+</span>
-              <kbd className="px-1.5 py-0.5 bg-gray-100 border border-gray-300 rounded text-xs font-mono">Scroll</kbd>
+              <span className="text-gray-500">Scroll</span>
+              <span className="text-gray-400">→</span>
               <span>Zoom</span>
             </div>
           </div>

@@ -295,8 +295,15 @@
                 document.body.style.overflow = '';
             }
 
-            // Trigger resize event for React Flow to adjust
-            window.dispatchEvent(new Event('resize'));
+            // Trigger resize and fit view after a short delay to allow layout to settle
+            setTimeout(() => {
+                window.dispatchEvent(new Event('resize'));
+
+                // Trigger fit view if React Flow instance is available
+                if (window.reactFlowInstance) {
+                    window.reactFlowInstance.fitView({ padding: 0.3, duration: 800 });
+                }
+            }, 100);
         });
 
         // Handle ESC key to exit fullscreen
