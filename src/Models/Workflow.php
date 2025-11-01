@@ -6,6 +6,7 @@ use CleaniqueCoders\Flowstone\Concerns\InteractsWithWorkflow;
 use CleaniqueCoders\Flowstone\Contracts\Workflow as WorkflowContract;
 use CleaniqueCoders\Flowstone\Database\Factories\WorkflowFactory;
 use CleaniqueCoders\Traitify\Concerns\InteractsWithMeta;
+use CleaniqueCoders\Traitify\Concerns\InteractsWithTags;
 use CleaniqueCoders\Traitify\Concerns\InteractsWithUuid;
 use Illuminate\Database\Eloquent\Casts\Attribute;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
@@ -15,7 +16,7 @@ use Illuminate\Database\Eloquent\SoftDeletes;
 
 class Workflow extends Model implements WorkflowContract
 {
-    use HasFactory, InteractsWithMeta, InteractsWithUuid, InteractsWithWorkflow, SoftDeletes;
+    use HasFactory, InteractsWithMeta, InteractsWithTags, InteractsWithUuid, InteractsWithWorkflow, SoftDeletes;
 
     protected $fillable = [
         'name',
@@ -50,35 +51,6 @@ class Workflow extends Model implements WorkflowContract
         return $this->hasMany(WorkflowTransition::class)->orderBy('sort_order');
     }
 
-    // Tag management methods
-    public function addTag(string $tag): void
-    {
-        $tags = $this->tags ?? [];
-
-        if (! in_array($tag, $tags)) {
-            $tags[] = $tag;
-            $this->update(['tags' => $tags]);
-        }
-    }
-
-    public function removeTag(string $tag): void
-    {
-        $tags = $this->tags ?? [];
-
-        $tags = array_values(array_filter($tags, fn ($t) => $t !== $tag));
-        $this->update(['tags' => $tags]);
-    }
-
-    public function hasTag(string $tag): bool
-    {
-        return in_array($tag, $this->tags ?? []);
-    }
-
-    public function syncTags(array $tags): void
-    {
-        $this->update(['tags' => array_values(array_unique($tags))]);
-    }
-
     // Scopes for filtering
     public function scopeIsEnabled($query)
     {
@@ -93,29 +65,6 @@ class Workflow extends Model implements WorkflowContract
     public function scopeByCategory($query, string $category)
     {
         return $query->where('category', $category);
-    }
-
-    public function scopeByTag($query, string $tag)
-    {
-        return $query->whereJsonContains('tags', $tag);
-    }
-
-    public function scopeByTags($query, array $tags)
-    {
-        foreach ($tags as $tag) {
-            $query->whereJsonContains('tags', $tag);
-        }
-
-        return $query;
-    }
-
-    public function scopeByAnyTag($query, array $tags)
-    {
-        return $query->where(function ($q) use ($tags) {
-            foreach ($tags as $tag) {
-                $q->orWhereJsonContains('tags', $tag);
-            }
-        });
     }
 
     public function scopeSearch($query, string $term)
@@ -150,20 +99,6 @@ class Workflow extends Model implements WorkflowContract
         return static::whereNotNull('category')
             ->distinct()
             ->pluck('category')
-            ->sort()
-            ->values()
-            ->toArray();
-    }
-
-    /**
-     * Get all unique tags
-     */
-    public static function getAllTags(): array
-    {
-        return static::pluck('tags')
-            ->flatten()
-            ->unique()
-            ->filter()
             ->sort()
             ->values()
             ->toArray();
