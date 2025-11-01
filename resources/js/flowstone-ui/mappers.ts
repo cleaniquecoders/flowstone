@@ -6,7 +6,8 @@ export function compileGraphToWorkflow(nodes: Node[], edges: Edge[]): WorkflowCo
     .filter(n => (n.data as DesignerNodeData)?.kind === 'place')
     .reduce<Record<string, unknown>>((acc, n) => {
       const data = n.data as DesignerNodeData;
-      acc[data.key] = { ...(data.meta ?? {}), isInitial: !!(data as any).isInitial };
+      // Use label as the key (it's the user-visible and editable name)
+      acc[data.label] = { ...(data.meta ?? {}), isInitial: !!(data as any).isInitial };
       return acc;
     }, {});
 
@@ -28,7 +29,7 @@ export function compileGraphToWorkflow(nodes: Node[], edges: Edge[]): WorkflowCo
         .map(srcId => nodes.find(n => n.id === srcId))
         .filter(Boolean)
         .filter(n => (n!.data as DesignerNodeData)?.kind === 'place')
-        .map(n => (n!.data as DesignerNodeData).key);
+        .map(n => (n!.data as DesignerNodeData).label); // Use label instead of key
 
       const outgoingPlaces = edges
         .filter(e => e.source === t.id)
@@ -36,11 +37,12 @@ export function compileGraphToWorkflow(nodes: Node[], edges: Edge[]): WorkflowCo
         .map(tgtId => nodes.find(n => n.id === tgtId))
         .filter(Boolean)
         .filter(n => (n!.data as DesignerNodeData)?.kind === 'place')
-        .map(n => (n!.data as DesignerNodeData).key);
+        .map(n => (n!.data as DesignerNodeData).label); // Use label instead of key
 
       const to = outgoingPlaces[0];
 
-      acc[data.key] = {
+      // Use label as the key
+      acc[data.label] = {
         from: incomingPlaces,
         to,
         metadata: { ...(data.meta ?? {}) },
@@ -55,8 +57,8 @@ export function compileGraphToWorkflow(nodes: Node[], edges: Edge[]): WorkflowCo
 
       if (sourceNode && targetNode && edge.label) {
         const transitionKey = edge.data?.transitionKey || edge.label;
-        const fromKey = (sourceNode.data as DesignerNodeData).key;
-        const toKey = (targetNode.data as DesignerNodeData).key;
+        const fromKey = (sourceNode.data as DesignerNodeData).label; // Use label instead of key
+        const toKey = (targetNode.data as DesignerNodeData).label; // Use label instead of key
 
         if (!transitions[transitionKey]) {
           transitions[transitionKey] = {

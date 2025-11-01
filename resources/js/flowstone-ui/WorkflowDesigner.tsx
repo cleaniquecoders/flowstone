@@ -208,10 +208,18 @@ function WorkflowDesignerInner({ initialConfig, initialDesigner, onChange, workf
     const newLabel = prompt('Enter new label:', data.label);
 
     if (newLabel && newLabel.trim()) {
+      const trimmedLabel = newLabel.trim();
       setNodes((nds) =>
         nds.map((n) =>
           n.id === node.id
-            ? { ...n, data: { ...n.data, label: newLabel.trim() } }
+            ? {
+                ...n,
+                data: {
+                  ...n.data,
+                  label: trimmedLabel,
+                  key: trimmedLabel // Update key to match label for consistency
+                }
+              }
             : n
         )
       );
