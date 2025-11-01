@@ -26,6 +26,12 @@ class WorkflowIndex extends Component
         $this->resetPage();
     }
 
+    public function resetFilters(): void
+    {
+        $this->reset(['search', 'type', 'enabled']);
+        $this->resetPage();
+    }
+
     public function render(): View
     {
         $query = Workflow::query()->withCount(['places', 'transitions']);
@@ -43,7 +49,7 @@ class WorkflowIndex extends Component
         }
 
         return view('flowstone::livewire.workflow-index', [
-            'workflows' => $query->orderBy('name')->paginate(10),
+            'workflows' => $query->paginate(9),
         ]);
     }
 }

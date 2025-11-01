@@ -7,8 +7,9 @@ use CleaniqueCoders\Flowstone\Commands\FlowstoneCommand;
 use CleaniqueCoders\Flowstone\Commands\PublishAssetsCommand;
 use CleaniqueCoders\Flowstone\Livewire\CreateWorkflow;
 use CleaniqueCoders\Flowstone\Livewire\Dashboard;
+use CleaniqueCoders\Flowstone\Livewire\EditWorkflow;
+use CleaniqueCoders\Flowstone\Livewire\WorkflowIndex;
 use CleaniqueCoders\Flowstone\Livewire\WorkflowShow;
-use CleaniqueCoders\Flowstone\Livewire\WorkflowsIndex;
 use Illuminate\Support\Facades\Blade;
 use Illuminate\Support\Facades\Gate;
 use Livewire\Livewire;
@@ -81,9 +82,10 @@ class FlowstoneServiceProvider extends PackageServiceProvider
         }
 
         Livewire::component('flowstone.dashboard', Dashboard::class);
-        Livewire::component('flowstone.workflows-index', WorkflowsIndex::class);
+        Livewire::component('flowstone.workflows-index', WorkflowIndex::class);
         Livewire::component('flowstone.workflow-show', WorkflowShow::class);
         Livewire::component('flowstone.create-workflow', CreateWorkflow::class);
+        Livewire::component('flowstone.edit-workflow', EditWorkflow::class);
     }
 
     protected function registerBladeComponents(): void

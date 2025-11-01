@@ -1,132 +1,314 @@
-<div class="space-y-6">
-    <!-- Workflow Header -->
-    <div class="bg-white rounded-xl shadow-sm border border-gray-200 p-6">
-        <div class="flex items-center justify-between">
-            <div class="flex items-center space-x-4">
-                <div class="w-12 h-12 bg-linear-to-br from-flowstone-100 to-flowstone-200 rounded-xl flex items-center justify-center">
-                    <svg class="w-6 h-6 text-flowstone-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z" />
-                    </svg>
-                </div>
-                <div>
-                    <h1 class="text-2xl font-bold text-gray-900">Workflow Visualization</h1>
-                    <p class="text-gray-600">Interactive view of your workflow states and transitions</p>
-                </div>
-            </div>
+<div>
+    <div class="space-y-6">
+        <!-- Workflow Header -->
+        <div class="relative overflow-hidden bg-gradient-to-br from-white via-flowstone-50/30 to-purple-50/20 rounded-2xl shadow-lg border border-gray-200/50 backdrop-blur-sm">
+            <!-- Decorative Elements -->
+            <div class="absolute top-0 right-0 -mt-4 -mr-4 w-32 h-32 bg-flowstone-400/10 rounded-full blur-3xl"></div>
+            <div class="absolute bottom-0 left-0 -mb-4 -ml-4 w-32 h-32 bg-purple-400/10 rounded-full blur-3xl"></div>
 
-            <div class="flex items-center space-x-3">
-                <button type="button" class="inline-flex items-center px-4 py-2 border border-gray-300 rounded-lg shadow-sm text-sm font-medium text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-flowstone-500 transition-colors">
-                    <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" />
-                    </svg>
-                    Export
-                </button>
-
-                <button wire:click="refreshGraph" class="inline-flex items-center px-4 py-2 border border-transparent rounded-lg shadow-sm text-sm font-medium text-white bg-flowstone-600 hover:bg-flowstone-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-flowstone-500 transition-colors">
-                    <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
-                    </svg>
-                    Refresh Graph
-                </button>
-            </div>
-        </div>
-    </div>
-
-    <!-- Main Content Grid -->
-    <div class="grid grid-cols-1 lg:grid-cols-4 gap-6">
-        <!-- Workflow Canvas -->
-        <div class="lg:col-span-3">
-            <div class="bg-white border border-gray-200 rounded-xl overflow-hidden shadow-sm">
-                <div class="border-b border-gray-200 px-6 py-4">
-                    <div class="flex items-center justify-between">
-                        <div>
-                            <h2 class="text-lg font-semibold text-gray-900">Workflow Diagram</h2>
-                            <p class="text-sm text-gray-600">Visual representation of states and transitions</p>
-                        </div>
-                        <div class="flex items-center space-x-2">
-                            <div class="flex items-center space-x-1 text-xs text-gray-500">
-                                <div class="w-3 h-3 bg-flowstone-500 rounded-full"></div>
-                                <span>Active</span>
+            <div class="relative p-8">
+                <div class="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-6">
+                    <!-- Left Side: Title and Info -->
+                    <div class="flex items-start space-x-5">
+                        <div class="relative group">
+                            <div class="absolute inset-0 bg-gradient-to-br from-flowstone-500 to-purple-600 rounded-2xl blur-lg opacity-20 group-hover:opacity-30 transition-opacity duration-300"></div>
+                            <div class="relative w-16 h-16 bg-gradient-to-br from-flowstone-500 to-purple-600 rounded-2xl flex items-center justify-center shadow-lg transform group-hover:scale-105 transition-transform duration-300">
+                                <svg class="w-8 h-8 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                        d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z" />
+                                </svg>
                             </div>
-                            <div class="flex items-center space-x-1 text-xs text-gray-500">
-                                <div class="w-3 h-3 bg-gray-300 rounded-full"></div>
-                                <span>Inactive</span>
+                        </div>
+                        <div class="flex-1 min-w-0">
+                            <div class="flex items-center gap-3 mb-2">
+                                <h1 class="text-3xl font-bold bg-gradient-to-r from-gray-900 via-flowstone-800 to-purple-900 bg-clip-text text-transparent">
+                                    {{ $workflow->name }}
+                                </h1>
+                                <span class="inline-flex items-center px-3 py-1 rounded-full text-xs font-semibold {{ $workflow->is_enabled ? 'bg-green-100 text-green-700 ring-1 ring-green-600/20' : 'bg-gray-100 text-gray-700 ring-1 ring-gray-600/20' }}">
+                                    {{ $workflow->is_enabled ? '● Active' : '○ Inactive' }}
+                                </span>
+                            </div>
+                            <p class="text-gray-600 text-sm leading-relaxed max-w-2xl">
+                                {{ $workflow->description ?? 'Interactive view of your workflow states and transitions' }}
+                            </p>
+                            <div class="flex items-center gap-4 mt-3">
+                                <span class="inline-flex items-center gap-1.5 text-xs font-medium text-gray-600">
+                                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 7h.01M7 3h5c.512 0 1.024.195 1.414.586l7 7a2 2 0 010 2.828l-7 7a2 2 0 01-2.828 0l-7-7A1.994 1.994 0 013 12V7a4 4 0 014-4z" />
+                                    </svg>
+                                    {{ ucwords(str_replace('_', ' ', $workflow->type)) }}
+                                </span>
+                                <span class="inline-flex items-center gap-1.5 text-xs font-medium text-gray-600">
+                                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
+                                    </svg>
+                                    {{ $workflow->created_at->format('M j, Y') }}
+                                </span>
                             </div>
                         </div>
                     </div>
-                </div>
 
-                <div id="flowstone-canvas"
-                     class="h-[560px] bg-gray-50"
-                     x-data
-                     x-init="window.FlowstoneUI && window.FlowstoneUI.mount($el, @js($graph))"
-                     x-on:flowstone:graph:update.window="window.FlowstoneUI && window.FlowstoneUI.mount($el, $event.detail.graph)">
-                    <!-- Workflow canvas will be mounted here -->
-                </div>
-            </div>
-        </div>
-
-        <!-- Sidebar -->
-        <div class="lg:col-span-1 space-y-6">
-            <!-- Workflow Info -->
-            <div class="bg-white border border-gray-200 rounded-xl p-6 shadow-sm">
-                <h3 class="text-lg font-semibold text-gray-900 mb-4">Workflow Info</h3>
-
-                <div class="space-y-4">
-                    <div>
-                        <div class="text-sm font-medium text-gray-500 mb-1">Initial State</div>
-                        <div class="text-lg font-semibold text-gray-900">{{ $graph['meta']['initial_marking'] ?? '-' }}</div>
-                    </div>
-
-                    <div>
-                        <div class="text-sm font-medium text-gray-500 mb-1">Current State</div>
-                        <div class="text-lg font-semibold text-flowstone-600">{{ $graph['meta']['current_marking'] ?? '-' }}</div>
-                    </div>
-
-                    <hr class="border-gray-200">
-
-                    <div class="grid grid-cols-2 gap-4">
-                        <div class="text-center">
-                            <div class="text-2xl font-bold text-flowstone-600">{{ $graph['meta']['counts']['places'] ?? 0 }}</div>
-                            <div class="text-xs text-gray-500 uppercase tracking-wide">Places</div>
-                        </div>
-                        <div class="text-center">
-                            <div class="text-2xl font-bold text-purple-600">{{ $graph['meta']['counts']['transitions'] ?? 0 }}</div>
-                            <div class="text-xs text-gray-500 uppercase tracking-wide">Transitions</div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-
-            <!-- Quick Actions -->
-            <div class="bg-white border border-gray-200 rounded-xl p-6 shadow-sm">
-                <h3 class="text-lg font-semibold text-gray-900 mb-4">Quick Actions</h3>
-
-                <div class="space-y-3">
-                    <a href="{{ route('flowstone.workflows.designer', $workflow) }}"
-                           class="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-lg text-white bg-flowstone-600 hover:bg-flowstone-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-flowstone-500 transition-colors">
-                            <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
+                    <!-- Right Side: Actions -->
+                    <div class="flex items-center gap-3 lg:flex-shrink-0">
+                        <button type="button" wire:click="$dispatch('open-edit-modal', { workflowId: {{ $workflow->id }} })"
+                            class="group relative inline-flex items-center gap-2 px-4 py-2.5 text-sm font-medium text-gray-700 bg-white/80 backdrop-blur-sm border border-gray-200 rounded-xl hover:bg-white hover:border-flowstone-300 hover:text-flowstone-700 focus:outline-none focus:ring-2 focus:ring-flowstone-500 focus:ring-offset-2 transition-all duration-200 shadow-sm hover:shadow-md">
+                            <svg class="w-4 h-4 transition-transform duration-200 group-hover:scale-110" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"/>
                             </svg>
-                            Design
+                            <span>Edit Details</span>
+                        </button>
+
+                        <a href="{{ route('flowstone.workflows.designer', $workflow) }}"
+                            class="group relative inline-flex items-center gap-2 px-5 py-2.5 text-sm font-semibold text-white bg-gradient-to-r from-flowstone-600 to-purple-600 rounded-xl shadow-lg shadow-flowstone-500/30 hover:shadow-xl hover:shadow-flowstone-500/40 hover:scale-105 focus:outline-none focus:ring-2 focus:ring-flowstone-500 focus:ring-offset-2 transition-all duration-200 ease-out overflow-hidden"
+                            title="Open Workflow Designer">
+                            <!-- Shimmer effect -->
+                            <div class="absolute inset-0 bg-gradient-to-r from-transparent via-white/20 to-transparent translate-x-[-100%] group-hover:translate-x-[100%] transition-transform duration-1000"></div>
+
+                            <svg class="w-5 h-5 relative z-10 transition-transform duration-200 group-hover:rotate-12" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 5a1 1 0 011-1h14a1 1 0 011 1v2a1 1 0 01-1 1H5a1 1 0 01-1-1V5zM4 13a1 1 0 011-1h6a1 1 0 011 1v6a1 1 0 01-1 1H5a1 1 0 01-1-1v-6zM16 13a1 1 0 011-1h2a1 1 0 011 1v6a1 1 0 01-1 1h-2a1 1 0 01-1-1v-6z" />
+                            </svg>
+                            <span class="relative z-10">Designer</span>
                         </a>
-
-                    <button type="button" class="flex items-center w-full px-4 py-2 border border-gray-300 rounded-lg shadow-sm text-sm font-medium text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-flowstone-500 transition-colors">
-                        <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7H5a2 2 0 00-2 2v9a2 2 0 002 2h14a2 2 0 002-2V9a2 2 0 00-2-2h-3m-1 4l-3 3m0 0l-3-3m3 3V4" />
-                        </svg>
-                        Export JSON
-                    </button>
-
-                    <button type="button" class="flex items-center w-full px-4 py-2 border border-gray-300 rounded-lg shadow-sm text-sm font-medium text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-flowstone-500 transition-colors">
-                        <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
-                        </svg>
-                        View Logs
-                    </button>
+                    </div>
                 </div>
             </div>
         </div>
+
+        <!-- Main Content Grid -->
+        <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+            <!-- Workflow Details -->
+            <div class="lg:col-span-2 space-y-6">
+                <!-- Basic Information -->
+                <div class="bg-white border border-gray-200 rounded-xl p-6 shadow-sm">
+                    <h3 class="text-lg font-semibold text-gray-900 mb-4">Workflow Details</h3>
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                        <div>
+                            <div class="text-sm font-medium text-gray-500 mb-1">Name</div>
+                            <div class="text-lg font-semibold text-gray-900">{{ $workflow->name }}</div>
+                        </div>
+                        <div>
+                            <div class="text-sm font-medium text-gray-500 mb-1">Type</div>
+                            <span
+                                class="inline-flex items-center px-3 py-1 rounded-full text-sm font-medium
+                            {{ $workflow->type === 'state_machine' ? 'bg-blue-100 text-blue-800' : 'bg-indigo-100 text-indigo-800' }}">
+                                {{ ucwords(str_replace('_', ' ', $workflow->type)) }}
+                            </span>
+                        </div>
+                        <div>
+                            <div class="text-sm font-medium text-gray-500 mb-1">Status</div>
+                            <span
+                                class="inline-flex items-center px-3 py-1 rounded-full text-sm font-medium
+                            {{ $workflow->is_enabled ? 'bg-green-100 text-green-800' : 'bg-gray-100 text-gray-800' }}">
+                                {{ $workflow->is_enabled ? 'Enabled' : 'Disabled' }}
+                            </span>
+                        </div>
+                        <div>
+                            <div class="text-sm font-medium text-gray-500 mb-1">Created</div>
+                            <div class="text-lg font-semibold text-gray-900">
+                                {{ $workflow->created_at->format('M j, Y') }}</div>
+                        </div>
+                    </div>
+                    <div class="mt-6">
+                        <div class="text-sm font-medium text-gray-500 mb-2">Description</div>
+                        <div class="text-gray-900">{{ $workflow->description ?? 'No description provided.' }}</div>
+                    </div>
+                </div>
+
+                <!-- Places (States) -->
+                <div class="bg-white border border-gray-200 rounded-xl shadow-sm">
+                    <div class="border-b border-gray-200 px-6 py-4">
+                        <div class="flex items-center justify-between">
+                            <div>
+                                <h3 class="text-lg font-semibold text-gray-900">Places (States)</h3>
+                                <p class="text-sm text-gray-600">Available workflow states</p>
+                            </div>
+                            <div class="text-sm text-gray-500">
+                                {{ $workflow->places->count() }} total
+                            </div>
+                        </div>
+                    </div>
+                    <div class="p-6">
+                        @if ($workflow->places->count() > 0)
+                            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                                @foreach ($workflow->places->sortBy('sort_order') as $place)
+                                    <div
+                                        class="flex items-center p-4 border border-gray-200 rounded-lg hover:bg-gray-50 transition-colors">
+                                        <div
+                                            class="w-10 h-10 bg-linear-to-br from-flowstone-100 to-flowstone-200 rounded-lg flex items-center justify-center mr-3">
+                                            <svg class="w-5 h-5 text-flowstone-600" fill="none" stroke="currentColor"
+                                                viewBox="0 0 24 24">
+                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                                    d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" />
+                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                                    d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" />
+                                            </svg>
+                                        </div>
+                                        <div class="flex-1">
+                                            <div class="font-medium text-gray-900">{{ $place->name }}</div>
+                                            <div class="text-sm text-gray-500">Order: {{ $place->sort_order }}</div>
+                                        </div>
+                                    </div>
+                                @endforeach
+                            </div>
+                        @else
+                            <div class="text-center py-8">
+                                <svg class="mx-auto h-12 w-12 text-gray-400" fill="none" viewBox="0 0 24 24"
+                                    stroke="currentColor">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                        d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" />
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                        d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" />
+                                </svg>
+                                <h3 class="mt-2 text-sm font-medium text-gray-900">No places defined</h3>
+                                <p class="mt-1 text-sm text-gray-500">Add places to define workflow states.</p>
+                            </div>
+                        @endif
+                    </div>
+                </div>
+
+                <!-- Transitions -->
+                <div class="bg-white border border-gray-200 rounded-xl shadow-sm">
+                    <div class="border-b border-gray-200 px-6 py-4">
+                        <div class="flex items-center justify-between">
+                            <div>
+                                <h3 class="text-lg font-semibold text-gray-900">Transitions</h3>
+                                <p class="text-sm text-gray-600">State change definitions</p>
+                            </div>
+                            <div class="text-sm text-gray-500">
+                                {{ $workflow->transitions->count() }} total
+                            </div>
+                        </div>
+                    </div>
+                    <div class="p-6">
+                        @if ($workflow->transitions->count() > 0)
+                            <div class="space-y-4">
+                                @foreach ($workflow->transitions->sortBy('sort_order') as $transition)
+                                    <div
+                                        class="flex items-center p-4 border border-gray-200 rounded-lg hover:bg-gray-50 transition-colors">
+                                        <div
+                                            class="w-10 h-10 bg-linear-to-br from-purple-100 to-purple-200 rounded-lg flex items-center justify-center mr-3">
+                                            <svg class="w-5 h-5 text-purple-600" fill="none" stroke="currentColor"
+                                                viewBox="0 0 24 24">
+                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                                    d="M13 10V3L4 14h7v7l9-11h-7z" />
+                                            </svg>
+                                        </div>
+                                        <div class="flex-1">
+                                            <div class="font-medium text-gray-900">{{ $transition->name }}</div>
+                                            <div class="text-sm text-gray-600">
+                                                <span class="font-medium">{{ $transition->from_place }}</span>
+                                                <svg class="inline w-4 h-4 mx-1" fill="none" stroke="currentColor"
+                                                    viewBox="0 0 24 24">
+                                                    <path stroke-linecap="round" stroke-linejoin="round"
+                                                        stroke-width="2" d="M17 8l4 4m0 0l-4 4m4-4H3" />
+                                                </svg>
+                                                <span class="font-medium">{{ $transition->to_place }}</span>
+                                            </div>
+                                            <div class="text-sm text-gray-500">Order: {{ $transition->sort_order }}
+                                            </div>
+                                        </div>
+                                    </div>
+                                @endforeach
+                            </div>
+                        @else
+                            <div class="text-center py-8">
+                                <svg class="mx-auto h-12 w-12 text-gray-400" fill="none" viewBox="0 0 24 24"
+                                    stroke="currentColor">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                        d="M13 10V3L4 14h7v7l9-11h-7z" />
+                                </svg>
+                                <h3 class="mt-2 text-sm font-medium text-gray-900">No transitions defined</h3>
+                                <p class="mt-1 text-sm text-gray-500">Add transitions to define state changes.</p>
+                            </div>
+                        @endif
+                    </div>
+                </div>
+
+                <!-- Meta Information -->
+                @if ($workflow->meta)
+                    <div class="bg-white border border-gray-200 rounded-xl p-6 shadow-sm">
+                        <h3 class="text-lg font-semibold text-gray-900 mb-4">Meta Information</h3>
+                        <div class="bg-gray-50 rounded-lg p-4">
+                            <pre class="text-sm text-gray-800 whitespace-pre-wrap">{{ json_encode($workflow->meta, JSON_PRETTY_PRINT) }}</pre>
+                        </div>
+                    </div>
+                @endif
+            </div>
+
+            <!-- Sidebar -->
+            <div class="lg:col-span-1 space-y-6">
+                <!-- Quick Stats -->
+                <div class="bg-white border border-gray-200 rounded-xl p-6 shadow-sm">
+                    <h3 class="text-lg font-semibold text-gray-900 mb-4">Quick Stats</h3>
+
+                    <div class="space-y-4">
+                        <div class="flex items-center justify-between">
+                            <div class="text-sm font-medium text-gray-500">Places</div>
+                            <div class="text-2xl font-bold text-flowstone-600">{{ $workflow->places->count() }}</div>
+                        </div>
+
+                        <div class="flex items-center justify-between">
+                            <div class="text-sm font-medium text-gray-500">Transitions</div>
+                            <div class="text-2xl font-bold text-purple-600">{{ $workflow->transitions->count() }}
+                            </div>
+                        </div>
+
+                        <hr class="border-gray-200">
+
+                        <div class="flex items-center justify-between">
+                            <div class="text-sm font-medium text-gray-500">Initial State</div>
+                            <div class="text-sm font-semibold text-gray-900">
+                                {{ $workflow->initial_marking ?? 'Not set' }}</div>
+                        </div>
+
+                        <div class="flex items-center justify-between">
+                            <div class="text-sm font-medium text-gray-500">Current State</div>
+                            <div class="text-sm font-semibold text-flowstone-600">
+                                {{ $workflow->marking ?? 'Not set' }}</div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Workflow Metadata -->
+                @if ($workflow->meta)
+                    <div class="bg-white border border-gray-200 rounded-xl p-6 shadow-sm">
+                        <h3 class="text-lg font-semibold text-gray-900 mb-4">Workflow Metadata</h3>
+                        <div class="bg-gray-50 rounded-lg p-4">
+                            <pre class="text-sm text-gray-800 whitespace-pre-wrap">{{ json_encode($workflow->meta, JSON_PRETTY_PRINT) }}</pre>
+                        </div>
+                    </div>
+                @else
+                    <div class="bg-white border border-gray-200 rounded-xl p-6 shadow-sm">
+                        <h3 class="text-lg font-semibold text-gray-900 mb-4">Workflow Metadata</h3>
+                        <div class="text-center py-4">
+                            <svg class="mx-auto h-8 w-8 text-gray-400" fill="none" viewBox="0 0 24 24"
+                                stroke="currentColor">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                    d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+                            </svg>
+                            <p class="mt-2 text-sm text-gray-500">No metadata available</p>
+                        </div>
+                    </div>
+                @endif
+
+                <!-- Configuration -->
+                @if ($workflow->config)
+                    <div class="bg-white border border-gray-200 rounded-xl p-6 shadow-sm">
+                        <h3 class="text-lg font-semibold text-gray-900 mb-4">Configuration</h3>
+                        <div class="bg-gray-50 rounded-lg p-3">
+                            <div class="text-xs text-gray-600 font-mono">
+                                Type: {{ ucfirst($workflow->type) }}<br>
+                                Enabled: {{ $workflow->is_enabled ? 'Yes' : 'No' }}<br>
+                                UUID: {{ Str::limit($workflow->uuid, 8) }}...
+                            </div>
+                        </div>
+                    </div>
+                @endif
+            </div>
+        </div>
     </div>
+
+    {{-- Edit Workflow Modal --}}
+    @livewire('flowstone.edit-workflow', ['workflow' => $workflow], key('edit-workflow-' . $workflow->id))
+
 </div>
