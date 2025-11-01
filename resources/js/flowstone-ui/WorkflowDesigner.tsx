@@ -156,13 +156,19 @@ function WorkflowDesignerInner({ initialConfig, onChange }: WorkflowDesignerProp
         nodeTypes={nodeTypes}
         isValidConnection={isValidConnection}
         fitView
-        fitViewOptions={{ padding: 0.2 }}
+        fitViewOptions={{ padding: 0.3, maxZoom: 1 }}
         minZoom={0.1}
-        maxZoom={4}
+        maxZoom={2}
         defaultEdgeOptions={{
           type: 'smoothstep',
           markerEnd: { type: MarkerType.ArrowClosed },
+          animated: true,
         }}
+        nodesDraggable={true}
+        nodesConnectable={true}
+        elementsSelectable={true}
+        snapToGrid={true}
+        snapGrid={[20, 20]}
         className="bg-gray-50"
       >
         <Background gap={20} size={1} color="#e5e7eb" />
@@ -229,6 +235,27 @@ function WorkflowDesignerInner({ initialConfig, onChange }: WorkflowDesignerProp
                 </svg>
                 Export Config
               </button>
+            </div>
+          </div>
+        </Panel>
+
+        {/* Keyboard Shortcuts Info */}
+        <Panel position="bottom-right" className="bg-white/95 backdrop-blur-sm px-3 py-2 rounded-lg shadow-lg border border-gray-200 text-xs">
+          <div className="space-y-1 text-gray-600">
+            <div className="font-semibold text-gray-700 mb-2">Keyboard Shortcuts</div>
+            <div className="flex items-center gap-2">
+              <kbd className="px-1.5 py-0.5 bg-gray-100 border border-gray-300 rounded text-xs font-mono">Delete</kbd>
+              <span>Remove selected</span>
+            </div>
+            <div className="flex items-center gap-2">
+              <kbd className="px-1.5 py-0.5 bg-gray-100 border border-gray-300 rounded text-xs font-mono">Esc</kbd>
+              <span>Exit fullscreen</span>
+            </div>
+            <div className="flex items-center gap-2">
+              <kbd className="px-1.5 py-0.5 bg-gray-100 border border-gray-300 rounded text-xs font-mono">Ctrl</kbd>
+              <span>+</span>
+              <kbd className="px-1.5 py-0.5 bg-gray-100 border border-gray-300 rounded text-xs font-mono">Scroll</kbd>
+              <span>Zoom</span>
             </div>
           </div>
         </Panel>

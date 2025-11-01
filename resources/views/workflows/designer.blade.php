@@ -110,14 +110,14 @@
             </div>
 
             <!-- Workflow Designer -->
-            <div class="bg-white rounded-xl shadow-sm border border-gray-200 overflow-hidden">
+            <div id="designer-container" class="bg-white rounded-xl shadow-sm border border-gray-200 overflow-hidden transition-all duration-300">
                 <div class="border-b border-gray-200 px-6 py-5 bg-linear-to-r from-gray-50 to-white">
                     <div class="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-4">
                         <div>
                             <h2 class="text-lg font-semibold text-gray-900 mb-1">Visual Designer</h2>
                             <p class="text-sm text-gray-600">Drag and drop to design your workflow states and transitions</p>
                         </div>
-                        <div class="flex items-center gap-4">
+                        <div class="flex items-center gap-4 flex-wrap">
                             <!-- Legend -->
                             <div class="flex items-center gap-4 px-4 py-2 bg-gray-50 rounded-lg border border-gray-200">
                                 <div class="flex items-center gap-2">
@@ -138,6 +138,20 @@
                                     <span class="text-xs font-medium text-gray-700">Transition (Action)</span>
                                 </div>
                             </div>
+
+                            <!-- Fullscreen Toggle -->
+                            <button id="fullscreen-toggle"
+                                    class="group inline-flex items-center gap-2 px-3 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-200 rounded-lg hover:bg-gray-50 hover:border-flowstone-300 hover:text-flowstone-700 focus:outline-none focus:ring-2 focus:ring-flowstone-500 transition-all"
+                                    title="Toggle fullscreen">
+                                <svg id="expand-icon" class="w-4 h-4 transition-transform duration-200 group-hover:scale-110" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 8V4m0 0h4M4 4l5 5m11-1V4m0 0h-4m4 0l-5 5M4 16v4m0 0h4m-4 0l5-5m11 5l-5-5m5 5v-4m0 4h-4" />
+                                </svg>
+                                <svg id="compress-icon" class="w-4 h-4 hidden transition-transform duration-200 group-hover:scale-110" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 9V4.5M9 9H4.5M9 9L3.75 3.75M9 15v4.5M9 15H4.5M9 15l-5.25 5.25M15 9h4.5M15 9V4.5M15 9l5.25-5.25M15 15h4.5M15 15v4.5m0-4.5l5.25 5.25" />
+                                </svg>
+                                <span class="hidden sm:inline">Fullscreen</span>
+                            </button>
+
                             <div class="flex items-center gap-2 text-xs text-gray-500">
                                 <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
@@ -148,7 +162,7 @@
                     </div>
                 </div>
 
-                <div id="workflow-designer" class="w-full h-[800px] bg-linear-to-br from-gray-50 to-gray-100">
+                <div id="workflow-designer" class="w-full h-[calc(100vh-400px)] min-h-[600px] bg-linear-to-br from-gray-50 to-gray-100">
                     <!-- Workflow Designer will be mounted here -->
                 </div>
             </div>
@@ -159,9 +173,15 @@
     <script>
     document.addEventListener('DOMContentLoaded', function() {
         const designerElement = document.getElementById('workflow-designer');
+        const designerContainer = document.getElementById('designer-container');
         const saveButton = document.getElementById('save-workflow');
         const saveText = document.getElementById('save-text');
         const saveSpinner = document.getElementById('save-spinner');
+        const fullscreenToggle = document.getElementById('fullscreen-toggle');
+        const expandIcon = document.getElementById('expand-icon');
+        const compressIcon = document.getElementById('compress-icon');
+
+        let isFullscreen = false;
 
         // Show loading state initially
         designerElement.innerHTML = `
@@ -253,6 +273,39 @@
             });
         });
 
+        // Fullscreen toggle functionality
+        fullscreenToggle.addEventListener('click', function() {
+            isFullscreen = !isFullscreen;
+
+            if (isFullscreen) {
+                // Enter fullscreen
+                designerContainer.classList.add('fixed', 'inset-0', 'z-50', 'rounded-none', 'm-0');
+                designerElement.classList.remove('h-[calc(100vh-400px)]', 'min-h-[600px]');
+                designerElement.classList.add('h-screen');
+                expandIcon.classList.add('hidden');
+                compressIcon.classList.remove('hidden');
+                document.body.style.overflow = 'hidden';
+            } else {
+                // Exit fullscreen
+                designerContainer.classList.remove('fixed', 'inset-0', 'z-50', 'rounded-none', 'm-0');
+                designerElement.classList.add('h-[calc(100vh-400px)]', 'min-h-[600px]');
+                designerElement.classList.remove('h-screen');
+                expandIcon.classList.remove('hidden');
+                compressIcon.classList.add('hidden');
+                document.body.style.overflow = '';
+            }
+
+            // Trigger resize event for React Flow to adjust
+            window.dispatchEvent(new Event('resize'));
+        });
+
+        // Handle ESC key to exit fullscreen
+        document.addEventListener('keydown', function(event) {
+            if (event.key === 'Escape' && isFullscreen) {
+                fullscreenToggle.click();
+            }
+        });
+
         // Notification helper
         function showNotification(message, type = 'info') {
             const colors = {
@@ -262,7 +315,7 @@
             };
 
             const notification = document.createElement('div');
-            notification.className = `fixed top-4 right-4 z-50 p-4 rounded-lg border ${colors[type]} max-w-sm shadow-lg`;
+            notification.className = `fixed top-4 right-4 z-[60] p-4 rounded-lg border ${colors[type]} max-w-sm shadow-lg`;
             notification.innerHTML = `
                 <div class="flex items-center">
                     <div class="flex-1">${message}</div>

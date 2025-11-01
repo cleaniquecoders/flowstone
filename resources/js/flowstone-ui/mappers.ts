@@ -79,7 +79,7 @@ export function parseWorkflowToGraph(config: WorkflowConfig): { nodes: Node[]; e
     nodes.push({
       id,
       type: 'place',
-      position: { x: 100 + idx * 120, y: 100 },
+      position: { x: 150 + idx * 250, y: 100 },
       data: {
         kind: 'place',
         key,
@@ -104,7 +104,7 @@ export function parseWorkflowToGraph(config: WorkflowConfig): { nodes: Node[]; e
     nodes.push({
       id: tId,
       type: 'transition',
-      position: { x: 100 + idx * 160, y: 300 },
+      position: { x: 150 + idx * 250, y: 350 },
       data: {
         kind: 'transition',
         key: tKey,
