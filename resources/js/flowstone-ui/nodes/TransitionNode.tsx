@@ -11,16 +11,14 @@ export function TransitionNode({ data, selected }: NodeProps<TransitionData>) {
           selected ? 'border-orange-600 shadow-lg' : 'border-orange-400 shadow-md'
         } bg-white`}
       >
-        {/* Connection Handles */}
+        {/* Connection Handles - styled via CSS */}
         <Handle
           type="target"
           position={Position.Left}
-          className="w-3! h-3! bg-orange-500! border-2! border-white!"
         />
         <Handle
           type="source"
           position={Position.Right}
-          className="w-3! h-3! bg-orange-500! border-2! border-white!"
         />
 
         {/* Label - with roles info */}

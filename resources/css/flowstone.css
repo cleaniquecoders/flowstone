@@ -41,12 +41,15 @@
 }
 
 .react-flow__edge-path {
-  stroke-width: 2;
-  transition: stroke-width 0.2s ease;
+  stroke-width: 2.5;
+  stroke-dasharray: 8, 4;
+  animation: dash 20s linear infinite;
+  transition: all 0.3s ease;
 }
 
 .react-flow__edge:hover .react-flow__edge-path {
-  stroke-width: 3;
+  stroke-width: 3.5;
+  stroke-dasharray: 10, 5;
 }
 
 .react-flow__edge-text {
@@ -54,11 +57,50 @@
   font-weight: 600;
 }
 
+/* Make handles more visible and attractive */
 .react-flow__handle {
-  width: 8px;
-  height: 8px;
-  background: #0ea5e9;
-  border: 2px solid white;
+  width: 14px;
+  height: 14px;
+  background: linear-gradient(135deg, #0ea5e9 0%, #06b6d4 100%);
+  border: 3px solid white;
+  box-shadow: 0 2px 8px rgba(14, 165, 233, 0.4);
+  transition: all 0.2s ease;
+  cursor: crosshair;
+  opacity: 0.9;
+}
+
+.react-flow__handle:hover {
+  width: 18px;
+  height: 18px;
+  box-shadow: 0 4px 12px rgba(14, 165, 233, 0.6);
+  opacity: 1;
+  transform: scale(1.1);
+}
+
+/* Different colors for source and target handles */
+.react-flow__handle-left {
+  background: linear-gradient(135deg, #10b981 0%, #059669 100%);
+  box-shadow: 0 2px 8px rgba(16, 185, 129, 0.4);
+}
+
+.react-flow__handle-left:hover {
+  box-shadow: 0 4px 12px rgba(16, 185, 129, 0.6);
+}
+
+.react-flow__handle-right {
+  background: linear-gradient(135deg, #f59e0b 0%, #d97706 100%);
+  box-shadow: 0 2px 8px rgba(245, 158, 11, 0.4);
+}
+
+.react-flow__handle-right:hover {
+  box-shadow: 0 4px 12px rgba(245, 158, 11, 0.6);
+}
+
+/* Animated dash keyframe */
+@keyframes dash {
+  to {
+    stroke-dashoffset: -100;
+  }
 }
 
 .react-flow__controls {

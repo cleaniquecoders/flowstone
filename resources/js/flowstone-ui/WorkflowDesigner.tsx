@@ -165,13 +165,13 @@ function WorkflowDesignerInner({ initialConfig, initialDesigner, onChange, workf
       setEdges((eds) => addEdge({
         ...params,
         type: 'custom',
-        animated: false,
+        animated: true,
         label: edgeLabel,
         data: {
           transitionKey: edgeLabel || undefined,
         },
         style: {
-          strokeWidth: 2,
+          strokeWidth: 2.5,
           stroke: '#64748b',
         },
       }, eds));
@@ -298,16 +298,16 @@ function WorkflowDesignerInner({ initialConfig, initialDesigner, onChange, workf
         minZoom={0.1}
         maxZoom={2}
         defaultEdgeOptions={{
-          type: 'custom', // Custom bezier edge with Tailwind styling
+          type: 'custom', // Custom bezier edge with animated dashed lines
           markerEnd: {
             type: MarkerType.ArrowClosed,
-            width: 20,
-            height: 20,
+            width: 22,
+            height: 22,
             color: '#64748b',
           },
-          animated: false,
+          animated: true,
           style: {
-            strokeWidth: 2,
+            strokeWidth: 2.5,
             stroke: '#64748b',
           },
         }}
@@ -317,8 +317,9 @@ function WorkflowDesignerInner({ initialConfig, initialDesigner, onChange, workf
         snapToGrid={true}
         snapGrid={[15, 15]}
         connectionLineStyle={{
-          strokeWidth: 2,
+          strokeWidth: 2.5,
           stroke: '#64748b',
+          strokeDasharray: '8, 4',
         }}
         connectionLineType={ConnectionLineType.Bezier}
         className="bg-linear-to-br from-slate-50 via-gray-50 to-slate-100"

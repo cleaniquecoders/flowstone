@@ -13,16 +13,14 @@ export function PlaceNode({ data, selected }: NodeProps<PlaceData>) {
           selected ? 'border-blue-600 shadow-lg' : 'border-blue-400 shadow-md'
         } ${isInitial ? 'bg-blue-100' : 'bg-white'}`}
       >
-        {/* Connection Handles */}
+        {/* Connection Handles - styled via CSS */}
         <Handle
           type="target"
           position={Position.Left}
-          className="w-3! h-3! bg-blue-500! border-2! border-white!"
         />
         <Handle
           type="source"
           position={Position.Right}
-          className="w-3! h-3! bg-blue-500! border-2! border-white!"
         />
 
         {/* Initial Indicator */}
