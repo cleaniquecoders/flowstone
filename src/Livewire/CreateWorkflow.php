@@ -48,6 +48,13 @@ class CreateWorkflow extends Component
         $this->resetForm();
     }
 
+    protected function getListeners(): array
+    {
+        return [
+            'open-create-modal' => 'openModal',
+        ];
+    }
+
     public function resetForm(): void
     {
         $this->name = '';

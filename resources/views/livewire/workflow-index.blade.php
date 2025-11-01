@@ -26,11 +26,6 @@
                         </p>
                     </div>
                 </div>
-
-                <!-- Right Side: Create Button -->
-                <div class="lg:shrink-0">
-                    @livewire('flowstone.create-workflow')
-                </div>
             </div>
         </div>
     </div>
@@ -198,4 +193,7 @@
             </div>
         </div>
     @endif
+
+    {{-- Create Workflow Modal (Hidden, triggered from header) --}}
+    @livewire('flowstone.create-workflow')
 </div>
