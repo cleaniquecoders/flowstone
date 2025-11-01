@@ -24,6 +24,7 @@ import { PlaceNode } from './nodes/PlaceNode';
 import { TransitionNode } from './nodes/TransitionNode';
 import { TransitionHandleNode } from './nodes/TransitionHandleNode';
 import { CustomEdge } from './edges/CustomEdge';
+import { EditLabelModal } from './components/EditLabelModal';
 import { DesignerNodeData, WorkflowConfig, WorkflowType } from './types';
 import { compileGraphToWorkflow, parseWorkflowToGraph } from './mappers';
 import { getLayoutedElements } from './layoutUtils';
@@ -49,6 +50,10 @@ function WorkflowDesignerInner({ initialConfig, initialDesigner, onChange, workf
   const reactFlowWrapper = useRef<HTMLDivElement>(null);
   const [reactFlowInstance, setReactFlowInstance] = useState<any>(null);
   const [showToolbar, setShowToolbar] = useState(false);
+
+  // Modal state for editing node labels
+  const [editingNode, setEditingNode] = useState<Node | null>(null);
+  const [isModalOpen, setIsModalOpen] = useState(false);
 
   // Store instance globally for fullscreen handler
   const handleInit = useCallback((instance: any) => {
@@ -202,16 +207,19 @@ function WorkflowDesignerInner({ initialConfig, initialDesigner, onChange, workf
     setNodes((nds) => [...nds, newNode]);
   }, [setNodes, nodes, workflowType]);
 
-  // Handle double click to edit node label
+  // Handle double click to edit node label - opens modal
   const onNodeDoubleClick = useCallback((event: React.MouseEvent, node: Node) => {
-    const data = node.data as DesignerNodeData;
-    const newLabel = prompt('Enter new label:', data.label);
+    setEditingNode(node);
+    setIsModalOpen(true);
+  }, []);
 
-    if (newLabel && newLabel.trim()) {
+  // Handle saving new label from modal
+  const handleSaveLabel = useCallback((newLabel: string) => {
+    if (editingNode && newLabel.trim()) {
       const trimmedLabel = newLabel.trim();
       setNodes((nds) =>
         nds.map((n) =>
-          n.id === node.id
+          n.id === editingNode.id
             ? {
                 ...n,
                 data: {
@@ -224,7 +232,15 @@ function WorkflowDesignerInner({ initialConfig, initialDesigner, onChange, workf
         )
       );
     }
-  }, [setNodes]);
+    setIsModalOpen(false);
+    setEditingNode(null);
+  }, [editingNode, setNodes]);
+
+  // Handle canceling modal
+  const handleCancelEdit = useCallback(() => {
+    setIsModalOpen(false);
+    setEditingNode(null);
+  }, []);
 
   // Delete selected nodes and edges
   const onNodesDelete = useCallback((deletedNodes: Node[]) => {
@@ -308,9 +324,9 @@ function WorkflowDesignerInner({ initialConfig, initialDesigner, onChange, workf
         defaultEdgeOptions={{
           type: 'custom', // Custom bezier edge with animated dashed lines
           markerEnd: {
-            type: MarkerType.ArrowClosed,
-            width: 22,
-            height: 22,
+            type: MarkerType.Arrow,
+            width: 11,
+            height: 11,
             color: '#64748b',
           },
           animated: true,
@@ -472,6 +488,17 @@ function WorkflowDesignerInner({ initialConfig, initialDesigner, onChange, workf
           </div>
         </Panel>
       </ReactFlow>
+
+      {/* Edit Label Modal */}
+      {editingNode && (
+        <EditLabelModal
+          isOpen={isModalOpen}
+          currentLabel={(editingNode.data as DesignerNodeData).label}
+          nodeType={(editingNode.data as DesignerNodeData).kind}
+          onSave={handleSaveLabel}
+          onCancel={handleCancelEdit}
+        />
+      )}
     </div>
   );
 }
