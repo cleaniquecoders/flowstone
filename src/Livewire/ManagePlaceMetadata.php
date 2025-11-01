@@ -4,6 +4,7 @@ namespace CleaniqueCoders\Flowstone\Livewire;
 
 use CleaniqueCoders\Flowstone\Models\WorkflowPlace;
 use Illuminate\Contracts\View\View;
+use Illuminate\Support\Facades\Log;
 use Livewire\Attributes\Layout;
 use Livewire\Component;
 
@@ -82,50 +83,63 @@ class ManagePlaceMetadata extends Component
 
     public function addMetadata(): void
     {
-        $this->validate([
-            'key' => 'required|string|max:255',
-            'value' => 'required',
-            'type' => 'required|in:'.implode(',', array_keys($this->types)),
-        ]);
+        try {
+            $this->validate([
+                'key' => 'required|string|max:255',
+                'value' => 'required',
+                'type' => 'required|in:'.implode(',', array_keys($this->types)),
+            ]);
 
-        // Convert value based on type
-        $convertedValue = $this->convertValueByType($this->value, $this->type);
+            // Convert value based on type
+            $convertedValue = $this->convertValueByType($this->value, $this->type);
 
-        if ($this->isEditing) {
-            // Remove old key if it's different
-            if ($this->editingKey !== $this->key) {
-                unset($this->metadata[$this->editingKey]);
+            // Reload metadata to ensure we have the latest state
+            $this->loadMetadata();
+
+            if ($this->isEditing) {
+                // Remove old key if it's different
+                if ($this->editingKey !== $this->key) {
+                    unset($this->metadata[$this->editingKey]);
+                }
             }
+
+            // Check if key already exists (and not editing the same key)
+            if (isset($this->metadata[$this->key]) && ! $this->isEditing) {
+                $this->addError('key', 'This key already exists.');
+
+                return;
+            }
+
+            // Add or update metadata
+            $this->metadata[$this->key] = [
+                'value' => $convertedValue,
+                'type' => $this->type,
+            ];
+
+            // Save to database
+            $this->place->update([
+                'meta' => $this->metadata,
+            ]);
+
+            // Refresh the model to ensure we have the latest data
+            $this->place->refresh();
+
+            // Reload metadata from fresh model
+            $this->loadMetadata();
+
+            $this->resetForm();
+
+            session()->flash('success', $this->isEditing ? 'Metadata updated successfully!' : 'Metadata added successfully!');
+
+            $this->dispatch('place-metadata-updated', placeId: $this->place->id);
+            $this->dispatch('workflow-updated');
+        } catch (\Exception $e) {
+            Log::error('Failed to add/update place metadata', [
+                'place_id' => $this->place->id,
+                'error' => $e->getMessage(),
+            ]);
+            session()->flash('error', 'Failed to save metadata. Please try again.');
         }
-
-        // Check if key already exists (and not editing the same key)
-        if (isset($this->metadata[$this->key]) && ! $this->isEditing) {
-            $this->addError('key', 'This key already exists.');
-
-            return;
-        }
-
-        // Add or update metadata
-        $this->metadata[$this->key] = [
-            'value' => $convertedValue,
-            'type' => $this->type,
-        ];
-
-        // Save to database
-        $this->place->update([
-            'meta' => $this->metadata,
-        ]);
-
-        // Refresh the model to ensure we have the latest data
-        $this->place->refresh();
-
-        $this->resetForm();
-        $this->loadMetadata();
-
-        session()->flash('success', $this->isEditing ? 'Metadata updated successfully!' : 'Metadata added successfully!');
-
-        $this->dispatch('place-metadata-updated', placeId: $this->place->id);
-        $this->dispatch('workflow-updated');
     }
 
     public function editMetadata(string $key): void
@@ -145,21 +159,40 @@ class ManagePlaceMetadata extends Component
 
     public function deleteMetadata(string $key): void
     {
-        unset($this->metadata[$key]);
+        try {
+            // Reload metadata to ensure we have the latest state
+            $this->loadMetadata();
 
-        $this->place->update([
-            'meta' => $this->metadata,
-        ]);
+            if (! isset($this->metadata[$key])) {
+                session()->flash('error', 'Metadata key not found.');
 
-        // Refresh the model to ensure we have the latest data
-        $this->place->refresh();
+                return;
+            }
 
-        $this->loadMetadata();
+            unset($this->metadata[$key]);
 
-        session()->flash('success', 'Metadata deleted successfully!');
+            $this->place->update([
+                'meta' => $this->metadata,
+            ]);
 
-        $this->dispatch('place-metadata-updated', placeId: $this->place->id);
-        $this->dispatch('workflow-updated');
+            // Refresh the model to ensure we have the latest data
+            $this->place->refresh();
+
+            // Reload metadata from fresh model
+            $this->loadMetadata();
+
+            session()->flash('success', 'Metadata deleted successfully!');
+
+            $this->dispatch('place-metadata-updated', placeId: $this->place->id);
+            $this->dispatch('workflow-updated');
+        } catch (\Exception $e) {
+            Log::error('Failed to delete place metadata', [
+                'place_id' => $this->place->id,
+                'key' => $key,
+                'error' => $e->getMessage(),
+            ]);
+            session()->flash('error', 'Failed to delete metadata. Please try again.');
+        }
     }
 
     public function cancelEdit(): void

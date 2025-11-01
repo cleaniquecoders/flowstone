@@ -13,6 +13,7 @@ export function CustomEdge({
   style = {},
   markerEnd,
   label,
+  data,
 }: EdgeProps) {
   const { sourceNode, targetNode } = useStore((s) => {
     const sourceNode = s.nodeInternals.get(source);
@@ -59,8 +60,36 @@ export function CustomEdge({
                 pointerEvents: 'all',
               }}
             >
-              <div className="px-2.5 py-1 rounded-md text-xs font-semibold shadow-sm bg-white text-gray-700 border border-gray-300 cursor-pointer hover:bg-gray-50 transition-colors">
-                {label}
+              <div className="flex items-center gap-1.5">
+                <div className="px-2.5 py-1 rounded-md text-xs font-semibold shadow-sm bg-white text-gray-700 border border-gray-300 cursor-pointer hover:bg-gray-50 transition-colors">
+                  {label}
+                </div>
+                {data?.transitionId && (
+                  <button
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      console.log('Edge metadata button clicked for transition:', data.transitionKey);
+                      console.log('Transition ID:', data.transitionId);
+                      console.log('Livewire available?', !!(window as any).Livewire);
+
+                      if (data.transitionId) {
+                        console.log('Dispatching open-transition-metadata-modal with transitionId:', data.transitionId);
+                        (window as any).Livewire?.dispatch('open-transition-metadata-modal', { transitionId: data.transitionId });
+                      }
+                    }}
+                    onMouseDown={(e) => e.stopPropagation()}
+                    className={`w-6 h-6 rounded-full border-2 border-white shadow-lg flex items-center justify-center transition-all hover:scale-110 cursor-pointer nodrag nopan ${
+                      data?.metadata && Object.keys(data.metadata).length > 0
+                        ? 'bg-orange-600 hover:bg-orange-700'
+                        : 'bg-gray-400 hover:bg-gray-500'
+                    }`}
+                    title={data?.metadata && Object.keys(data.metadata).length > 0 ? 'Edit metadata' : 'Add metadata'}
+                  >
+                    <svg className="w-3 h-3 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" />
+                    </svg>
+                  </button>
+                )}
               </div>
             </div>
           </EdgeLabelRenderer>

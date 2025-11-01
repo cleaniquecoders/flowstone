@@ -105,8 +105,21 @@ function WorkflowDesignerInner({
           return node;
         });
 
+        // Merge saved edges with new edges to preserve transition IDs
+        const edgesWithData = graph.edges.map(edge => {
+          const savedEdge = initialDesigner.edges?.find((e: any) => e.id === edge.id);
+          if (savedEdge) {
+            return {
+              ...edge,
+              // Merge saved data with new data to preserve transition IDs
+              data: { ...savedEdge.data, transitionId: edge.data?.transitionId },
+            };
+          }
+          return edge;
+        });
+
         setNodes(nodesWithPositions);
-        setEdges(initialDesigner.edges || graph.edges);
+        setEdges(edgesWithData);
 
         // Restore viewport if saved
         if (initialDesigner.viewport && reactFlowInstance) {

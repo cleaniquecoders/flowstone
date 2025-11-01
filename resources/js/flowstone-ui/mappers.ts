@@ -178,6 +178,7 @@ export function parseWorkflowToGraph(
             animated: false,
             data: {
               transitionKey: tKey,
+              transitionId: transitionsWithIds[tKey], // Add database ID for metadata management
               metadata: meta,
             },
             style: {
