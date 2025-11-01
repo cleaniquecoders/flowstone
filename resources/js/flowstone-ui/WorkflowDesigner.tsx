@@ -17,6 +17,7 @@ import {
   EdgeTypes,
   MarkerType,
   ConnectionLineType,
+  ConnectionMode,
 } from 'reactflow';
 import 'reactflow/dist/style.css';
 
@@ -322,7 +323,7 @@ function WorkflowDesignerInner({ initialConfig, initialDesigner, onChange, workf
         minZoom={0.1}
         maxZoom={2}
         defaultEdgeOptions={{
-          type: 'custom', // Custom bezier edge with animated dashed lines
+          type: 'custom',
           markerEnd: {
             type: MarkerType.Arrow,
             width: 11,
@@ -340,12 +341,13 @@ function WorkflowDesignerInner({ initialConfig, initialDesigner, onChange, workf
         elementsSelectable={true}
         snapToGrid={true}
         snapGrid={[15, 15]}
+        connectionMode={ConnectionMode.Loose}
         connectionLineStyle={{
           strokeWidth: 2.5,
           stroke: '#64748b',
           strokeDasharray: '8, 4',
         }}
-        connectionLineType={ConnectionLineType.Bezier}
+        connectionLineType={ConnectionLineType.SmoothStep}
         className="bg-linear-to-br from-slate-50 via-gray-50 to-slate-100"
       >
         <Background

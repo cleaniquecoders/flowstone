@@ -9,6 +9,7 @@ import ReactFlow, {
   NodeTypes,
   MarkerType,
   Position,
+  ConnectionMode,
 } from 'reactflow';
 import 'reactflow/dist/style.css';
 
@@ -103,7 +104,7 @@ export function ReactFlowCanvas({ graph }: { graph: GraphPayload }) {
     }));
   }, [graph]);
 
-  // Transform edges with better styling
+  // Transform edges with better styling - using smoothstep
   const edges: Edge[] = useMemo(() => {
     if (!graph?.edges) return [];
 
@@ -182,9 +183,14 @@ export function ReactFlowCanvas({ graph }: { graph: GraphPayload }) {
           }}
           minZoom={0.1}
           maxZoom={4}
+          connectionMode={ConnectionMode.Loose}
           defaultEdgeOptions={{
             type: 'smoothstep',
             animated: false,
+            style: {
+              strokeWidth: 2,
+              stroke: '#94a3b8',
+            },
           }}
           className="bg-linear-to-br from-gray-50 to-white"
         >

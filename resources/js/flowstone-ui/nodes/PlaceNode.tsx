@@ -7,11 +7,11 @@ export function PlaceNode({ data, selected }: NodeProps<PlaceData>) {
 
   return (
     <div className="relative">
-      {/* Simple Circular Place Node */}
+      {/* Auto-sized Circular Place Node - Always Blue */}
       <div
-        className={`w-24 h-24 rounded-full border-4 flex items-center justify-center transition-all cursor-pointer ${
-          selected ? 'border-blue-600 shadow-lg' : 'border-blue-400 shadow-md'
-        } ${isInitial ? 'bg-blue-100' : 'bg-white'}`}
+        className={`min-w-24 min-h-24 max-w-40 rounded-md border-4 bg-blue-50 flex items-center justify-center transition-all cursor-pointer px-4 py-4 ${
+          selected ? 'border-blue-600 shadow-lg ring-2 ring-blue-300' : 'border-blue-500 shadow-md'
+        }`}
       >
         {/* Connection Handles - styled via CSS */}
         <Handle
@@ -25,11 +25,11 @@ export function PlaceNode({ data, selected }: NodeProps<PlaceData>) {
 
         {/* Initial Indicator */}
         {isInitial && (
-          <div className="absolute -top-1 -right-1 w-4 h-4 bg-green-500 rounded-full border-2 border-white" />
+          <div className="absolute -top-1 -right-1 w-4 h-4 bg-green-500 rounded-md border-2 border-white" />
         )}
 
         {/* Label */}
-        <div className="text-sm font-bold text-gray-800 text-center px-2 wrap-break-word">
+        <div className="text-sm font-bold text-blue-900 text-center wrap-break-word leading-tight">
           {data.label}
         </div>
       </div>
