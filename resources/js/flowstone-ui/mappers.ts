@@ -1,5 +1,5 @@
 import { Edge, Node, Position } from 'reactflow';
-import { WorkflowConfig, DesignerNodeData } from './types';
+import { WorkflowConfig, DesignerNodeData, WorkflowType } from './types';
 
 export function compileGraphToWorkflow(nodes: Node[], edges: Edge[]): WorkflowConfig {
   const places = nodes
@@ -11,54 +11,103 @@ export function compileGraphToWorkflow(nodes: Node[], edges: Edge[]): WorkflowCo
     }, {});
 
   const transitionsNodes = nodes.filter(n => (n.data as DesignerNodeData)?.kind === 'transition');
+  const placeNodes = nodes.filter(n => (n.data as DesignerNodeData)?.kind === 'place');
 
-  const transitions = transitionsNodes.reduce<Record<string, any>>((acc, t) => {
-    const data = t.data as DesignerNodeData;
-    const incomingPlaces = edges
-      .filter(e => e.target === t.id)
-      .map(e => e.source)
-      .map(srcId => nodes.find(n => n.id === srcId))
-      .filter(Boolean)
-      .filter(n => (n!.data as DesignerNodeData)?.kind === 'place')
-      .map(n => (n!.data as DesignerNodeData).key);
+  let transitions: Record<string, any> = {};
 
-    const outgoingPlaces = edges
-      .filter(e => e.source === t.id)
-      .map(e => e.target)
-      .map(tgtId => nodes.find(n => n.id === tgtId))
-      .filter(Boolean)
-      .filter(n => (n!.data as DesignerNodeData)?.kind === 'place')
-      .map(n => (n!.data as DesignerNodeData).key);
+  // Check if this is a state machine (direct place-to-place edges with labels)
+  const hasTransitionNodes = transitionsNodes.length > 0;
 
-    // For now, single target place
-    const to = outgoingPlaces[0];
+  if (hasTransitionNodes) {
+    // Workflow type: transitions are nodes
+    transitions = transitionsNodes.reduce<Record<string, any>>((acc, t) => {
+      const data = t.data as DesignerNodeData;
+      const incomingPlaces = edges
+        .filter(e => e.target === t.id)
+        .map(e => e.source)
+        .map(srcId => nodes.find(n => n.id === srcId))
+        .filter(Boolean)
+        .filter(n => (n!.data as DesignerNodeData)?.kind === 'place')
+        .map(n => (n!.data as DesignerNodeData).key);
 
-    acc[data.key] = {
-      from: incomingPlaces,
-      to,
-      metadata: { ...(data.meta ?? {}) },
-    };
-    return acc;
-  }, {});
+      const outgoingPlaces = edges
+        .filter(e => e.source === t.id)
+        .map(e => e.target)
+        .map(tgtId => nodes.find(n => n.id === tgtId))
+        .filter(Boolean)
+        .filter(n => (n!.data as DesignerNodeData)?.kind === 'place')
+        .map(n => (n!.data as DesignerNodeData).key);
+
+      const to = outgoingPlaces[0];
+
+      acc[data.key] = {
+        from: incomingPlaces,
+        to,
+        metadata: { ...(data.meta ?? {}) },
+      };
+      return acc;
+    }, {});
+  } else {
+    // State Machine: transitions are edge labels
+    edges.forEach(edge => {
+      const sourceNode = nodes.find(n => n.id === edge.source);
+      const targetNode = nodes.find(n => n.id === edge.target);
+
+      if (sourceNode && targetNode && edge.label) {
+        const transitionKey = edge.data?.transitionKey || edge.label;
+        const fromKey = (sourceNode.data as DesignerNodeData).key;
+        const toKey = (targetNode.data as DesignerNodeData).key;
+
+        if (!transitions[transitionKey]) {
+          transitions[transitionKey] = {
+            from: [fromKey],
+            to: toKey,
+            metadata: edge.data?.metadata || {},
+          };
+        } else {
+          // Add to existing from array if not already there
+          if (!transitions[transitionKey].from.includes(fromKey)) {
+            transitions[transitionKey].from.push(fromKey);
+          }
+        }
+      }
+    });
+  }
 
   return {
-    type: 'state_machine',
+    type: hasTransitionNodes ? 'workflow' : 'state_machine',
     places,
     transitions,
     metadata: {},
   };
 }
 
-export function parseWorkflowToGraph(config: WorkflowConfig): { nodes: Node[]; edges: Edge[] } {
+export function parseWorkflowToGraph(
+  config: WorkflowConfig,
+  workflowType: WorkflowType = 'workflow'
+): { nodes: Node[]; edges: Edge[] } {
   const placeIdByKey = new Map<string, string>();
   const transitionIdByKey = new Map<string, string>();
   const nodes: Node[] = [];
   const edges: Edge[] = [];
 
+  // Set default dimensions for ELK layout
+  const placeNodeDimensions = { width: 96, height: 96 }; // w-24 h-24 (fixed size)
+
+  // Helper function to calculate transition node width based on text length
+  const calculateTransitionWidth = (label: string): number => {
+    const minWidth = 96; // min-w-24
+    const charWidth = 8; // approximate width per character
+    const padding = 32; // px-4 on both sides
+    const calculatedWidth = label.length * charWidth + padding;
+    return Math.max(minWidth, Math.min(calculatedWidth, 300)); // max 300px
+  };
+
   // Handle places - they can be in different formats
   const places = config.places || {};
   const placeEntries = Object.entries(places);
 
+  // Horizontal layout: places arranged left to right with more spacing
   placeEntries.forEach(([key, placeConfig], idx) => {
     const id = `place-${key}`;
     placeIdByKey.set(key, id);
@@ -79,11 +128,13 @@ export function parseWorkflowToGraph(config: WorkflowConfig): { nodes: Node[]; e
       }
     }
 
-    // Horizontal layout: places arranged left to right
+    // Initial position (will be layouted by ELK)
     nodes.push({
       id,
       type: 'place',
-      position: { x: 100 + idx * 320, y: 200 },
+      position: { x: 0, y: 0 },
+      width: placeNodeDimensions.width,
+      height: placeNodeDimensions.height,
       data: {
         kind: 'place',
         key,
@@ -94,86 +145,112 @@ export function parseWorkflowToGraph(config: WorkflowConfig): { nodes: Node[]; e
     });
   });
 
-  // Handle transitions - positioned between their connected places
+  // Handle transitions - different rendering based on workflow type
   const transitions = config.transitions || {};
   const transitionEntries = Object.entries(transitions);
 
-  transitionEntries.forEach(([tKey, def], idx) => {
-    const tId = `transition-${tKey}`;
-    transitionIdByKey.set(tKey, tId);
+  if (workflowType === 'state_machine') {
+    // State Machine: Direct edges between places with transition labels
+    transitionEntries.forEach(([tKey, def]) => {
+      const fromPlaces = (def as any).from || [];
+      const toPlace = (def as any).to;
+      const meta = (typeof def === 'object' && def !== null && 'metadata' in def)
+        ? (def as any).metadata || {}
+        : {};
 
-    // Handle transition metadata
-    let meta: any = {};
-    if (typeof def === 'object' && def !== null && 'metadata' in def) {
-      meta = (def as any).metadata || {};
-    }
+      // Create direct edges from each source place to target place
+      fromPlaces.forEach((fromKey: string, idx: number) => {
+        const fromId = placeIdByKey.get(fromKey);
+        const toId = placeIdByKey.get(toPlace);
 
-    // Calculate position based on connected places for better horizontal flow
-    const fromPlaces = (def as any).from || [];
-    const toPlace = (def as any).to;
-
-    let xPos = 100 + idx * 320;
-    let yPos = 400; // Below places for vertical spacing
-
-    // Try to position transition between source and target
-    if (fromPlaces.length > 0 && toPlace) {
-      const fromIdx = placeEntries.findIndex(([k]) => k === fromPlaces[0]);
-      const toIdx = placeEntries.findIndex(([k]) => k === toPlace);
-
-      if (fromIdx !== -1 && toIdx !== -1) {
-        xPos = 100 + ((fromIdx + toIdx) / 2) * 320;
-      }
-    }
-
-    nodes.push({
-      id: tId,
-      type: 'transition',
-      position: { x: xPos, y: yPos },
-      data: {
-        kind: 'transition',
-        key: tKey,
-        label: tKey,
-        meta
-      },
+        if (fromId && toId) {
+          edges.push({
+            id: `e-${fromId}-${toId}-${tKey}`,
+            source: fromId,
+            target: toId,
+            label: tKey, // Transition name as edge label
+            type: 'custom',
+            animated: false,
+            data: {
+              transitionKey: tKey,
+              metadata: meta,
+            },
+            style: {
+              strokeWidth: 2,
+              stroke: '#64748b',
+            },
+          });
+        }
+      });
     });
+  } else {
+    // Workflow: Use transition nodes (squares) between places
+    transitionEntries.forEach(([tKey, def], idx) => {
+      const tId = `transition-${tKey}`;
+      transitionIdByKey.set(tKey, tId);
 
-    // Handle from/to connections
-    fromPlaces.forEach((pKey: string, pIdx: number) => {
-      const pId = placeIdByKey.get(pKey);
-      if (pId) {
-        edges.push({
-          id: `e-${pId}-${tId}-${pIdx}`,
-          source: pId,
-          target: tId,
-          label: '',
-          data: { arc: 'in' },
-          type: 'default', // Use default bezier for smoother curves
-          style: {
-            strokeWidth: 2,
-            stroke: '#64748b',
-          },
-        });
+      // Handle transition metadata
+      let meta: any = {};
+      if (typeof def === 'object' && def !== null && 'metadata' in def) {
+        meta = (def as any).metadata || {};
+      }
+
+      // Get connected places
+      const fromPlaces = (def as any).from || [];
+      const toPlace = (def as any).to;
+
+      // Create transition node with calculated width based on label length
+      const transitionWidth = calculateTransitionWidth(tKey);
+      nodes.push({
+        id: tId,
+        type: 'transition',
+        position: { x: 0, y: 0 },
+        width: transitionWidth,
+        height: 96, // min-h-24 (can grow vertically if needed)
+        data: {
+          kind: 'transition',
+          key: tKey,
+          label: tKey,
+          meta
+        },
+      });
+
+      // Handle from/to connections
+      fromPlaces.forEach((pKey: string, pIdx: number) => {
+        const pId = placeIdByKey.get(pKey);
+        if (pId) {
+          edges.push({
+            id: `e-${pId}-${tId}-${pIdx}`,
+            source: pId,
+            target: tId,
+            type: 'custom',
+            animated: false,
+            style: {
+              strokeWidth: 2,
+              stroke: '#64748b',
+            },
+          });
+        }
+      });
+
+      if (toPlace) {
+        const toId = placeIdByKey.get(toPlace);
+        if (toId) {
+          edges.push({
+            id: `e-${tId}-${toId}`,
+            source: tId,
+            target: toId,
+            type: 'custom',
+            animated: false,
+            style: {
+              strokeWidth: 2,
+              stroke: '#64748b',
+            },
+          });
+        }
       }
     });
-
-    if (toPlace) {
-      const toId = placeIdByKey.get(toPlace);
-      if (toId) {
-        edges.push({
-          id: `e-${tId}-${toId}`,
-          source: tId,
-          target: toId,
-          label: '',
-          data: { arc: 'out' },
-          type: 'default', // Use default bezier for smoother curves
-          style: {
-            strokeWidth: 2,
-            stroke: '#64748b',
-          },
-        });
-      }
-    }
-  });
+  }
 
   return { nodes, edges };
 }

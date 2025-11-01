@@ -17,8 +17,10 @@ export type TransitionData = {
 
 export type DesignerNodeData = PlaceData | TransitionData;
 
+export type WorkflowType = 'state_machine' | 'workflow';
+
 export type WorkflowConfig = {
-  type: 'state_machine' | 'workflow';
+  type: WorkflowType;
   places: Record<string, unknown>;
   transitions: Record<
     string,

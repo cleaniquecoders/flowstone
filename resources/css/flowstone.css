@@ -28,6 +28,18 @@
   cursor: pointer;
 }
 
+/* Edge Label Positioning */
+.react-flow__edge-label-wrapper {
+  position: absolute;
+  pointer-events: all;
+}
+
+.edge-label-positioned {
+  position: absolute;
+  transform: translate(-50%, -50%);
+  pointer-events: all;
+}
+
 .react-flow__edge-path {
   stroke-width: 2;
   transition: stroke-width 0.2s ease;

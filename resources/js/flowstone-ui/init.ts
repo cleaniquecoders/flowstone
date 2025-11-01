@@ -42,7 +42,13 @@ if (!window.FlowstoneUI) {
       root = createRoot(el);
       (el as any).__flowstone_root__ = root;
     }
-    root.render(React.createElement(WorkflowDesigner, { initialConfig: config, onChange }));
+    // Determine workflow type from config
+    const workflowType = config?.type || 'workflow';
+    root.render(React.createElement(WorkflowDesigner, {
+      initialConfig: config,
+      onChange,
+      workflowType
+    }));
   } catch (e) {
     console.error('FlowstoneUI.mountDesigner error:', e);
     if (el) {
