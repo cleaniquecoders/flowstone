@@ -20,6 +20,9 @@ class Workflow extends Model implements WorkflowContract
     protected $fillable = [
         'name',
         'description',
+        'group',
+        'category',
+        'tags',
         'type',
         'initial_marking',
         'marking',
@@ -34,6 +37,7 @@ class Workflow extends Model implements WorkflowContract
         'meta' => 'array',
         'config' => 'array',
         'designer' => 'array',
+        'tags' => 'array',
     ];
 
     public function places(): HasMany
@@ -46,9 +50,123 @@ class Workflow extends Model implements WorkflowContract
         return $this->hasMany(WorkflowTransition::class)->orderBy('sort_order');
     }
 
+    // Tag management methods
+    public function addTag(string $tag): void
+    {
+        $tags = $this->tags ?? [];
+
+        if (! in_array($tag, $tags)) {
+            $tags[] = $tag;
+            $this->update(['tags' => $tags]);
+        }
+    }
+
+    public function removeTag(string $tag): void
+    {
+        $tags = $this->tags ?? [];
+
+        $tags = array_values(array_filter($tags, fn ($t) => $t !== $tag));
+        $this->update(['tags' => $tags]);
+    }
+
+    public function hasTag(string $tag): bool
+    {
+        return in_array($tag, $this->tags ?? []);
+    }
+
+    public function syncTags(array $tags): void
+    {
+        $this->update(['tags' => array_values(array_unique($tags))]);
+    }
+
+    // Scopes for filtering
     public function scopeIsEnabled($query)
     {
         return $query->where('is_enabled', true);
+    }
+
+    public function scopeByGroup($query, string $group)
+    {
+        return $query->where('group', $group);
+    }
+
+    public function scopeByCategory($query, string $category)
+    {
+        return $query->where('category', $category);
+    }
+
+    public function scopeByTag($query, string $tag)
+    {
+        return $query->whereJsonContains('tags', $tag);
+    }
+
+    public function scopeByTags($query, array $tags)
+    {
+        foreach ($tags as $tag) {
+            $query->whereJsonContains('tags', $tag);
+        }
+
+        return $query;
+    }
+
+    public function scopeByAnyTag($query, array $tags)
+    {
+        return $query->where(function ($q) use ($tags) {
+            foreach ($tags as $tag) {
+                $q->orWhereJsonContains('tags', $tag);
+            }
+        });
+    }
+
+    public function scopeSearch($query, string $term)
+    {
+        return $query->where(function ($q) use ($term) {
+            $q->where('name', 'like', "%{$term}%")
+                ->orWhere('description', 'like', "%{$term}%")
+                ->orWhere('group', 'like', "%{$term}%")
+                ->orWhere('category', 'like', "%{$term}%")
+                ->orWhereJsonContains('tags', $term);
+        });
+    }
+
+    /**
+     * Get all unique groups
+     */
+    public static function getAllGroups(): array
+    {
+        return static::whereNotNull('group')
+            ->distinct()
+            ->pluck('group')
+            ->sort()
+            ->values()
+            ->toArray();
+    }
+
+    /**
+     * Get all unique categories
+     */
+    public static function getAllCategories(): array
+    {
+        return static::whereNotNull('category')
+            ->distinct()
+            ->pluck('category')
+            ->sort()
+            ->values()
+            ->toArray();
+    }
+
+    /**
+     * Get all unique tags
+     */
+    public static function getAllTags(): array
+    {
+        return static::pluck('tags')
+            ->flatten()
+            ->unique()
+            ->filter()
+            ->sort()
+            ->values()
+            ->toArray();
     }
 
     /**

@@ -15,6 +15,9 @@ class WorkflowFactory extends Factory
         return [
             'name' => $this->faker->sentence(3),
             'description' => $this->faker->paragraph(),
+            'group' => $this->faker->randomElement(['finance', 'operations', 'hr', 'sales', 'support', 'it']),
+            'category' => $this->faker->randomElement(['document-management', 'e-commerce', 'customer-support', 'project-management', 'approval', 'reporting']),
+            'tags' => $this->faker->randomElements(['Critical', 'Automated', 'Manual Review', 'SLA', 'Compliance', 'Customer-facing', 'Internal', 'Time-sensitive'], $this->faker->numberBetween(1, 4)),
             'type' => 'state_machine',
             'initial_marking' => Status::DRAFT->value,
             'marking' => Status::DRAFT->value,
