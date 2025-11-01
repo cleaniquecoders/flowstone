@@ -1,13 +1,22 @@
 import React from 'react';
-import { Handle, Position, NodeProps } from 'reactflow';
+import { Handle, Position, NodeProps, NodeResizer } from 'reactflow';
 import { TransitionData } from '../types';
 
 export function TransitionNode({ data, selected }: NodeProps<TransitionData>) {
   return (
-    <div className="relative inline-block">
-      {/* Auto-sized Square Transition Node with Dashed Border */}
+    <div className="relative w-full h-full">
+      {/* Node Resizer - visible when selected, resize from all sides */}
+      <NodeResizer
+        isVisible={selected}
+        minWidth={112}
+        minHeight={96}
+        handleStyle={{ width: '12px', height: '12px' }}
+        lineStyle={{ borderWidth: '2px' }}
+      />
+
+      {/* Transition Node with Dashed Border */}
       <div
-        className={`min-w-28 min-h-24 max-w-60 rounded-md bg-orange-50 border-4 border-dashed flex items-center justify-center transition-all cursor-pointer px-5 py-4 ${
+        className={`w-full h-full rounded-md bg-orange-50 border-4 border-dashed flex items-center justify-center transition-all cursor-pointer px-5 py-4 ${
           selected ? 'border-orange-600 shadow-lg ring-2 ring-orange-300' : 'border-orange-500 shadow-md'
         }`}
       >

@@ -1,15 +1,24 @@
 import React from 'react';
-import { Handle, Position, NodeProps } from 'reactflow';
+import { Handle, Position, NodeProps, NodeResizer } from 'reactflow';
 import { PlaceData } from '../types';
 
 export function PlaceNode({ data, selected }: NodeProps<PlaceData>) {
   const isInitial = data.isInitial;
 
   return (
-    <div className="relative">
-      {/* Auto-sized Circular Place Node - Always Blue */}
+    <div className="relative w-full h-full">
+      {/* Node Resizer - visible when selected, resize from all sides */}
+      <NodeResizer
+        isVisible={selected}
+        minWidth={96}
+        minHeight={96}
+        handleStyle={{ width: '12px', height: '12px' }}
+        lineStyle={{ borderWidth: '2px' }}
+      />
+
+      {/* Place Node - Always Blue */}
       <div
-        className={`min-w-24 min-h-24 max-w-40 rounded-md border-4 bg-blue-50 flex items-center justify-center transition-all cursor-pointer px-4 py-4 ${
+        className={`w-full h-full rounded-md border-4 bg-blue-50 flex items-center justify-center transition-all cursor-pointer px-4 py-4 ${
           selected ? 'border-blue-600 shadow-lg ring-2 ring-blue-300' : 'border-blue-500 shadow-md'
         }`}
       >

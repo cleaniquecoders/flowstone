@@ -81,11 +81,16 @@ function WorkflowDesignerInner({ initialConfig, initialDesigner, onChange, workf
 
       // Check if we have saved designer positions
       if (initialDesigner?.nodes && initialDesigner.nodes.length > 0) {
-        // Use saved positions
+        // Use saved positions, data, and style (including dimensions)
         const nodesWithPositions = graph.nodes.map(node => {
           const savedNode = initialDesigner.nodes.find((n: any) => n.id === node.id);
-          if (savedNode?.position) {
-            return { ...node, position: savedNode.position };
+          if (savedNode) {
+            return {
+              ...node,
+              position: savedNode.position || node.position,
+              data: savedNode.data || node.data,
+              style: savedNode.style || node.style,
+            };
           }
           return node;
         });
@@ -118,6 +123,8 @@ function WorkflowDesignerInner({ initialConfig, initialDesigner, onChange, workf
           id: node.id,
           position: node.position,
           type: node.type,
+          data: node.data,
+          style: node.style,
         })),
         edges: edges.map(edge => ({
           id: edge.id,
@@ -208,6 +215,14 @@ function WorkflowDesignerInner({ initialConfig, initialDesigner, onChange, workf
         ...(type === 'place' ? { meta: { color: '#3b82f6' } } : { meta: {} }),
       } as DesignerNodeData,
     };
+
+    // Set default dimensions for resizable nodes (not for transitionHandle)
+    if (nodeType !== 'transitionHandle') {
+      newNode.style = {
+        width: type === 'place' ? 120 : 140,
+        height: type === 'place' ? 120 : 100,
+      };
+    }
 
     setNodes((nds) => [...nds, newNode]);
   }, [setNodes, nodes, workflowType]);
@@ -354,6 +369,8 @@ function WorkflowDesignerInner({ initialConfig, initialDesigner, onChange, workf
         id: node.id,
         position: node.position,
         type: node.type,
+        data: node.data,
+        style: node.style,
       })),
       edges: edges.map(edge => ({
         id: edge.id,
