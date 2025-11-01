@@ -10,7 +10,7 @@ declare global {
   interface Window {
     FlowstoneUI?: {
       mount: (el: HTMLElement, graph: GraphPayload) => void;
-      mountDesigner: (el: HTMLElement, config?: WorkflowConfig, onChange?: (config: WorkflowConfig) => void) => void;
+      mountDesigner: (el: HTMLElement, config?: WorkflowConfig, designer?: any, onChange?: (config: WorkflowConfig, designer: any) => void) => void;
     };
   }
 }
@@ -35,7 +35,7 @@ if (!window.FlowstoneUI) {
   }
 };
 
-(window.FlowstoneUI as any).mountDesigner = (el: HTMLElement, config?: WorkflowConfig, onChange?: (config: WorkflowConfig) => void) => {
+(window.FlowstoneUI as any).mountDesigner = (el: HTMLElement, config?: WorkflowConfig, designer?: any, onChange?: (config: WorkflowConfig, designer: any) => void) => {
   try {
     let root: Root | undefined = (el as any).__flowstone_root__;
     if (!root) {
@@ -46,6 +46,7 @@ if (!window.FlowstoneUI) {
     const workflowType = config?.type || 'workflow';
     root.render(React.createElement(WorkflowDesigner, {
       initialConfig: config,
+      initialDesigner: designer,
       onChange,
       workflowType
     }));

@@ -40,11 +40,12 @@ const edgeTypes: EdgeTypes = {
 
 interface WorkflowDesignerProps {
   initialConfig?: WorkflowConfig;
-  onChange?: (config: WorkflowConfig) => void;
+  initialDesigner?: any;
+  onChange?: (config: WorkflowConfig, designer: any) => void;
   workflowType?: WorkflowType;
 }
 
-function WorkflowDesignerInner({ initialConfig, onChange, workflowType = 'workflow' }: WorkflowDesignerProps) {
+function WorkflowDesignerInner({ initialConfig, initialDesigner, onChange, workflowType = 'workflow' }: WorkflowDesignerProps) {
   const reactFlowWrapper = useRef<HTMLDivElement>(null);
   const [reactFlowInstance, setReactFlowInstance] = useState<any>(null);
   const [showToolbar, setShowToolbar] = useState(false);
@@ -59,17 +60,62 @@ function WorkflowDesignerInner({ initialConfig, onChange, workflowType = 'workfl
   const [nodes, setNodes, onNodesChange] = useNodesState([]);
   const [edges, setEdges, onEdgesChange] = useEdgesState([]);
 
-  // Apply ELK layout when config loads
+  // Apply ELK layout when config loads OR load saved designer positions
   useEffect(() => {
     if (initialConfig) {
       const graph = parseWorkflowToGraph(initialConfig, workflowType);
 
-      getLayoutedElements(graph.nodes, graph.edges).then(({ nodes: layoutedNodes, edges: layoutedEdges }) => {
-        setNodes(layoutedNodes);
-        setEdges(layoutedEdges);
-      });
+      // Check if we have saved designer positions
+      if (initialDesigner?.nodes && initialDesigner.nodes.length > 0) {
+        // Use saved positions
+        const nodesWithPositions = graph.nodes.map(node => {
+          const savedNode = initialDesigner.nodes.find((n: any) => n.id === node.id);
+          if (savedNode?.position) {
+            return { ...node, position: savedNode.position };
+          }
+          return node;
+        });
+
+        setNodes(nodesWithPositions);
+        setEdges(initialDesigner.edges || graph.edges);
+
+        // Restore viewport if saved
+        if (initialDesigner.viewport && reactFlowInstance) {
+          setTimeout(() => {
+            reactFlowInstance.setViewport(initialDesigner.viewport);
+          }, 100);
+        }
+      } else {
+        // Use ELK auto-layout for new workflows
+        getLayoutedElements(graph.nodes, graph.edges).then(({ nodes: layoutedNodes, edges: layoutedEdges }) => {
+          setNodes(layoutedNodes);
+          setEdges(layoutedEdges);
+        });
+      }
     }
-  }, [initialConfig, workflowType, setNodes, setEdges]);
+  }, [initialConfig, initialDesigner, workflowType, setNodes, setEdges, reactFlowInstance]);
+
+  // Auto-save: Trigger onChange when nodes or edges change
+  useEffect(() => {
+    if (nodes.length > 0 && onChange) {
+      const config = compileGraphToWorkflow(nodes, edges);
+      const designerData = {
+        nodes: nodes.map(node => ({
+          id: node.id,
+          position: node.position,
+          type: node.type,
+        })),
+        edges: edges.map(edge => ({
+          id: edge.id,
+          source: edge.source,
+          target: edge.target,
+          label: edge.label,
+        })),
+        viewport: reactFlowInstance?.getViewport() || { x: 0, y: 0, zoom: 1 },
+      };
+      onChange(config, designerData);
+    }
+  }, [nodes, edges, reactFlowInstance, onChange]);
 
   // Handle window resize to reposition panels and fit view
   useEffect(() => {
@@ -93,25 +139,14 @@ function WorkflowDesignerInner({ initialConfig, onChange, workflowType = 'workfl
     return map;
   }, [nodes]);
 
-  // Validate connections based on workflow type
+  // Allow all connections - no restrictions
   const isValidConnection = useCallback((connection: Connection) => {
     const sourceNode = nodesById.get(connection.source!);
     const targetNode = nodesById.get(connection.target!);
 
-    if (!sourceNode || !targetNode) return false;
-
-    const sourceKind = (sourceNode.data as DesignerNodeData)?.kind;
-    const targetKind = (targetNode.data as DesignerNodeData)?.kind;
-
-    if (workflowType === 'state_machine') {
-      // State Machine: Only allow place -> place connections
-      return sourceKind === 'place' && targetKind === 'place';
-    } else {
-      // Workflow: Only allow place -> transition or transition -> place
-      return (sourceKind === 'place' && targetKind === 'transition') ||
-             (sourceKind === 'transition' && targetKind === 'place');
-    }
-  }, [nodesById, workflowType]);
+    // Just check that both nodes exist
+    return !!(sourceNode && targetNode);
+  }, [nodesById]);
 
   const onConnect = useCallback((params: Connection) => {
     if (isValidConnection(params)) {
@@ -217,12 +252,29 @@ function WorkflowDesignerInner({ initialConfig, onChange, workflowType = 'workfl
     addNode(type as 'place' | 'transition', position);
   }, [reactFlowInstance, addNode]);
 
-  // Export current graph to workflow config
+  // Export current graph to workflow config with designer data
   const exportWorkflow = useCallback(() => {
     const config = compileGraphToWorkflow(nodes, edges);
-    onChange?.(config);
+
+    // Capture designer layout data
+    const designerData = {
+      nodes: nodes.map(node => ({
+        id: node.id,
+        position: node.position,
+        type: node.type,
+      })),
+      edges: edges.map(edge => ({
+        id: edge.id,
+        source: edge.source,
+        target: edge.target,
+        label: edge.label,
+      })),
+      viewport: reactFlowInstance?.getViewport() || { x: 0, y: 0, zoom: 1 },
+    };
+
+    onChange?.(config, designerData);
     return config;
-  }, [nodes, edges, onChange]);
+  }, [nodes, edges, reactFlowInstance, onChange]);
 
   return (
     <div className="w-full h-full relative" ref={reactFlowWrapper}>

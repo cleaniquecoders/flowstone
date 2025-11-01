@@ -39,7 +39,7 @@ Route::group([
         Route::prefix('api')->group(function () {
             Route::get('/workflows', [FlowstoneApiController::class, 'index']);
             Route::get('/workflows/{workflow}', [FlowstoneApiController::class, 'show']);
-            Route::patch('/workflows/{workflow}', [FlowstoneApiController::class, 'update']);
+            Route::patch('/workflows/{workflow}', [FlowstoneApiController::class, 'update'])->name('flowstone.api.workflow.update');
             Route::get('/workflows/{workflow}/graph', [FlowstoneApiController::class, 'graph']);
         });
     });

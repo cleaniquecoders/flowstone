@@ -21,7 +21,17 @@ class Flowstone
         }
 
         if (static::shouldInlineAssets()) {
-            $styles = @file_get_contents(__DIR__.'/../dist/flowstone-ui.css');
+            $cssPath = __DIR__.'/../dist/flowstone-ui.css';
+
+            if (! file_exists($cssPath)) {
+                throw new RuntimeException(
+                    'Unable to load the flowstone dashboard CSS. '.
+                    'Please run "npm run build" to compile the assets. '.
+                    'Expected path: '.$cssPath
+                );
+            }
+
+            $styles = file_get_contents($cssPath);
 
             return new HtmlString(<<<HTML
                 <style>{$styles}</style>
@@ -50,9 +60,17 @@ class Flowstone
         $flowstone = Js::from(static::scriptVariables());
 
         if (static::shouldInlineAssets()) {
-            if (($js = @file_get_contents(__DIR__.'/../dist/flowstone-ui.js')) === false) {
-                throw new RuntimeException('Unable to load the flowstone dashboard JavaScript.');
+            $jsPath = __DIR__.'/../dist/flowstone-ui.js';
+
+            if (! file_exists($jsPath)) {
+                throw new RuntimeException(
+                    'Unable to load the flowstone dashboard JavaScript. '.
+                    'Please run "npm run build" to compile the assets. '.
+                    'Expected path: '.$jsPath
+                );
             }
+
+            $js = file_get_contents($jsPath);
 
             $sourceMapUrl = route('flowstone.asset', ['asset' => 'flowstone-ui.js.map']);
 

@@ -198,13 +198,16 @@
         `;
 
         if (window.FlowstoneUI && window.FlowstoneUI.mountDesigner) {
-            // Load existing workflow config
+            // Load existing workflow config and designer data
             const workflowConfig = @json($workflow->config && !empty($workflow->config) ? $workflow->config : null);
+            const designerData = @json($workflow->designer ?? null);
 
-            window.FlowstoneUI.mountDesigner(designerElement, workflowConfig, function(updatedConfig) {
+            window.FlowstoneUI.mountDesigner(designerElement, workflowConfig, designerData, function(updatedConfig, updatedDesigner) {
                 console.log('Workflow updated:', updatedConfig);
-                // Store the config for saving
+                console.log('Designer updated:', updatedDesigner);
+                // Store both config and designer data for saving
                 window.currentWorkflowConfig = updatedConfig;
+                window.currentDesignerData = updatedDesigner;
             });
         } else {
             designerElement.innerHTML = `
@@ -243,14 +246,15 @@
             saveText.textContent = 'Saving...';
             saveSpinner.classList.remove('hidden');
 
-            fetch('{{ route("flowstone.workflows.designer", $workflow) }}', {
+            fetch('{{ route("flowstone.api.workflow.update", $workflow) }}', {
                 method: 'PATCH',
                 headers: {
                     'Content-Type': 'application/json',
                     'X-CSRF-TOKEN': '{{ csrf_token() }}'
                 },
                 body: JSON.stringify({
-                    config: window.currentWorkflowConfig
+                    config: window.currentWorkflowConfig,
+                    designer: window.currentDesignerData
                 })
             })
             .then(response => response.json())

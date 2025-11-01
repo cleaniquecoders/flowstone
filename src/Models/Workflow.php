@@ -24,6 +24,7 @@ class Workflow extends Model implements WorkflowContract
         'initial_marking',
         'marking',
         'config',
+        'designer',
         'is_enabled',
         'meta',
     ];
@@ -32,6 +33,7 @@ class Workflow extends Model implements WorkflowContract
         'is_enabled' => 'boolean',
         'meta' => 'array',
         'config' => 'array',
+        'designer' => 'array',
     ];
 
     public function places(): HasMany
