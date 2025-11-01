@@ -170,41 +170,66 @@ function WorkflowDesignerInner({ initialConfig, onChange }: WorkflowDesignerProp
         <MiniMap
           nodeColor={(node) => {
             const kind = (node.data as DesignerNodeData)?.kind;
-            return kind === 'place' ? '#3b82f6' : '#fb923c';
+            return kind === 'place' ? '#3b82f6' : '#f97316';
           }}
-          maskColor="rgba(0, 0, 0, 0.05)"
-          nodeBorderRadius={8}
+          maskColor="rgba(0, 0, 0, 0.08)"
+          nodeStrokeWidth={3}
+          className="bg-white! border! border-gray-200! rounded-lg! shadow-lg!"
         />
 
         {/* Toolbar Panel */}
-        <Panel position="top-left" className="bg-white p-4 rounded-lg shadow-lg border">
-          <div className="flex gap-2">
-            <div
-              className="px-3 py-2 bg-blue-500 text-white rounded cursor-move"
-              onDragStart={(event) => {
-                event.dataTransfer.setData('application/reactflow', 'place');
-                event.dataTransfer.effectAllowed = 'move';
-              }}
-              draggable
-            >
-              Add Place
+        <Panel position="top-left" className="bg-white/95 backdrop-blur-sm p-4 rounded-xl shadow-xl border border-gray-200">
+          <div className="flex flex-col gap-3">
+            <div className="text-xs font-semibold text-gray-600 uppercase tracking-wider mb-1">
+              Components
             </div>
-            <div
-              className="px-3 py-2 bg-orange-500 text-white rounded cursor-move"
-              onDragStart={(event) => {
-                event.dataTransfer.setData('application/reactflow', 'transition');
-                event.dataTransfer.effectAllowed = 'move';
-              }}
-              draggable
-            >
-              Add Transition
+            <div className="flex gap-2">
+              {/* Add Place */}
+              <div
+                className="group flex items-center gap-2 px-4 py-2.5 bg-blue-500 hover:bg-blue-600 text-white rounded-lg shadow-md hover:shadow-lg cursor-move transition-all"
+                onDragStart={(event) => {
+                  event.dataTransfer.setData('application/reactflow', 'place');
+                  event.dataTransfer.effectAllowed = 'move';
+                }}
+                draggable
+                title="Drag to canvas to add a new place (state)"
+              >
+                <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" />
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" />
+                </svg>
+                <span className="text-sm font-semibold">Place</span>
+              </div>
+
+              {/* Add Transition */}
+              <div
+                className="group flex items-center gap-2 px-4 py-2.5 bg-orange-500 hover:bg-orange-600 text-white rounded-lg shadow-md hover:shadow-lg cursor-move transition-all"
+                onDragStart={(event) => {
+                  event.dataTransfer.setData('application/reactflow', 'transition');
+                  event.dataTransfer.effectAllowed = 'move';
+                }}
+                draggable
+                title="Drag to canvas to add a new transition (action)"
+              >
+                <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M13 10V3L4 14h7v7l9-11h-7z" />
+                </svg>
+                <span className="text-sm font-semibold">Transition</span>
+              </div>
             </div>
-            <button
-              onClick={exportWorkflow}
-              className="px-3 py-2 bg-green-500 text-white rounded hover:bg-green-600"
-            >
-              Export
-            </button>
+
+            <div className="border-t border-gray-200 pt-3">
+              <button
+                onClick={exportWorkflow}
+                className="w-full flex items-center justify-center gap-2 px-4 py-2 bg-green-500 hover:bg-green-600 text-white rounded-lg shadow-md hover:shadow-lg transition-all font-semibold text-sm"
+                title="Export workflow configuration"
+              >
+                <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4" />
+                </svg>
+                Export Config
+              </button>
+            </div>
           </div>
         </Panel>
       </ReactFlow>

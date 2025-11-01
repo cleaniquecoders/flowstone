@@ -70,24 +70,85 @@
                 </div>
             </div>
 
-            <!-- Workflow Designer -->
-            <div class="bg-white rounded-xl shadow-sm border border-gray-200 overflow-hidden">
-                <div class="border-b border-gray-200 px-6 py-4">
-                    <div class="flex items-center justify-between">
-                        <div>
-                            <h2 class="text-lg font-semibold text-gray-900">Workflow Designer</h2>
-                            <p class="text-sm text-gray-600">Drag and drop to design your workflow states and transitions</p>
-                        </div>
-                        <div class="flex items-center space-x-2 text-sm text-gray-500">
-                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+            <!-- Info Cards -->
+            <div class="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-8">
+                <!-- Workflow Info -->
+                <div class="bg-white rounded-xl shadow-sm border border-gray-200 p-6">
+                    <div class="flex items-start gap-4">
+                        <div class="w-12 h-12 bg-blue-100 rounded-full flex items-center justify-center shrink-0">
+                            <svg class="w-6 h-6 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
                             </svg>
-                            <span>Click nodes to edit, drag to reposition</span>
+                        </div>
+                        <div class="flex-1 min-w-0">
+                            <h3 class="text-sm font-semibold text-gray-900 mb-1">What is a Workflow?</h3>
+                            <p class="text-sm text-gray-600 leading-relaxed">
+                                A workflow models a process where objects can be in <strong>multiple places simultaneously</strong>.
+                                Perfect for complex processes like document approval where multiple reviewers work in parallel.
+                            </p>
                         </div>
                     </div>
                 </div>
 
-                <div id="workflow-designer" class="w-full h-[800px] bg-gray-50">
+                <!-- State Machine Info -->
+                <div class="bg-white rounded-xl shadow-sm border border-gray-200 p-6">
+                    <div class="flex items-start gap-4">
+                        <div class="w-12 h-12 bg-purple-100 rounded-full flex items-center justify-center shrink-0">
+                            <svg class="w-6 h-6 text-purple-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2" />
+                            </svg>
+                        </div>
+                        <div class="flex-1 min-w-0">
+                            <h3 class="text-sm font-semibold text-gray-900 mb-1">What is a State Machine?</h3>
+                            <p class="text-sm text-gray-600 leading-relaxed">
+                                A state machine holds a <strong>single state at a time</strong>.
+                                Ideal for linear processes like order status (pending → processing → completed) or blog post publishing.
+                            </p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Workflow Designer -->
+            <div class="bg-white rounded-xl shadow-sm border border-gray-200 overflow-hidden">
+                <div class="border-b border-gray-200 px-6 py-5 bg-linear-to-r from-gray-50 to-white">
+                    <div class="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-4">
+                        <div>
+                            <h2 class="text-lg font-semibold text-gray-900 mb-1">Visual Designer</h2>
+                            <p class="text-sm text-gray-600">Drag and drop to design your workflow states and transitions</p>
+                        </div>
+                        <div class="flex items-center gap-4">
+                            <!-- Legend -->
+                            <div class="flex items-center gap-4 px-4 py-2 bg-gray-50 rounded-lg border border-gray-200">
+                                <div class="flex items-center gap-2">
+                                    <div class="w-8 h-8 bg-blue-500 rounded-full shadow-sm flex items-center justify-center">
+                                        <svg class="w-4 h-4 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" />
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" />
+                                        </svg>
+                                    </div>
+                                    <span class="text-xs font-medium text-gray-700">Place (State)</span>
+                                </div>
+                                <div class="flex items-center gap-2">
+                                    <div class="w-8 h-8 bg-orange-500 rounded-lg shadow-sm flex items-center justify-center">
+                                        <svg class="w-4 h-4 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z" />
+                                        </svg>
+                                    </div>
+                                    <span class="text-xs font-medium text-gray-700">Transition (Action)</span>
+                                </div>
+                            </div>
+                            <div class="flex items-center gap-2 text-xs text-gray-500">
+                                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                                </svg>
+                                <span>Click to edit • Drag to move</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div id="workflow-designer" class="w-full h-[800px] bg-linear-to-br from-gray-50 to-gray-100">
                     <!-- Workflow Designer will be mounted here -->
                 </div>
             </div>
@@ -106,9 +167,12 @@
         designerElement.innerHTML = `
             <div class="flex items-center justify-center h-full">
                 <div class="text-center">
-                    <div class="animate-spin rounded-full h-12 w-12 border-b-2 border-flowstone-600 mx-auto mb-4"></div>
-                    <p class="text-gray-600 font-medium">Loading Workflow Designer...</p>
-                    <p class="text-gray-400 text-sm mt-1">Please wait while we initialize the canvas</p>
+                    <div class="relative w-16 h-16 mx-auto mb-6">
+                        <div class="absolute inset-0 border-4 border-flowstone-200 rounded-full"></div>
+                        <div class="absolute inset-0 border-4 border-flowstone-600 rounded-full border-t-transparent animate-spin"></div>
+                    </div>
+                    <p class="text-gray-700 font-semibold text-lg mb-2">Loading Visual Designer...</p>
+                    <p class="text-gray-500 text-sm max-w-md mx-auto">Initializing the interactive canvas where you can design your workflow with places (circles) and transitions (squares)</p>
                 </div>
             </div>
         `;
@@ -125,14 +189,22 @@
         } else {
             designerElement.innerHTML = `
                 <div class="flex items-center justify-center h-full">
-                    <div class="text-center">
-                        <div class="text-gray-400 mb-4">
-                            <svg class="mx-auto h-16 w-16" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <div class="text-center max-w-lg">
+                        <div class="mb-6">
+                            <svg class="mx-auto h-20 w-20 text-orange-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-2.5L13.732 4c-.77-.833-1.964-.833-2.732 0L4.082 16.5c-.77.833.192 2.5 1.732 2.5z" />
                             </svg>
                         </div>
-                        <p class="text-gray-500 text-lg font-medium">Flowstone UI not loaded</p>
-                        <p class="text-gray-400 text-sm mt-2 max-w-md">Please check that the JavaScript bundle is properly built and loaded. Try running <code class="bg-gray-100 px-1 py-0.5 rounded text-xs">npm run build</code> or <code class="bg-gray-100 px-1 py-0.5 rounded text-xs">npm run watch</code>.</p>
+                        <p class="text-gray-700 text-xl font-semibold mb-3">Designer Not Available</p>
+                        <p class="text-gray-600 text-sm mb-4 leading-relaxed">The Flowstone UI JavaScript bundle is not loaded. Please ensure the assets are properly built.</p>
+                        <div class="bg-gray-50 border border-gray-200 rounded-lg p-4 text-left">
+                            <p class="text-xs font-semibold text-gray-700 mb-2">Build the assets:</p>
+                            <div class="space-y-2">
+                                <code class="block bg-gray-900 text-green-400 px-3 py-2 rounded text-xs font-mono">npm run build</code>
+                                <p class="text-xs text-gray-500 text-center">or for development with hot reload</p>
+                                <code class="block bg-gray-900 text-green-400 px-3 py-2 rounded text-xs font-mono">npm run watch</code>
+                            </div>
+                        </div>
                     </div>
                 </div>
             `;
