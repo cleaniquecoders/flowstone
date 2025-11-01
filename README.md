@@ -4,7 +4,7 @@
 
 **Flowstone** is a powerful Laravel package that integrates the robust **Symfony Workflow** engine into your Laravel applications. Build sophisticated workflow and state machine systems with database-driven configurations, role-based permissions, and seamless Laravel integration.
 
-![Designer](screenshots/designer-state-machine.png)
+![Workflow Designer — Document Approval](screenshots/workflow-designer-document-approval.png)
 
 ## 🚀 Key Features
 
