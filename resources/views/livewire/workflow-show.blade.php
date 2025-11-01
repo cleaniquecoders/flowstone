@@ -186,11 +186,48 @@
                 </div>
 
                 <!-- Meta Information -->
-                @if ($workflow->meta)
-                    <div class="bg-white border border-gray-200 rounded-xl p-6 shadow-sm">
-                        <h3 class="text-lg font-semibold text-gray-900 mb-4">Meta Information</h3>
-                        <div class="bg-gray-50 rounded-lg p-4">
-                            <pre class="text-sm text-gray-800 whitespace-pre-wrap">{{ json_encode($workflow->meta, JSON_PRETTY_PRINT) }}</pre>
+                @if ($workflow->meta && count($workflow->meta) > 0)
+                    <div class="bg-white border border-gray-200 rounded-xl shadow-sm">
+                        <div class="border-b border-gray-200 px-6 py-4">
+                            <div class="flex items-center justify-between">
+                                <div>
+                                    <h3 class="text-lg font-semibold text-gray-900">Meta Information</h3>
+                                    <p class="text-sm text-gray-600">Custom metadata key-value pairs</p>
+                                </div>
+                                <button type="button" wire:click="$dispatch('open-metadata-modal')"
+                                    class="inline-flex items-center gap-2 px-3 py-1.5 text-sm font-medium text-flowstone-600 hover:text-flowstone-700 hover:bg-flowstone-50 rounded-lg transition-colors">
+                                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                            d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"/>
+                                    </svg>
+                                    <span>Manage</span>
+                                </button>
+                            </div>
+                        </div>
+                        <div class="p-6">
+                            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                                @foreach ($workflow->meta as $key => $item)
+                                    <div class="bg-gray-50 border border-gray-200 rounded-lg p-4 hover:border-flowstone-300 transition-colors">
+                                        <div class="flex items-center gap-2 mb-2">
+                                            <div class="text-sm font-medium text-gray-900">{{ $key }}</div>
+                                            <span class="inline-flex items-center px-2 py-0.5 rounded text-xs font-medium bg-gray-200 text-gray-700">
+                                                {{ $item['type'] ?? 'string' }}
+                                            </span>
+                                        </div>
+                                        <div class="text-sm text-gray-600 break-all">
+                                            @if (is_array($item['value']))
+                                                <code class="text-xs bg-gray-100 px-1 py-0.5 rounded font-mono block overflow-x-auto">{{ json_encode($item['value']) }}</code>
+                                            @elseif(is_bool($item['value']))
+                                                <span class="inline-flex items-center px-2 py-0.5 rounded text-xs font-medium {{ $item['value'] ? 'bg-green-100 text-green-800' : 'bg-red-100 text-red-800' }}">
+                                                    {{ $item['value'] ? 'True' : 'False' }}
+                                                </span>
+                                            @else
+                                                {{ $item['value'] }}
+                                            @endif
+                                        </div>
+                                    </div>
+                                @endforeach
+                            </div>
                         </div>
                     </div>
                 @endif
@@ -231,26 +268,60 @@
                 </div>
 
                 <!-- Workflow Metadata -->
-                @if ($workflow->meta)
-                    <div class="bg-white border border-gray-200 rounded-xl p-6 shadow-sm">
-                        <h3 class="text-lg font-semibold text-gray-900 mb-4">Workflow Metadata</h3>
-                        <div class="bg-gray-50 rounded-lg p-4">
-                            <pre class="text-sm text-gray-800 whitespace-pre-wrap">{{ json_encode($workflow->meta, JSON_PRETTY_PRINT) }}</pre>
-                        </div>
+                <div class="bg-white border border-gray-200 rounded-xl p-6 shadow-sm">
+                    <div class="flex items-center justify-between mb-4">
+                        <h3 class="text-lg font-semibold text-gray-900">Workflow Metadata</h3>
+                        <button type="button" wire:click="$dispatch('open-metadata-modal')"
+                            class="inline-flex items-center gap-2 px-3 py-1.5 text-sm font-medium text-flowstone-600 hover:text-flowstone-700 hover:bg-flowstone-50 rounded-lg transition-colors">
+                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                    d="M12 4v16m8-8H4" />
+                            </svg>
+                            <span>{{ $workflow->meta ? 'Manage' : 'Add' }}</span>
+                        </button>
                     </div>
-                @else
-                    <div class="bg-white border border-gray-200 rounded-xl p-6 shadow-sm">
-                        <h3 class="text-lg font-semibold text-gray-900 mb-4">Workflow Metadata</h3>
-                        <div class="text-center py-4">
-                            <svg class="mx-auto h-8 w-8 text-gray-400" fill="none" viewBox="0 0 24 24"
+
+                    @if ($workflow->meta && count($workflow->meta) > 0)
+                        <div class="space-y-2">
+                            @foreach ($workflow->meta as $key => $item)
+                                <div class="flex items-start justify-between p-3 bg-gray-50 rounded-lg">
+                                    <div class="flex-1 min-w-0">
+                                        <div class="flex items-center gap-2">
+                                            <span class="font-medium text-gray-900 text-sm">{{ $key }}</span>
+                                            <span
+                                                class="inline-flex items-center px-2 py-0.5 rounded text-xs font-medium bg-gray-200 text-gray-700">
+                                                {{ $item['type'] ?? 'string' }}
+                                            </span>
+                                        </div>
+                                        <div class="mt-1 text-sm text-gray-600 break-all">
+                                            @if (is_array($item['value']))
+                                                <code
+                                                    class="text-xs bg-gray-100 px-1 py-0.5 rounded font-mono">{{ json_encode($item['value']) }}</code>
+                                            @elseif(is_bool($item['value']))
+                                                <span
+                                                    class="inline-flex items-center px-2 py-0.5 rounded text-xs font-medium {{ $item['value'] ? 'bg-green-100 text-green-800' : 'bg-red-100 text-red-800' }}">
+                                                    {{ $item['value'] ? 'True' : 'False' }}
+                                                </span>
+                                            @else
+                                                {{ Str::limit($item['value'], 100) }}
+                                            @endif
+                                        </div>
+                                    </div>
+                                </div>
+                            @endforeach
+                        </div>
+                    @else
+                        <div class="text-center py-6">
+                            <svg class="mx-auto h-12 w-12 text-gray-400" fill="none" viewBox="0 0 24 24"
                                 stroke="currentColor">
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                                     d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
                             </svg>
-                            <p class="mt-2 text-sm text-gray-500">No metadata available</p>
+                            <h3 class="mt-2 text-sm font-medium text-gray-900">No metadata available</h3>
+                            <p class="mt-1 text-sm text-gray-500">Click "Add" to create metadata entries.</p>
                         </div>
-                    </div>
-                @endif
+                    @endif
+                </div>
 
                 <!-- Configuration -->
                 @if ($workflow->config)
@@ -271,5 +342,8 @@
 
     {{-- Edit Workflow Modal --}}
     @livewire('flowstone.edit-workflow', ['workflow' => $workflow], key('edit-workflow-' . $workflow->id))
+
+    {{-- Manage Metadata Modal --}}
+    @livewire('flowstone.manage-workflow-metadata', ['workflow' => $workflow], key('manage-metadata-' . $workflow->id))
 
 </div>
