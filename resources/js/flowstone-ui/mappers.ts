@@ -86,7 +86,9 @@ export function compileGraphToWorkflow(nodes: Node[], edges: Edge[]): WorkflowCo
 
 export function parseWorkflowToGraph(
   config: WorkflowConfig,
-  workflowType: WorkflowType = 'workflow'
+  workflowType: WorkflowType = 'workflow',
+  placesWithIds: Record<string, number> = {},
+  transitionsWithIds: Record<string, number> = {}
 ): { nodes: Node[]; edges: Edge[] } {
   const placeIdByKey = new Map<string, string>();
   const transitionIdByKey = new Map<string, string>();
@@ -141,6 +143,7 @@ export function parseWorkflowToGraph(
         kind: 'place',
         key,
         label: key,
+        id: placesWithIds[key], // Add database ID
         isInitial,
         meta
       },
@@ -213,6 +216,7 @@ export function parseWorkflowToGraph(
           kind: 'transition',
           key: tKey,
           label: tKey,
+          id: transitionsWithIds[tKey], // Add database ID
           meta
         },
       });

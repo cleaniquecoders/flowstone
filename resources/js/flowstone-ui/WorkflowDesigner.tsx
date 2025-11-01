@@ -45,9 +45,18 @@ interface WorkflowDesignerProps {
   initialDesigner?: any;
   onChange?: (config: WorkflowConfig, designer: any) => void;
   workflowType?: WorkflowType;
+  placesWithIds?: Record<string, number>;
+  transitionsWithIds?: Record<string, number>;
 }
 
-function WorkflowDesignerInner({ initialConfig, initialDesigner, onChange, workflowType = 'workflow' }: WorkflowDesignerProps) {
+function WorkflowDesignerInner({
+  initialConfig,
+  initialDesigner,
+  onChange,
+  workflowType = 'workflow',
+  placesWithIds = {},
+  transitionsWithIds = {}
+}: WorkflowDesignerProps) {
   const reactFlowWrapper = useRef<HTMLDivElement>(null);
   const [reactFlowInstance, setReactFlowInstance] = useState<any>(null);
   const [showToolbar, setShowToolbar] = useState(false);
@@ -77,7 +86,7 @@ function WorkflowDesignerInner({ initialConfig, initialDesigner, onChange, workf
   // Apply ELK layout when config loads OR load saved designer positions
   useEffect(() => {
     if (initialConfig) {
-      const graph = parseWorkflowToGraph(initialConfig, workflowType);
+      const graph = parseWorkflowToGraph(initialConfig, workflowType, placesWithIds, transitionsWithIds);
 
       // Check if we have saved designer positions
       if (initialDesigner?.nodes && initialDesigner.nodes.length > 0) {
@@ -88,7 +97,8 @@ function WorkflowDesignerInner({ initialConfig, initialDesigner, onChange, workf
             return {
               ...node,
               position: savedNode.position || node.position,
-              data: savedNode.data || node.data,
+              // Merge saved data with new data to preserve database IDs
+              data: { ...savedNode.data, id: node.data.id },
               style: savedNode.style || node.style,
             };
           }

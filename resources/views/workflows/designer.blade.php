@@ -95,6 +95,15 @@
         </div>
     </div>
 
+    {{-- Metadata Management Modals --}}
+    @foreach($workflow->places as $place)
+        @livewire('flowstone.manage-place-metadata', ['place' => $place], key('place-metadata-' . $place->id))
+    @endforeach
+
+    @foreach($workflow->transitions as $transition)
+        @livewire('flowstone.manage-transition-metadata', ['transition' => $transition], key('transition-metadata-' . $transition->id))
+    @endforeach
+
     @push('scripts')
         <script>
             document.addEventListener('DOMContentLoaded', function() {
@@ -130,6 +139,15 @@
                     const workflowConfig = @json($workflow->config && !empty($workflow->config) ? $workflow->config : null);
                     const designerData = @json($workflow->designer ?? null);
 
+                    // Pass places and transitions with their IDs for metadata management
+                    const placesWithIds = @json($workflow->places->mapWithKeys(function($place) {
+                        return [$place->name => $place->id];
+                    }));
+
+                    const transitionsWithIds = @json($workflow->transitions->mapWithKeys(function($transition) {
+                        return [$transition->name => $transition->id];
+                    }));
+
                     window.FlowstoneUI.mountDesigner(designerElement, workflowConfig, designerData, function(
                         updatedConfig, updatedDesigner) {
                         console.log('Workflow updated:', updatedConfig);
@@ -137,6 +155,9 @@
                         // Store both config and designer data for saving
                         window.currentWorkflowConfig = updatedConfig;
                         window.currentDesignerData = updatedDesigner;
+                    }, {
+                        placesWithIds,
+                        transitionsWithIds
                     });
                 } else {
                     designerElement.innerHTML = `

@@ -8,6 +8,8 @@ use CleaniqueCoders\Flowstone\Commands\PublishAssetsCommand;
 use CleaniqueCoders\Flowstone\Livewire\CreateWorkflow;
 use CleaniqueCoders\Flowstone\Livewire\Dashboard;
 use CleaniqueCoders\Flowstone\Livewire\EditWorkflow;
+use CleaniqueCoders\Flowstone\Livewire\ManagePlaceMetadata;
+use CleaniqueCoders\Flowstone\Livewire\ManageTransitionMetadata;
 use CleaniqueCoders\Flowstone\Livewire\ManageWorkflowMetadata;
 use CleaniqueCoders\Flowstone\Livewire\WorkflowIndex;
 use CleaniqueCoders\Flowstone\Livewire\WorkflowShow;
@@ -89,6 +91,8 @@ class FlowstoneServiceProvider extends PackageServiceProvider
         Livewire::component('flowstone.create-workflow', CreateWorkflow::class);
         Livewire::component('flowstone.edit-workflow', EditWorkflow::class);
         Livewire::component('flowstone.manage-workflow-metadata', ManageWorkflowMetadata::class);
+        Livewire::component('flowstone.manage-place-metadata', ManagePlaceMetadata::class);
+        Livewire::component('flowstone.manage-transition-metadata', ManageTransitionMetadata::class);
     }
 
     protected function registerBladeComponents(): void

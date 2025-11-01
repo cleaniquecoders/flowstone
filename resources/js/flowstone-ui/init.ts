@@ -11,7 +11,13 @@ declare global {
   interface Window {
     FlowstoneUI?: {
       mount: (el: HTMLElement, graph: GraphPayload) => void;
-      mountDesigner: (el: HTMLElement, config?: WorkflowConfig, designer?: any, onChange?: (config: WorkflowConfig, designer: any) => void) => void;
+      mountDesigner: (
+        el: HTMLElement,
+        config?: WorkflowConfig,
+        designer?: any,
+        onChange?: (config: WorkflowConfig, designer: any) => void,
+        options?: { placesWithIds?: Record<string, number>; transitionsWithIds?: Record<string, number> }
+      ) => void;
       mountInfoModal: (el: HTMLElement, workflowType: string) => void;
     };
   }
@@ -37,7 +43,13 @@ if (!window.FlowstoneUI) {
   }
 };
 
-(window.FlowstoneUI as any).mountDesigner = (el: HTMLElement, config?: WorkflowConfig, designer?: any, onChange?: (config: WorkflowConfig, designer: any) => void) => {
+(window.FlowstoneUI as any).mountDesigner = (
+  el: HTMLElement,
+  config?: WorkflowConfig,
+  designer?: any,
+  onChange?: (config: WorkflowConfig, designer: any) => void,
+  options?: { placesWithIds?: Record<string, number>; transitionsWithIds?: Record<string, number> }
+) => {
   try {
     let root: Root | undefined = (el as any).__flowstone_root__;
     if (!root) {
@@ -50,7 +62,9 @@ if (!window.FlowstoneUI) {
       initialConfig: config,
       initialDesigner: designer,
       onChange,
-      workflowType
+      workflowType,
+      placesWithIds: options?.placesWithIds,
+      transitionsWithIds: options?.transitionsWithIds
     }));
   } catch (e) {
     console.error('FlowstoneUI.mountDesigner error:', e);

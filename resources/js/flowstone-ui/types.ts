@@ -4,6 +4,7 @@ export type PlaceData = {
   kind: 'place';
   key: string;
   label: string;
+  id?: number;
   isInitial?: boolean;
   meta?: { color?: string; [k: string]: unknown };
 };
@@ -12,8 +13,18 @@ export type TransitionData = {
   kind: 'transition';
   key: string;
   label: string;
+  id?: number;
   meta?: { roles?: string[]; guard?: string; [k: string]: unknown };
 };
+
+// Extend Window interface for Livewire
+declare global {
+  interface Window {
+    Livewire?: {
+      dispatch(event: string, data?: Record<string, any>): void;
+    };
+  }
+}
 
 export type DesignerNodeData = PlaceData | TransitionData;
 
