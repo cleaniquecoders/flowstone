@@ -1,6 +1,20 @@
-# Usage Guide
+# Workflows
 
-Complete guide for using Flowstone in your Laravel applications, from basic implementation to advanced patterns.
+This page introduces the Flowstone UI for managing workflows and provides a quick guide to implementing workflows in your app.
+
+## Screenshots
+
+### Dashboard — Welcome to Flowstone
+
+![Dashboard — Welcome to Flowstone](../../screenshots/dashboard.png)
+
+### Workflows — List & Filters
+
+![Workflows — List & Filters](../../screenshots/workflow-list.png)
+
+---
+
+Below is a practical usage guide for adding workflow support to your models.
 
 ## Getting Started
 

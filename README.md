@@ -4,6 +4,8 @@
 
 **Flowstone** is a powerful Laravel package that integrates the robust **Symfony Workflow** engine into your Laravel applications. Build sophisticated workflow and state machine systems with database-driven configurations, role-based permissions, and seamless Laravel integration.
 
+![Designer](screenshots/designer-state-machine.png)
+
 ## 🚀 Key Features
 
 - **🔄 Database-Driven Workflows** - Configure workflows through the database for runtime flexibility
@@ -47,24 +49,9 @@ php artisan vendor:publish --tag="flowstone-config"
 
 Comprehensive documentation is available in the [`docs/`](docs/) directory:
 
-- **[Getting Started](docs/01-getting-started/)**
-  - [Installation Guide](docs/01-getting-started/01-installation.md) - Detailed setup instructions
-  - [Quick Start Guide](docs/01-getting-started/02-quick-start.md) - Get up and running quickly
-- **[Configuration Reference](docs/02-configuration/01-configuration.md)** - Complete configuration options
-- **[Usage Guide](docs/03-usage/01-usage-guide.md)** - Detailed usage instructions
-- **[API Reference](docs/04-api/01-api-reference.md)** - Complete API documentation
-
 ## Examples
 
 Real-world examples are available in the [`examples/`](examples/) directory:
-
-1. **[Document Approval](examples/document-approval/)** - Classic approval process with roles
-2. **[E-commerce Orders](examples/ecommerce-order/)** - Order lifecycle management
-3. **[Content Publishing](examples/content-publishing/)** - Editorial workflow with scheduling
-4. **[Bug Tracking](examples/bug-tracking/)** - Issue management for development teams
-5. **[Employee Onboarding](examples/employee-onboarding/)** - HR workflow with multi-department coordination
-
-Each example includes complete implementation with models, controllers, views, and tests.
 
 ## Testing
 

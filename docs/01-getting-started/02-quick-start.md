@@ -2,6 +2,15 @@
 
 Get up and running with Flowstone in minutes! This guide shows you how to implement a basic workflow in your Laravel application.
 
+## Overview
+
+This guide will show you how to:
+
+1. Create a model with workflow support
+2. Define workflow configuration
+3. Apply transitions
+4. Use the Flowstone UI (optional)
+
 ## Step 1: Create a Model with Workflow
 
 Let's create a document approval workflow as an example.
@@ -491,14 +500,90 @@ class DocumentWorkflowTest extends TestCase
 }
 ```
 
+## Step 5: Use the Flowstone UI (Optional)
+
+Flowstone includes a visual workflow designer and management interface.
+
+### Access the UI
+
+Navigate to the Flowstone UI in your browser:
+
+```
+http://your-app.test/flowstone
+```
+
+### UI Features
+
+The Flowstone UI provides:
+
+1. **Dashboard** - Overview of all workflows
+2. **Workflow List** - Browse and filter workflows by group, category, or tags
+3. **Workflow Designer** - Visual drag-and-drop workflow builder using React Flow
+4. **Workflow Details** - View workflow configuration, places, and transitions
+5. **Metadata Management** - Configure roles and permissions for transitions
+
+### Creating a Workflow via UI
+
+1. Click "Create Workflow" in the UI
+2. Fill in the basic information:
+   - Name: `document-approval`
+   - Type: State Machine
+   - Group: `documents`
+   - Category: `approval`
+   - Tags: `Critical`, `Management`
+3. Add places (states) using the visual designer
+4. Define transitions between states
+5. Configure metadata (roles, permissions) for each transition
+6. Save and enable the workflow
+
+### Visual Workflow Graph
+
+The UI displays an interactive graph of your workflow:
+
+- **Nodes**: Represent workflow places (states)
+- **Edges**: Represent transitions between states
+- **Metadata**: Hover over transitions to see roles and permissions
+
+### Authorization
+
+By default, the UI is only accessible in the `local` environment. To configure access:
+
+```php
+// In AuthServiceProvider
+Gate::define('viewFlowstone', function ($user) {
+    return in_array($user->email, [
+        'admin@example.com',
+    ]);
+});
+```
+
+Or configure in `config/flowstone.php`:
+
+```php
+'ui' => [
+    'enabled' => true,
+    'middleware' => ['web', 'auth'],
+    'gate' => 'viewFlowstone',
+],
+```
+
 ## Next Steps
 
-Congratulations! You've implemented a basic workflow. Now you can:
+Now that you have a basic workflow running:
 
-1. **Explore [Database Workflows](database-workflows.md)** for dynamic configuration
-2. **Learn about [Advanced Usage](advanced-usage.md)** for complex scenarios
-3. **Check [Examples](examples.md)** for more workflow patterns
-4. **Review [API Reference](../04-api/01-api-reference.md)** for detailed documentation
+1. **Explore [Workflows](../03-usage/01-workflows.md)** - Learn about complex workflows
+2. **Check out [Configuration](../02-configuration/01-configuration.md)** - Customize workflows further
+3. **Learn about [Workflow Organization](../03-usage/02-workflow-organization.md)** - Group and categorize workflows
+4. **Master the [Workflow Designer](../03-usage/03-workflow-designer.md)** - Drag-and-drop workflow builder
+5. **Read [API Reference](../04-api/01-api-reference.md)** - Full API documentation
+6. **Browse [Examples](../../examples/)** - Real-world workflow examples
+
+## Additional Resources
+
+- [Status Enum Reference](../04-api/01-api-reference.md#status-enum) - All available statuses
+- [Role-Based Permissions](../03-usage/01-workflows.md#role-based-permissions) - Implement authorization
+- [Custom Workflows](../03-usage/01-workflows.md#custom-workflows) - Create specialized workflows
+- [Workflow Organization](../03-usage/02-workflow-organization.md) - Manage workflows with groups, categories, and tags
 
 ## Troubleshooting
 

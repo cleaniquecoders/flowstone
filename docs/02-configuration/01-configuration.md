@@ -418,9 +418,161 @@ public function boot()
 }
 ```
 
+## UI Configuration
+
+Flowstone includes an optional visual workflow designer and management interface, similar to Laravel Telescope.
+
+### Enable/Disable UI
+
+Control whether the UI is accessible:
+
+```php
+'ui' => [
+    'enabled' => env('FLOWSTONE_UI_ENABLED', true),
+],
+```
+
+Set in your `.env` file:
+
+```env
+FLOWSTONE_UI_ENABLED=true
+```
+
+### UI Path and Domain
+
+Customize where the UI is accessible:
+
+```php
+'ui' => [
+    'path' => env('FLOWSTONE_UI_PATH', 'flowstone'),
+    'domain' => env('FLOWSTONE_UI_DOMAIN', null),
+],
+```
+
+**Examples**:
+- Default: `http://your-app.test/flowstone`
+- Custom path: Set `FLOWSTONE_UI_PATH=admin/workflows`
+- Custom domain: Set `FLOWSTONE_UI_DOMAIN=workflows.your-app.test`
+
+### Middleware Configuration
+
+Define middleware stack for UI routes:
+
+```php
+'ui' => [
+    'middleware' => [
+        'web',
+        // 'auth',      // Require authentication
+        // 'verified',  // Require email verification
+        // 'throttle:60,1', // Rate limiting
+    ],
+],
+```
+
+### Authorization Gate
+
+Configure who can access the UI:
+
+```php
+'ui' => [
+    'gate' => env('FLOWSTONE_UI_GATE', 'viewFlowstone'),
+],
+```
+
+Define the gate in your `AuthServiceProvider`:
+
+```php
+use Illuminate\Support\Facades\Gate;
+
+Gate::define('viewFlowstone', function ($user) {
+    return in_array($user->email, [
+        'admin@example.com',
+    ]);
+});
+```
+
+### Asset Configuration
+
+Configure how UI assets are served:
+
+```php
+'ui' => [
+    'asset_url' => env('FLOWSTONE_UI_ASSET_URL', '/vendor/flowstone'),
+    'inline_assets' => env('FLOWSTONE_INLINE_ASSETS', true),
+],
+```
+
+- **`asset_url`**: Base URL for published UI assets
+- **`inline_assets`**: Whether to inline assets in HTML (true) or serve as separate files (false)
+
+**Publishing Assets**:
+
+```bash
+php artisan vendor:publish --tag="flowstone-ui-assets"
+# or
+php artisan flowstone:publish-assets
+```
+
+### Allow List
+
+Specify allowed users when not in local environment:
+
+```php
+'ui' => [
+    'allowed' => [
+        'admin@example.com',
+        'manager@example.com',
+        // Or use user IDs:
+        // 1, 2, 3,
+    ],
+],
+```
+
+### Complete UI Configuration Example
+
+```php
+'ui' => [
+    'enabled' => env('FLOWSTONE_UI_ENABLED', true),
+    'path' => env('FLOWSTONE_UI_PATH', 'flowstone'),
+    'domain' => env('FLOWSTONE_UI_DOMAIN', null),
+    'middleware' => [
+        'web',
+        'auth',
+    ],
+    'gate' => env('FLOWSTONE_UI_GATE', 'viewFlowstone'),
+    'allowed' => [
+        'admin@example.com',
+    ],
+    'asset_url' => env('FLOWSTONE_UI_ASSET_URL', '/vendor/flowstone'),
+    'inline_assets' => env('FLOWSTONE_INLINE_ASSETS', true),
+],
+```
+
+## Environment Variables Reference
+
+All available environment variables for Flowstone:
+
+```env
+# UI Configuration
+FLOWSTONE_UI_ENABLED=true
+FLOWSTONE_UI_PATH=flowstone
+FLOWSTONE_UI_DOMAIN=null
+FLOWSTONE_UI_GATE=viewFlowstone
+FLOWSTONE_UI_ASSET_URL=/vendor/flowstone
+FLOWSTONE_INLINE_ASSETS=true
+
+# Cache Configuration
+FLOWSTONE_CACHE_DURATION=60
+
+# Default Workflow Settings
+FLOWSTONE_DEFAULT_TYPE=state_machine
+```
+
 ## Next Steps
 
 - Learn about [Database Workflows](database-workflows.md) for dynamic configurations
-- Explore [Usage Guide](../03-usage/01-usage-guide.md) for implementation details
-- Check [Examples](examples.md) for real-world patterns
+- Explore [Workflows](../03-usage/01-workflows.md) for implementation details
+- Learn about [Workflow Details](../03-usage/02-workflow-details.md) for managing workflows
+- Discover the [Workflow Designer](../03-usage/03-workflow-designer.md) for drag-and-drop workflow design
+- Check [Examples](../../examples/) for real-world patterns
 - Review [API Reference](../04-api/01-api-reference.md) for method documentation

@@ -55,6 +55,8 @@ This creates `config/flowstone.php` where you can:
 - Set up custom workflows
 - Configure auto-discovery settings
 - Customize marking store options
+- Configure the Flowstone UI (admin panel)
+- Set up authorization gates and middleware
 
 ### 4. Publish Views (Optional)
 
@@ -63,6 +65,22 @@ If you plan to use Flowstone's views or customize them:
 ```bash
 php artisan vendor:publish --tag="flowstone-views"
 ```
+
+### 5. Publish UI Assets (Optional)
+
+If you're using the Flowstone UI (admin panel), publish the compiled JavaScript and CSS assets:
+
+```bash
+php artisan vendor:publish --tag="flowstone-ui-assets"
+```
+
+Or use the convenience command:
+
+```bash
+php artisan flowstone:publish-assets
+```
+
+This publishes the React-based workflow designer assets to `public/vendor/flowstone/`.
 
 ## Verification
 
@@ -77,7 +95,8 @@ php artisan list flowstone
 You should see:
 
 - `flowstone:install` - Installation command
-- `workflow:create` - Create new workflow command
+- `flowstone:create-workflow` - Create new workflow command
+- `flowstone:publish-assets` - Publish UI assets command
 
 ### 2. Test Basic Functionality
 
@@ -98,6 +117,64 @@ $workflow = Workflow::create([
 ]);
 
 echo "Workflow created: " . $workflow->name;
+```
+
+### 3. Access the Flowstone UI (Optional)
+
+If you enabled the UI, access it at:
+
+```
+http://your-app.test/flowstone
+```
+
+By default, the UI is only accessible in the `local` environment. To configure authorization, see the [Configuration Guide](../02-configuration/01-configuration.md#ui-configuration).
+
+## Flowstone UI Configuration
+
+The Flowstone UI provides a visual interface for managing workflows, similar to Laravel Telescope.
+
+### Authorization
+
+Configure who can access the UI by defining a gate in your `AuthServiceProvider`:
+
+```php
+use Illuminate\Support\Facades\Gate;
+
+Gate::define('viewFlowstone', function ($user) {
+    return in_array($user->email, [
+        'admin@example.com',
+    ]);
+});
+```
+
+### Environment Variables
+
+Control UI behavior through environment variables:
+
+```env
+FLOWSTONE_UI_ENABLED=true
+FLOWSTONE_UI_PATH=flowstone
+FLOWSTONE_UI_DOMAIN=null
+FLOWSTONE_UI_GATE=viewFlowstone
+FLOWSTONE_UI_ASSET_URL=/vendor/flowstone
+FLOWSTONE_INLINE_ASSETS=true
+```
+
+### Middleware Configuration
+
+Customize middleware for UI routes in `config/flowstone.php`:
+
+```php
+'ui' => [
+    'middleware' => [
+        'web',
+        'auth', // Add authentication
+        'verified', // Add email verification
+    ],
+],
+```
+
+## Common Installation Issues
 ```
 
 ## Service Provider Registration
@@ -196,8 +273,8 @@ Now that Flowstone is installed:
 
 1. **Read the [Quick Start](02-quick-start.md) guide** to create your first workflow
 2. **Explore the [Configuration](../02-configuration/01-configuration.md)** options
-3. **Check out [Examples](examples.md)** for common patterns
-4. **Review the [Usage Guide](../03-usage/01-usage-guide.md)** for detailed usage
+3. **Check [Examples](examples.md)** for common patterns
+4. **Review [Workflows](../03-usage/01-workflows.md)** for detailed usage
 
 ## Alternative Installation Methods
 
