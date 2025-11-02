@@ -1,6 +1,6 @@
 # Changelog
 
-All notable changes to `laravel-worklfow` will be documented in this file.
+All notable changes to `flowstone` will be documented in this file.
 
 ## Added Field Group, Category and Tag - 2025-11-02
 
