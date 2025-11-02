@@ -49,9 +49,20 @@ php artisan vendor:publish --tag="flowstone-config"
 
 Comprehensive documentation is available in the [`docs/`](docs/) directory:
 
+- **[Getting Started](docs/01-getting-started/)** - Installation and quick start guide
+- **[Configuration](docs/02-configuration/01-configuration.md)** - Configure workflows, UI, and performance
+- **[Usage Guide](docs/03-usage/)** - Workflows, details, and visual designer
+- **[API Reference](docs/04-api/01-api-reference.md)** - Complete API documentation
+
 ## Examples
 
 Real-world examples are available in the [`examples/`](examples/) directory:
+
+- **[Bug Tracking](examples/bug-tracking/)** - Issue lifecycle management
+- **[Content Publishing](examples/content-publishing/)** - Content approval workflow
+- **[Document Approval](examples/document-approval/)** - Multi-step approval process
+- **[E-commerce Order](examples/ecommerce-order/)** - Order fulfillment workflow
+- **[Employee Onboarding](examples/employee-onboarding/)** - New hire process
 
 ## Testing
 

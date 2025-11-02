@@ -112,8 +112,8 @@ $workflow->apply($document, 'submit_for_review');
 - 🚀 [Quick Start](01-getting-started/02-quick-start.md) - Your first workflow
 - ⚙️ [Configuration](02-configuration/01-configuration.md) - Customize Flowstone
 - 📖 [Workflows](03-usage/01-workflows.md) - Detailed implementation
+- 🔍 [Workflow Details](03-usage/02-workflow-details.md) - Inspect and manage workflows
 - 🎨 [Workflow Designer](03-usage/03-workflow-designer.md) - Drag-and-drop workflow builder
-- 📁 [Workflow Organization](03-usage/02-workflow-organization.md) - Organize workflows
 - 🔧 [API Reference](04-api/01-api-reference.md) - Full API documentation
 
 ## What's New in Flowstone

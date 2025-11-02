@@ -1,6 +1,6 @@
 # Changelog
 
-All notable changes to `laravel-worklfow` will be documented in this file.
+All notable changes to `flowstone` will be documented in this file.
 
 ## Added UI for Managing Workflows - 2025-11-01
 
@@ -25,7 +25,7 @@ All notable changes to `laravel-worklfow` will be documented in this file.
   - `CreateWorkflow` - Create new workflows
   - `EditWorkflow` - Edit existing workflows
   - Metadata management components for places, transitions, and workflows
-  
+
 - **Modern UI Components** - Beautiful Blade components with Tailwind CSS styling
 - **Dashboard Route** - New `/flowstone/dashboard` route for workflow management
 
