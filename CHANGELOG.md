@@ -2,6 +2,18 @@
 
 All notable changes to `laravel-worklfow` will be documented in this file.
 
+## Added Field Group, Category and Tag - 2025-11-02
+
+### Flowstone v1.1.1 Release Notes
+
+- Documentation: cleaned up and reorganized usage docs; fixed file numbering and adopted consistent kebab-case filenames.
+- Screenshots: renamed to match UI labels and updated all references in docs.
+- README: refreshed links and screenshot reference.
+- Update Workflow model to use `InteractsWithTags` Trait.
+- Added `group`, `category` and `tags` field
+
+No breaking changes. No runtime code changes. Safe to update.
+
 ## Added UI for Managing Workflows - 2025-11-01
 
 ### Flowstone v1.1.0 Release Notes
@@ -25,7 +37,6 @@ All notable changes to `laravel-worklfow` will be documented in this file.
   - `CreateWorkflow` - Create new workflows
   - `EditWorkflow` - Edit existing workflows
   - Metadata management components for places, transitions, and workflows
-  
 - **Modern UI Components** - Beautiful Blade components with Tailwind CSS styling
 - **Dashboard Route** - New `/flowstone/dashboard` route for workflow management
 
@@ -47,6 +58,7 @@ Update your composer dependencies:
 ```bash
 composer require cleaniquecoders/flowstone:^1.1.0
 
+
 ```
 #### 🔧 Migration
 
@@ -56,6 +68,7 @@ If upgrading from v1.0.0, publish and run the new migration:
 php artisan vendor:publish --tag=flowstone-migrations
 php artisan migrate
 
+
 ```
 #### 🎨 UI Setup
 
@@ -63,6 +76,7 @@ To use the Flowstone UI, publish the frontend assets:
 
 ```bash
 php artisan flowstone:publish-assets
+
 
 ```
 Access the dashboard at: `http://your-app.test/flowstone/dashboard`
@@ -122,6 +136,7 @@ We're excited to announce the first stable release of **Flowstone**, a powerful 
 
 ```bash
 composer require cleaniquecoders/flowstone
+
 
 
 ```
