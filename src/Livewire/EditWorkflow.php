@@ -18,6 +18,12 @@ class EditWorkflow extends Component
 
     public string $description = '';
 
+    public string $group = '';
+
+    public string $category = '';
+
+    public string $tags = '';
+
     public string $type = 'state_machine';
 
     public bool $is_enabled = true;
@@ -30,6 +36,9 @@ class EditWorkflow extends Component
     protected $rules = [
         'name' => 'required|string|max:255',
         'description' => 'nullable|string',
+        'group' => 'nullable|string|max:255',
+        'category' => 'nullable|string|max:255',
+        'tags' => 'nullable|string',
         'type' => 'required|in:state_machine,workflow',
         'is_enabled' => 'boolean',
     ];
@@ -44,6 +53,9 @@ class EditWorkflow extends Component
     {
         $this->name = $this->workflow->name;
         $this->description = $this->workflow->description ?? '';
+        $this->group = $this->workflow->group ?? '';
+        $this->category = $this->workflow->category ?? '';
+        $this->tags = is_array($this->workflow->tags) ? implode(', ', $this->workflow->tags) : '';
         $this->type = $this->workflow->type;
         $this->is_enabled = $this->workflow->is_enabled;
     }
@@ -67,6 +79,9 @@ class EditWorkflow extends Component
         $this->workflow->update([
             'name' => $this->name,
             'description' => $this->description,
+            'group' => $this->group ?: null,
+            'category' => $this->category ?: null,
+            'tags' => $this->tags ? array_map('trim', explode(',', $this->tags)) : null,
             'type' => $this->type,
             'is_enabled' => $this->is_enabled,
         ]);

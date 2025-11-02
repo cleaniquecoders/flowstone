@@ -95,6 +95,49 @@
                                     @enderror
                                 </div>
 
+                                <!-- Organization Fields -->
+                                <div class="grid grid-cols-1 gap-4 sm:grid-cols-2">
+                                    <!-- Group -->
+                                    <div>
+                                        <label for="group" class="block text-sm font-medium text-gray-700 mb-2">
+                                            Group
+                                        </label>
+                                        <input type="text" id="group" wire:model="group"
+                                            class="block w-full px-3 py-2 border border-gray-300 rounded-lg shadow-sm focus:ring-2 focus:ring-flowstone-500 focus:border-flowstone-500 transition-colors @error('group') border-red-300 @enderror"
+                                            placeholder="e.g., HR, Operations">
+                                        @error('group')
+                                            <p class="mt-1 text-sm text-red-600">{{ $message }}</p>
+                                        @enderror
+                                    </div>
+
+                                    <!-- Category -->
+                                    <div>
+                                        <label for="category" class="block text-sm font-medium text-gray-700 mb-2">
+                                            Category
+                                        </label>
+                                        <input type="text" id="category" wire:model="category"
+                                            class="block w-full px-3 py-2 border border-gray-300 rounded-lg shadow-sm focus:ring-2 focus:ring-flowstone-500 focus:border-flowstone-500 transition-colors @error('category') border-red-300 @enderror"
+                                            placeholder="e.g., Approval, Publishing">
+                                        @error('category')
+                                            <p class="mt-1 text-sm text-red-600">{{ $message }}</p>
+                                        @enderror
+                                    </div>
+                                </div>
+
+                                <!-- Tags -->
+                                <div>
+                                    <label for="tags" class="block text-sm font-medium text-gray-700 mb-2">
+                                        Tags
+                                    </label>
+                                    <input type="text" id="tags" wire:model="tags"
+                                        class="block w-full px-3 py-2 border border-gray-300 rounded-lg shadow-sm focus:ring-2 focus:ring-flowstone-500 focus:border-flowstone-500 transition-colors @error('tags') border-red-300 @enderror"
+                                        placeholder="Comma-separated tags, e.g., urgent, approval, review">
+                                    <p class="mt-1 text-xs text-gray-500">Separate multiple tags with commas</p>
+                                    @error('tags')
+                                        <p class="mt-1 text-sm text-red-600">{{ $message }}</p>
+                                    @enderror
+                                </div>
+
                                 <!-- Type -->
                                 <div>
                                     <label class="block text-sm font-medium text-gray-700 mb-3">

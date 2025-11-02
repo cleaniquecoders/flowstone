@@ -16,6 +16,12 @@ class CreateWorkflow extends Component
 
     public string $description = '';
 
+    public string $group = '';
+
+    public string $category = '';
+
+    public string $tags = '';
+
     public string $type = 'workflow';
 
     public array $types = [
@@ -26,6 +32,9 @@ class CreateWorkflow extends Component
     protected array $rules = [
         'name' => 'required|string|max:255',
         'description' => 'required|string|max:1000',
+        'group' => 'nullable|string|max:255',
+        'category' => 'nullable|string|max:255',
+        'tags' => 'nullable|string',
         'type' => 'required|in:workflow,state_machine',
     ];
 
@@ -59,6 +68,9 @@ class CreateWorkflow extends Component
     {
         $this->name = '';
         $this->description = '';
+        $this->group = '';
+        $this->category = '';
+        $this->tags = '';
         $this->type = 'workflow';
         $this->resetValidation();
     }
@@ -70,6 +82,9 @@ class CreateWorkflow extends Component
         $workflow = Workflow::create([
             'name' => $this->name,
             'description' => $this->description,
+            'group' => $this->group ?: null,
+            'category' => $this->category ?: null,
+            'tags' => $this->tags ? array_map('trim', explode(',', $this->tags)) : null,
             'type' => $this->type,
             'config' => $this->getDefaultConfig(),
             'is_enabled' => true,
