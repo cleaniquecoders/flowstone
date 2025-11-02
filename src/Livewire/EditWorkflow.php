@@ -30,9 +30,19 @@ class EditWorkflow extends Component
 
     public bool $audit_trail_enabled = false;
 
+    public string $marking_store_type = 'method';
+
+    public string $marking_store_property = 'marking';
+
     public array $types = [
         'state_machine' => 'State Machine - Only one state at a time',
         'workflow' => 'Workflow - Multiple states simultaneously',
+    ];
+
+    public array $markingStoreTypes = [
+        'method' => 'Method - Standard getter/setter approach',
+        'single_state' => 'Single State - Explicit single state',
+        'multiple_state' => 'Multiple State - Multiple simultaneous states',
     ];
 
     protected $rules = [
@@ -44,6 +54,8 @@ class EditWorkflow extends Component
         'type' => 'required|in:state_machine,workflow',
         'is_enabled' => 'boolean',
         'audit_trail_enabled' => 'boolean',
+        'marking_store_type' => 'required|in:method,single_state,multiple_state',
+        'marking_store_property' => 'required|string|max:255',
     ];
 
     public function mount(Workflow $workflow): void
@@ -62,6 +74,8 @@ class EditWorkflow extends Component
         $this->type = $this->workflow->type;
         $this->is_enabled = $this->workflow->is_enabled;
         $this->audit_trail_enabled = $this->workflow->audit_trail_enabled ?? false;
+        $this->marking_store_type = $this->workflow->marking_store_type ?? 'method';
+        $this->marking_store_property = $this->workflow->marking_store_property ?? 'marking';
     }
 
     public function openModal(): void
@@ -89,6 +103,8 @@ class EditWorkflow extends Component
             'type' => $this->type,
             'is_enabled' => $this->is_enabled,
             'audit_trail_enabled' => $this->audit_trail_enabled,
+            'marking_store_type' => $this->marking_store_type,
+            'marking_store_property' => $this->marking_store_property,
         ]);
 
         $this->closeModal();

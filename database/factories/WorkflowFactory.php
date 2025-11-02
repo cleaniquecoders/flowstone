@@ -19,6 +19,8 @@ class WorkflowFactory extends Factory
             'category' => $this->faker->randomElement(['document-management', 'e-commerce', 'customer-support', 'project-management', 'approval', 'reporting']),
             'tags' => $this->faker->randomElements(['Critical', 'Automated', 'Manual Review', 'SLA', 'Compliance', 'Customer-facing', 'Internal', 'Time-sensitive'], $this->faker->numberBetween(1, 4)),
             'type' => 'state_machine',
+            'marking_store_type' => 'method',
+            'marking_store_property' => 'marking',
             'initial_marking' => Status::DRAFT->value,
             'marking' => Status::DRAFT->value,
             'is_enabled' => true,
@@ -133,6 +135,30 @@ class WorkflowFactory extends Factory
                     ],
                 ],
             ],
+        ]);
+    }
+
+    public function singleState(): static
+    {
+        return $this->state(fn (array $attributes) => [
+            'type' => 'state_machine',
+            'marking_store_type' => 'single_state',
+        ]);
+    }
+
+    public function multipleState(): static
+    {
+        return $this->state(fn (array $attributes) => [
+            'type' => 'workflow',
+            'marking_store_type' => 'multiple_state',
+        ]);
+    }
+
+    public function withMarkingStore(string $type, string $property): static
+    {
+        return $this->state(fn (array $attributes) => [
+            'marking_store_type' => $type,
+            'marking_store_property' => $property,
         ]);
     }
 }

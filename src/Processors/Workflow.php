@@ -154,7 +154,8 @@ class Workflow
 
         $definition = new Definition($places, $transitions);
 
-        $markingStore = new MethodMarkingStore(true, $config['marking_store']['property'] ?? 'marking');
+        // Create marking store based on configuration
+        $markingStore = static::createMarkingStore($config);
 
         $workflow = new SymfonyWorkflow($definition, $markingStore);
 
@@ -164,5 +165,33 @@ class Workflow
         }
 
         return $workflow;
+    }
+
+    /**
+     * Create marking store based on configuration
+     *
+     * Marking store types:
+     * - 'method': Uses getter/setter methods (single state by default)
+     * - 'single_state': Stores one state at a time (state_machine)
+     * - 'multiple_state': Stores multiple states simultaneously (workflow)
+     *
+     * @param  array  $config  Workflow configuration
+     */
+    protected static function createMarkingStore(array $config): MethodMarkingStore
+    {
+        $markingStoreConfig = $config['marking_store'] ?? [];
+        $type = $markingStoreConfig['type'] ?? 'method';
+        $property = $markingStoreConfig['property'] ?? 'marking';
+
+        // MethodMarkingStore first parameter:
+        // - true = single state (state_machine)
+        // - false = multiple states (workflow)
+        $singleState = match ($type) {
+            'multiple_state' => false,
+            'single_state', 'method' => true,
+            default => true,
+        };
+
+        return new MethodMarkingStore($singleState, $property);
     }
 }

@@ -25,6 +25,8 @@ class Workflow extends Model implements WorkflowContract
         'category',
         'tags',
         'type',
+        'marking_store_type',
+        'marking_store_property',
         'initial_marking',
         'marking',
         'config',
@@ -146,13 +148,39 @@ class Workflow extends Model implements WorkflowContract
             ];
         }
 
-        return [
+        $config = [
             'type' => $this->type,
             'places' => $places,
             'transitions' => $transitions,
             'initial_marking' => $this->initial_marking,
             'metadata' => $this->meta ?? [],
         ];
+
+        // Add marking store configuration if set
+        if ($this->marking_store_type || $this->marking_store_property) {
+            $config['marking_store'] = [
+                'type' => $this->marking_store_type ?? 'method',
+                'property' => $this->marking_store_property ?? 'marking',
+            ];
+        }
+
+        return $config;
+    }
+
+    /**
+     * Get the marking store type for this workflow
+     */
+    public function getMarkingStoreType(): string
+    {
+        return $this->marking_store_type ?? config('flowstone.default.marking_store.type', 'method');
+    }
+
+    /**
+     * Get the marking store property for this workflow
+     */
+    public function getMarkingStoreProperty(): string
+    {
+        return $this->marking_store_property ?? config('flowstone.default.marking_store.property', 'marking');
     }
 
     /**

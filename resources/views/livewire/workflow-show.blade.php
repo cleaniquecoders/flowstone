@@ -82,6 +82,14 @@
                             </span>
                         </div>
                         <div>
+                            <div class="text-sm font-medium text-gray-500 mb-1">Marking Store</div>
+                            <div class="text-sm text-gray-900">
+                                <span class="font-medium">{{ ucwords(str_replace('_', ' ', $workflow->marking_store_type ?? 'method')) }}</span>
+                                <span class="text-gray-500 mx-1">→</span>
+                                <code class="px-2 py-0.5 bg-gray-100 rounded text-xs font-mono">{{ $workflow->marking_store_property ?? 'marking' }}</code>
+                            </div>
+                        </div>
+                        <div>
                             <div class="text-sm font-medium text-gray-500 mb-1">Created</div>
                             <div class="text-lg font-semibold text-gray-900">
                                 {{ $workflow->created_at->format('M j, Y') }}</div>

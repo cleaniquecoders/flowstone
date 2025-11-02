@@ -180,6 +180,47 @@
                                 @enderror
                             </div>
 
+                            <!-- Marking Store Configuration -->
+                            <div class="border-t border-gray-200 pt-6">
+                                <h4 class="text-sm font-medium text-gray-900 mb-4 flex items-center gap-2">
+                                    <svg class="w-5 h-5 text-flowstone-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+                                    </svg>
+                                    Marking Store Configuration
+                                </h4>
+
+                                <div class="space-y-4">
+                                    <!-- Marking Store Type -->
+                                    <div>
+                                        <label for="edit-marking-store-type" class="block text-sm font-medium text-gray-700 mb-2">
+                                            Storage Type <span class="text-red-500">*</span>
+                                        </label>
+                                        <select id="edit-marking-store-type" wire:model="marking_store_type"
+                                            class="block w-full px-3 py-2 border border-gray-300 rounded-lg shadow-sm focus:ring-2 focus:ring-flowstone-500 focus:border-flowstone-500 transition-colors @error('marking_store_type') border-red-300 @enderror">
+                                            @foreach($markingStoreTypes as $key => $description)
+                                                <option value="{{ $key }}">{{ $description }}</option>
+                                            @endforeach
+                                        </select>
+                                        @error('marking_store_type')
+                                            <p class="mt-1 text-sm text-red-600">{{ $message }}</p>
+                                        @enderror
+                                    </div>
+
+                                    <!-- Marking Store Property -->
+                                    <div>
+                                        <label for="edit-marking-store-property" class="block text-sm font-medium text-gray-700 mb-2">
+                                            Property Name <span class="text-red-500">*</span>
+                                        </label>
+                                        <input type="text" id="edit-marking-store-property" wire:model="marking_store_property"
+                                            class="block w-full px-3 py-2 border border-gray-300 rounded-lg shadow-sm focus:ring-2 focus:ring-flowstone-500 focus:border-flowstone-500 transition-colors @error('marking_store_property') border-red-300 @enderror"
+                                            placeholder="e.g., marking, status, state">
+                                        @error('marking_store_property')
+                                            <p class="mt-1 text-sm text-red-600">{{ $message }}</p>
+                                        @enderror
+                                    </div>
+                                </div>
+                            </div>
+
                             <!-- Status -->
                             <div>
                                 <label class="block text-sm font-medium text-gray-700 mb-3">
