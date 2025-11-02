@@ -173,8 +173,45 @@
                                             </svg>
                                         </div>
                                         <div class="flex-1">
-                                            <div class="font-medium text-gray-900">{{ $transition->name }}</div>
-                                            <div class="text-sm text-gray-600">
+                                            <div class="flex items-center gap-2">
+                                                <div class="font-medium text-gray-900">{{ $transition->name }}</div>
+
+                                                {{-- Guard Indicators --}}
+                                                @php
+                                                    $meta = $transition->meta ?? [];
+                                                    $hasGuards = !empty($meta['guard']) || !empty($meta['guards']) || !empty($meta['roles']) || !empty($meta['permission']) || !empty($meta['permissions']);
+                                                @endphp
+
+                                                @if($hasGuards)
+                                                    <span class="inline-flex items-center px-2 py-0.5 rounded text-xs font-medium bg-amber-100 text-amber-800 ring-1 ring-amber-600/20" title="This transition has guard conditions">
+                                                        <svg class="w-3 h-3 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" />
+                                                        </svg>
+                                                        Guarded
+                                                    </span>
+
+                                                    {{-- Show guard details --}}
+                                                    <div class="inline-flex flex-wrap gap-1">
+                                                        @if(!empty($meta['roles']))
+                                                            <span class="text-xs px-1.5 py-0.5 bg-blue-50 text-blue-700 rounded">
+                                                                Roles: {{ is_array($meta['roles']) ? implode(', ', $meta['roles']) : $meta['roles'] }}
+                                                            </span>
+                                                        @endif
+                                                        @if(!empty($meta['permission']))
+                                                            <span class="text-xs px-1.5 py-0.5 bg-purple-50 text-purple-700 rounded">
+                                                                Permission: {{ $meta['permission'] }}
+                                                            </span>
+                                                        @endif
+                                                        @if(!empty($meta['permissions']))
+                                                            <span class="text-xs px-1.5 py-0.5 bg-purple-50 text-purple-700 rounded">
+                                                                Permissions: {{ implode(', ', $meta['permissions']) }}
+                                                            </span>
+                                                        @endif
+                                                    </div>
+                                                @endif
+                                            </div>
+
+                                            <div class="text-sm text-gray-600 mt-1">
                                                 <span class="font-medium">{{ $transition->from_place }}</span>
                                                 <svg class="inline w-4 h-4 mx-1" fill="none" stroke="currentColor"
                                                     viewBox="0 0 24 24">

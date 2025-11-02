@@ -231,4 +231,285 @@ trait InteractsWithWorkflow
     {
         return $this->auditLogs()->exists();
     }
+
+    /**
+     * Check if a transition can be applied without actually applying it.
+     *
+     * @param  string  $transitionName  The name of the transition to check
+     * @return bool True if the transition can be applied, false otherwise
+     */
+    public function canApplyTransition(string $transitionName): bool
+    {
+        $blockers = $this->getTransitionBlockers($transitionName);
+
+        return empty($blockers);
+    }
+
+    /**
+     * Get all blockers preventing a transition from being applied.
+     *
+     * @param  string  $transitionName  The name of the transition to check
+     * @return array Array of TransitionBlocker instances
+     */
+    public function getTransitionBlockers(string $transitionName): array
+    {
+        $workflow = $this->getWorkflow();
+        $blockers = [];
+
+        // Check if transition exists and is enabled based on current marking
+        $enabledTransitions = $this->getEnabledTransitions();
+        $transitionEnabled = false;
+
+        foreach ($enabledTransitions as $transition) {
+            if ($transition->getName() === $transitionName) {
+                $transitionEnabled = true;
+                break;
+            }
+        }
+
+        if (! $transitionEnabled) {
+            $blockers[] = \CleaniqueCoders\Flowstone\Guards\TransitionBlocker::createBlockedByMarking(
+                "The transition '{$transitionName}' is not available from the current state."
+            );
+
+            return $blockers;
+        }
+
+        // Check guard conditions from transition metadata
+        $guards = $this->getTransitionGuards($transitionName);
+
+        foreach ($guards as $guard) {
+            if (! $this->checkGuard($guard)) {
+                $blockers[] = $this->createBlockerFromGuard($guard);
+            }
+        }
+
+        return $blockers;
+    }
+
+    /**
+     * Get guard conditions for a transition.
+     *
+     * @param  string  $transitionName  The transition name
+     * @return array Array of guard configurations
+     */
+    protected function getTransitionGuards(string $transitionName): array
+    {
+        // Get transition configuration
+        $config = $this->config ?? [];
+        $transitions = $config['transitions'] ?? [];
+
+        if (! isset($transitions[$transitionName])) {
+            return [];
+        }
+
+        $transition = $transitions[$transitionName];
+        $metadata = $transition['metadata'] ?? [];
+        $guards = [];
+
+        // Support multiple guard formats
+        if (isset($metadata['guard'])) {
+            $guard = $metadata['guard'];
+
+            // If it's a string, treat as expression or method name
+            if (is_string($guard)) {
+                $guards[] = ['type' => 'expression', 'value' => $guard];
+            } elseif (is_array($guard)) {
+                $guards[] = $guard;
+            }
+        }
+
+        // Support guards array for multiple conditions
+        if (isset($metadata['guards']) && is_array($metadata['guards'])) {
+            foreach ($metadata['guards'] as $guard) {
+                if (is_string($guard)) {
+                    $guards[] = ['type' => 'expression', 'value' => $guard];
+                } elseif (is_array($guard)) {
+                    $guards[] = $guard;
+                }
+            }
+        }
+
+        // Support role-based guards
+        if (isset($metadata['roles']) && is_array($metadata['roles'])) {
+            $guards[] = ['type' => 'role', 'value' => $metadata['roles']];
+        }
+
+        // Support permission-based guards
+        if (isset($metadata['permission'])) {
+            $guards[] = ['type' => 'permission', 'value' => $metadata['permission']];
+        }
+
+        if (isset($metadata['permissions']) && is_array($metadata['permissions'])) {
+            foreach ($metadata['permissions'] as $permission) {
+                $guards[] = ['type' => 'permission', 'value' => $permission];
+            }
+        }
+
+        return $guards;
+    }
+
+    /**
+     * Check if a guard condition is met.
+     *
+     * @param  array  $guard  The guard configuration
+     * @return bool True if guard passes, false otherwise
+     */
+    protected function checkGuard(array $guard): bool
+    {
+        $type = $guard['type'] ?? 'expression';
+        $value = $guard['value'] ?? null;
+
+        if ($value === null) {
+            return true;
+        }
+
+        switch ($type) {
+            case 'role':
+                return $this->checkRoleGuard($value);
+
+            case 'permission':
+                return $this->checkPermissionGuard($value);
+
+            case 'method':
+                return $this->checkMethodGuard($value);
+
+            case 'expression':
+            default:
+                return $this->checkExpressionGuard($value);
+        }
+    }
+
+    /**
+     * Check role-based guard.
+     */
+    protected function checkRoleGuard(array|string $roles): bool
+    {
+        if (! auth()->check()) {
+            return false;
+        }
+
+        $roles = is_array($roles) ? $roles : [$roles];
+
+        // Check if user has any of the required roles
+        foreach ($roles as $role) {
+            if (auth()->user()->hasRole($role)) {
+                return true;
+            }
+        }
+
+        return false;
+    }
+
+    /**
+     * Check permission-based guard.
+     */
+    protected function checkPermissionGuard(string $permission): bool
+    {
+        if (! auth()->check()) {
+            return false;
+        }
+
+        // Try common permission checking methods
+        $user = auth()->user();
+
+        if (method_exists($user, 'hasPermissionTo')) {
+            return $user->hasPermissionTo($permission);
+        }
+
+        if (method_exists($user, 'can')) {
+            return $user->can($permission);
+        }
+
+        // Fallback to Laravel's Gate
+        return \Illuminate\Support\Facades\Gate::allows($permission, $this);
+    }
+
+    /**
+     * Check method-based guard (custom method on the model).
+     */
+    protected function checkMethodGuard(string $method): bool
+    {
+        if (! method_exists($this, $method)) {
+            return false;
+        }
+
+        return (bool) $this->{$method}();
+    }
+
+    /**
+     * Check expression-based guard.
+     * For now, this handles simple expressions. Full expression language support will be added later.
+     */
+    protected function checkExpressionGuard(string $expression): bool
+    {
+        // Simple expression parsing for common patterns
+        $expression = trim($expression);
+
+        // Handle is_granted() expressions
+        if (preg_match("/is_granted\(['\"](.*?)['\"]\)/", $expression, $matches)) {
+            $permission = $matches[1];
+
+            return $this->checkPermissionGuard($permission);
+        }
+
+        // Handle method calls on subject
+        if (preg_match('/subject\.(\w+)\(\)/', $expression, $matches)) {
+            $method = $matches[1];
+
+            return $this->checkMethodGuard($method);
+        }
+
+        // For complex expressions, we'll need the Expression Language component
+        // For now, treat as a method name
+        if (method_exists($this, $expression)) {
+            return $this->checkMethodGuard($expression);
+        }
+
+        // Default to true for unrecognized expressions (permissive)
+        return true;
+    }
+
+    /**
+     * Create a blocker from a guard configuration.
+     */
+    protected function createBlockerFromGuard(array $guard): \CleaniqueCoders\Flowstone\Guards\TransitionBlocker
+    {
+        $type = $guard['type'] ?? 'expression';
+        $value = $guard['value'] ?? '';
+
+        switch ($type) {
+            case 'role':
+                $roles = is_array($value) ? $value : [$value];
+
+                return \CleaniqueCoders\Flowstone\Guards\TransitionBlocker::createBlockedByRole($roles);
+
+            case 'permission':
+                return \CleaniqueCoders\Flowstone\Guards\TransitionBlocker::createBlockedByPermission($value);
+
+            case 'expression':
+                return \CleaniqueCoders\Flowstone\Guards\TransitionBlocker::createBlockedByExpressionGuard($value);
+
+            case 'method':
+                return \CleaniqueCoders\Flowstone\Guards\TransitionBlocker::createBlockedByCustomGuard(
+                    "The guard condition '{$value}' was not met."
+                );
+
+            default:
+                return \CleaniqueCoders\Flowstone\Guards\TransitionBlocker::createUnknown();
+        }
+    }
+
+    /**
+     * Get a user-friendly list of blocker messages.
+     *
+     * @param  string  $transitionName  The transition name
+     * @return array Array of blocker message strings
+     */
+    public function getTransitionBlockerMessages(string $transitionName): array
+    {
+        $blockers = $this->getTransitionBlockers($transitionName);
+
+        return array_map(fn ($blocker) => $blocker->getMessage(), $blockers);
+    }
 }
