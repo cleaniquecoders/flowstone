@@ -512,4 +512,291 @@ trait InteractsWithWorkflow
 
         return array_map(fn ($blocker) => $blocker->getMessage(), $blockers);
     }
+
+    // ====================================
+    // Multiple State Support
+    // ====================================
+
+    /**
+     * Check if this workflow supports multiple simultaneous states.
+     * State machines can only be in one state, workflows can be in multiple.
+     */
+    public function supportsMultipleStates(): bool
+    {
+        $config = $this->config ?? [];
+        $type = $config['type'] ?? 'state_machine';
+
+        return $type === 'workflow';
+    }
+
+    /**
+     * Get all current marked places.
+     * Returns array of place names that are currently marked.
+     */
+    public function getMarkedPlaces(): array
+    {
+        $workflow = $this->getWorkflow();
+        $marking = $workflow->getMarking($this);
+
+        return array_keys($marking->getPlaces());
+    }
+
+    /**
+     * Check if the model is in a specific place.
+     */
+    public function isInPlace(string $place): bool
+    {
+        return in_array($place, $this->getMarkedPlaces());
+    }
+
+    /**
+     * Check if the model is in all specified places.
+     */
+    public function isInAllPlaces(array $places): bool
+    {
+        $markedPlaces = $this->getMarkedPlaces();
+
+        foreach ($places as $place) {
+            if (! in_array($place, $markedPlaces)) {
+                return false;
+            }
+        }
+
+        return true;
+    }
+
+    /**
+     * Check if the model is in any of the specified places.
+     */
+    public function isInAnyPlace(array $places): bool
+    {
+        $markedPlaces = $this->getMarkedPlaces();
+
+        foreach ($places as $place) {
+            if (in_array($place, $markedPlaces)) {
+                return true;
+            }
+        }
+
+        return false;
+    }
+
+    /**
+     * Validate that the marking store type matches the workflow type.
+     * Should be called during workflow initialization.
+     */
+    public function validateMarkingStoreType(): bool
+    {
+        $config = $this->config ?? [];
+        $workflowType = $config['type'] ?? 'state_machine';
+        $markingStoreType = $config['marking_store']['type'] ?? 'single_state';
+
+        // State machines should use single_state, workflows can use multiple_state
+        if ($workflowType === 'state_machine' && $markingStoreType !== 'single_state') {
+            throw new \LogicException(
+                "State machine workflows must use 'single_state' marking store. Current: {$markingStoreType}"
+            );
+        }
+
+        return true;
+    }
+
+    // ====================================
+    // Context Support
+    // ====================================
+
+    /**
+     * Apply transition with context and return the context along with marking.
+     */
+    public function applyTransitionWithContext(string $transitionName, array $context = [], ?bool $logTransition = null): array
+    {
+        $marking = $this->applyTransition($transitionName, $context, $logTransition);
+
+        return [
+            'marking' => $marking,
+            'context' => $context,
+        ];
+    }
+
+    /**
+     * Get context from the last transition (from audit log).
+     */
+    public function getLastTransitionContext(): ?array
+    {
+        $lastLog = $this->auditLogs()->latest()->first();
+
+        return $lastLog?->context;
+    }
+
+    /**
+     * Get context from a specific transition by name (from audit log).
+     */
+    public function getTransitionContext(string $transitionName): ?array
+    {
+        $log = $this->auditLogs()
+            ->where('transition', $transitionName)
+            ->latest()
+            ->first();
+
+        return $log?->context;
+    }
+
+    /**
+     * Check guard with context support.
+     * Passes context to guard methods if they accept it.
+     */
+    protected function checkGuardWithContext(array $guard, array $context = []): bool
+    {
+        $type = $guard['type'] ?? 'expression';
+        $value = $guard['value'] ?? null;
+
+        if ($value === null) {
+            return true;
+        }
+
+        // For method guards, try to pass context if the method accepts it
+        if ($type === 'method') {
+            return $this->checkMethodGuardWithContext($value, $context);
+        }
+
+        // For expression guards, make context available
+        if ($type === 'expression' && ! empty($context)) {
+            return $this->checkExpressionGuardWithContext($value, $context);
+        }
+
+        // Fall back to regular guard checking
+        return $this->checkGuard($guard);
+    }
+
+    /**
+     * Check method guard with context parameter.
+     */
+    protected function checkMethodGuardWithContext(string $method, array $context = []): bool
+    {
+        if (! method_exists($this, $method)) {
+            return false;
+        }
+
+        $reflection = new \ReflectionMethod($this, $method);
+        $parameters = $reflection->getParameters();
+
+        // If method accepts parameters, pass context
+        if (count($parameters) > 0) {
+            return (bool) $this->{$method}($context);
+        }
+
+        // Otherwise call without parameters
+        return (bool) $this->{$method}();
+    }
+
+    /**
+     * Check expression guard with context available.
+     * This is a placeholder for full expression language support.
+     */
+    protected function checkExpressionGuardWithContext(string $expression, array $context = []): bool
+    {
+        // For now, context is stored but not used in expression evaluation
+        // Full Expression Language support will make context available in expressions
+        return $this->checkExpressionGuard($expression);
+    }
+
+    // ====================================
+    // Metadata Support
+    // ====================================
+
+    /**
+     * Get metadata from the workflow, place, or transition.
+     *
+     * @param  string|null  $key  The metadata key to retrieve (null to get all)
+     * @param  string  $type  'workflow', 'place', or 'transition'
+     * @param  string|null  $name  The place or transition name (required for place/transition)
+     * @return mixed The metadata value or array
+     */
+    public function getMetadata(?string $key = null, string $type = 'workflow', ?string $name = null): mixed
+    {
+        $workflow = $this->getWorkflow();
+        $metadataStore = $workflow->getMetadataStore();
+
+        $metadata = match ($type) {
+            'workflow' => $metadataStore->getWorkflowMetadata(),
+            'place' => $name ? $metadataStore->getPlaceMetadata($name) : [],
+            'transition' => $name ? $this->getTransitionMetadataFromStore($name, $metadataStore) : [],
+            default => [],
+        };
+
+        return $key ? ($metadata[$key] ?? null) : $metadata;
+    }
+
+    /**
+     * Get workflow-level metadata.
+     */
+    public function getWorkflowMetadata(?string $key = null): mixed
+    {
+        return $this->getMetadata($key, 'workflow');
+    }
+
+    /**
+     * Get place-level metadata.
+     */
+    public function getPlaceMetadata(string $place, ?string $key = null): mixed
+    {
+        return $this->getMetadata($key, 'place', $place);
+    }
+
+    /**
+     * Get transition-level metadata.
+     */
+    public function getTransitionMetadata(string $transition, ?string $key = null): mixed
+    {
+        return $this->getMetadata($key, 'transition', $transition);
+    }
+
+    /**
+     * Helper to get transition metadata from the metadata store.
+     */
+    protected function getTransitionMetadataFromStore(string $transitionName, $metadataStore): array
+    {
+        $workflow = $this->getWorkflow();
+        $definition = $workflow->getDefinition();
+
+        foreach ($definition->getTransitions() as $transition) {
+            if ($transition->getName() === $transitionName) {
+                return $metadataStore->getTransitionMetadata($transition);
+            }
+        }
+
+        return [];
+    }
+
+    /**
+     * Get all available places with their metadata.
+     */
+    public function getPlacesWithMetadata(): array
+    {
+        $workflow = $this->getWorkflow();
+        $definition = $workflow->getDefinition();
+        $places = [];
+
+        foreach ($definition->getPlaces() as $place) {
+            $places[$place] = $this->getPlaceMetadata($place);
+        }
+
+        return $places;
+    }
+
+    /**
+     * Get all available transitions with their metadata.
+     */
+    public function getTransitionsWithMetadata(): array
+    {
+        $workflow = $this->getWorkflow();
+        $definition = $workflow->getDefinition();
+        $transitions = [];
+
+        foreach ($definition->getTransitions() as $transition) {
+            $transitions[$transition->getName()] = $this->getTransitionMetadata($transition->getName());
+        }
+
+        return $transitions;
+    }
 }
