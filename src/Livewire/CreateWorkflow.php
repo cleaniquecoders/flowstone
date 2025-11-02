@@ -24,6 +24,8 @@ class CreateWorkflow extends Component
 
     public string $type = 'workflow';
 
+    public bool $audit_trail_enabled = false;
+
     public array $types = [
         'workflow' => 'Workflow - Can be in multiple places simultaneously, requires all previous places for transitions',
         'state_machine' => 'State Machine - Can only be in one place at a time, requires at least one previous place for transitions',
@@ -36,6 +38,7 @@ class CreateWorkflow extends Component
         'category' => 'nullable|string|max:255',
         'tags' => 'nullable|string',
         'type' => 'required|in:workflow,state_machine',
+        'audit_trail_enabled' => 'boolean',
     ];
 
     protected array $messages = [
@@ -72,6 +75,7 @@ class CreateWorkflow extends Component
         $this->category = '';
         $this->tags = '';
         $this->type = 'workflow';
+        $this->audit_trail_enabled = false;
         $this->resetValidation();
     }
 
@@ -88,6 +92,7 @@ class CreateWorkflow extends Component
             'type' => $this->type,
             'config' => $this->getDefaultConfig(),
             'is_enabled' => true,
+            'audit_trail_enabled' => $this->audit_trail_enabled,
         ]);
 
         $this->closeModal();

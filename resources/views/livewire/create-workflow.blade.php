@@ -39,7 +39,7 @@
                     x-transition:leave="ease-in duration-200"
                     x-transition:leave-start="opacity-100 translate-y-0 sm:scale-100"
                     x-transition:leave-end="opacity-0 translate-y-4 sm:translate-y-0 sm:scale-95"
-                    class="relative transform overflow-hidden rounded-lg bg-white text-left shadow-xl transition-all sm:my-8 sm:w-full sm:max-w-lg"
+                    class="relative transform overflow-hidden rounded-lg bg-white text-left shadow-xl transition-all sm:my-8 sm:w-full sm:max-w-3xl"
                     x-on:click.stop>
 
                     <form wire:submit="create">
@@ -134,6 +134,27 @@
                                         placeholder="Comma-separated tags, e.g., urgent, approval, review">
                                     <p class="mt-1 text-xs text-gray-500">Separate multiple tags with commas</p>
                                     @error('tags')
+                                        <p class="mt-1 text-sm text-red-600">{{ $message }}</p>
+                                    @enderror
+                                </div>
+
+                                <!-- Audit Trail -->
+                                <div>
+                                    <div class="flex items-start">
+                                        <div class="flex items-center h-5">
+                                            <input id="audit_trail_enabled" type="checkbox" wire:model="audit_trail_enabled"
+                                                class="h-4 w-4 text-flowstone-600 border-gray-300 rounded focus:ring-flowstone-500 transition-colors">
+                                        </div>
+                                        <div class="ml-3 text-sm">
+                                            <label for="audit_trail_enabled" class="font-medium text-gray-700">
+                                                Enable Audit Trail
+                                            </label>
+                                            <p class="text-gray-500">
+                                                Track all workflow state transitions with detailed logs including user, timestamp, and context.
+                                            </p>
+                                        </div>
+                                    </div>
+                                    @error('audit_trail_enabled')
                                         <p class="mt-1 text-sm text-red-600">{{ $message }}</p>
                                     @enderror
                                 </div>

@@ -30,11 +30,13 @@ class Workflow extends Model implements WorkflowContract
         'config',
         'designer',
         'is_enabled',
+        'audit_trail_enabled',
         'meta',
     ];
 
     protected $casts = [
         'is_enabled' => 'boolean',
+        'audit_trail_enabled' => 'boolean',
         'meta' => 'array',
         'config' => 'array',
         'designer' => 'array',
@@ -49,6 +51,11 @@ class Workflow extends Model implements WorkflowContract
     public function transitions(): HasMany
     {
         return $this->hasMany(WorkflowTransition::class)->orderBy('sort_order');
+    }
+
+    public function auditLogs(): HasMany
+    {
+        return $this->hasMany(WorkflowAuditLog::class)->latest();
     }
 
     // Scopes for filtering

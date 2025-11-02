@@ -64,6 +64,24 @@
                             </span>
                         </div>
                         <div>
+                            <div class="text-sm font-medium text-gray-500 mb-1">Audit Trail</div>
+                            <span
+                                class="inline-flex items-center px-3 py-1 rounded-full text-sm font-medium
+                            {{ $workflow->audit_trail_enabled ? 'bg-blue-100 text-blue-800' : 'bg-gray-100 text-gray-800' }}">
+                                @if($workflow->audit_trail_enabled)
+                                    <svg class="w-3.5 h-3.5 mr-1.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
+                                    </svg>
+                                    Enabled
+                                @else
+                                    <svg class="w-3.5 h-3.5 mr-1.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 14l2-2m0 0l2-2m-2 2l-2-2m2 2l2 2m7-2a9 9 0 11-18 0 9 9 0 0118 0z" />
+                                    </svg>
+                                    Disabled
+                                @endif
+                            </span>
+                        </div>
+                        <div>
                             <div class="text-sm font-medium text-gray-500 mb-1">Created</div>
                             <div class="text-lg font-semibold text-gray-900">
                                 {{ $workflow->created_at->format('M j, Y') }}</div>
@@ -265,6 +283,78 @@
                                 {{ $workflow->marking ?? 'Not set' }}</div>
                         </div>
                     </div>
+                </div>
+
+                <!-- Audit Trail -->
+                <div class="bg-white border border-gray-200 rounded-xl p-6 shadow-sm">
+                    <div class="flex items-center justify-between mb-4">
+                        <h3 class="text-lg font-semibold text-gray-900">Audit Trail</h3>
+                        @if($workflow->audit_trail_enabled)
+                            <span class="inline-flex items-center px-2.5 py-1 rounded-full text-xs font-semibold bg-blue-100 text-blue-800">
+                                <svg class="w-3 h-3 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
+                                </svg>
+                                Enabled
+                            </span>
+                        @else
+                            <span class="inline-flex items-center px-2.5 py-1 rounded-full text-xs font-semibold bg-gray-100 text-gray-700">
+                                <svg class="w-3 h-3 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 14l2-2m0 0l2-2m-2 2l-2-2m2 2l2 2m7-2a9 9 0 11-18 0 9 9 0 0118 0z" />
+                                </svg>
+                                Disabled
+                            </span>
+                        @endif
+                    </div>
+
+                    @if($workflow->audit_trail_enabled)
+                        <div class="space-y-3">
+                            <p class="text-sm text-gray-600">All state transitions are being tracked with detailed logs.</p>
+
+                            @php
+                                $recentLogs = $workflow->auditLogs()->latest()->take(3)->get();
+                            @endphp
+
+                            @if($recentLogs->count() > 0)
+                                <div class="space-y-2 mt-3">
+                                    <div class="text-xs font-medium text-gray-500 uppercase tracking-wide">Recent Activity</div>
+                                    @foreach($recentLogs as $log)
+                                        <div class="flex items-start gap-2 p-2 bg-gray-50 rounded-lg text-xs">
+                                            <svg class="w-4 h-4 text-gray-400 mt-0.5 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 9l3 3m0 0l-3 3m3-3H8m13 0a9 9 0 11-18 0 9 9 0 0118 0z" />
+                                            </svg>
+                                            <div class="flex-1 min-w-0">
+                                                <div class="font-medium text-gray-900">{{ $log->transition }}</div>
+                                                <div class="text-gray-500">
+                                                    {{ $log->from_place }} → {{ $log->to_place }}
+                                                </div>
+                                                <div class="text-gray-400 mt-1">{{ $log->created_at->diffForHumans() }}</div>
+                                            </div>
+                                        </div>
+                                    @endforeach
+                                </div>
+
+                                <a href="{{ route('flowstone.workflows.show', $workflow) }}#audit-logs"
+                                    class="block mt-3 text-sm font-medium text-flowstone-600 hover:text-flowstone-700 text-center">
+                                    View All Logs →
+                                </a>
+                            @else
+                                <div class="text-center py-4">
+                                    <svg class="mx-auto h-8 w-8 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+                                    </svg>
+                                    <p class="mt-2 text-xs text-gray-500">No transitions logged yet</p>
+                                </div>
+                            @endif
+                        </div>
+                    @else
+                        <div class="text-center py-4">
+                            <svg class="mx-auto h-8 w-8 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13.875 18.825A10.05 10.05 0 0112 19c-4.478 0-8.268-2.943-9.543-7a9.97 9.97 0 011.563-3.029m5.858.908a3 3 0 114.243 4.243M9.878 9.878l4.242 4.242M9.88 9.88l-3.29-3.29m7.532 7.532l3.29 3.29M3 3l3.59 3.59m0 0A9.953 9.953 0 0112 5c4.478 0 8.268 2.943 9.543 7a10.025 10.025 0 01-4.132 5.411m0 0L21 21" />
+                            </svg>
+                            <p class="mt-2 text-xs text-gray-600">Audit trail is disabled</p>
+                            <p class="text-xs text-gray-500 mt-1">Enable it to track transitions</p>
+                        </div>
+                    @endif
                 </div>
 
                 <!-- Workflow Metadata -->

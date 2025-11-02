@@ -28,6 +28,8 @@ class EditWorkflow extends Component
 
     public bool $is_enabled = true;
 
+    public bool $audit_trail_enabled = false;
+
     public array $types = [
         'state_machine' => 'State Machine - Only one state at a time',
         'workflow' => 'Workflow - Multiple states simultaneously',
@@ -41,6 +43,7 @@ class EditWorkflow extends Component
         'tags' => 'nullable|string',
         'type' => 'required|in:state_machine,workflow',
         'is_enabled' => 'boolean',
+        'audit_trail_enabled' => 'boolean',
     ];
 
     public function mount(Workflow $workflow): void
@@ -58,6 +61,7 @@ class EditWorkflow extends Component
         $this->tags = is_array($this->workflow->tags) ? implode(', ', $this->workflow->tags) : '';
         $this->type = $this->workflow->type;
         $this->is_enabled = $this->workflow->is_enabled;
+        $this->audit_trail_enabled = $this->workflow->audit_trail_enabled ?? false;
     }
 
     public function openModal(): void
@@ -84,6 +88,7 @@ class EditWorkflow extends Component
             'tags' => $this->tags ? array_map('trim', explode(',', $this->tags)) : null,
             'type' => $this->type,
             'is_enabled' => $this->is_enabled,
+            'audit_trail_enabled' => $this->audit_trail_enabled,
         ]);
 
         $this->closeModal();
