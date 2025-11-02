@@ -62,6 +62,7 @@ class FlowstoneServiceProvider extends PackageServiceProvider
         $this->registerUiRoutes();
         $this->registerLivewireComponents();
         $this->registerBladeComponents();
+        $this->registerBladeDirectives();
         $this->registerAssetPublishing();
     }
 
@@ -102,6 +103,41 @@ class FlowstoneServiceProvider extends PackageServiceProvider
     {
         // Register package Blade component namespace for <x-flowstone::... /> usage
         Blade::componentNamespace('CleaniqueCoders\\Flowstone\\View\\Components', 'flowstone');
+    }
+
+    protected function registerBladeDirectives(): void
+    {
+        // @canTransition - Check if a transition can be applied
+        Blade::directive('canTransition', function ($expression) {
+            return "<?php if(workflow_can({$expression})): ?>";
+        });
+
+        Blade::directive('endCanTransition', function () {
+            return '<?php endif; ?>';
+        });
+
+        // @cannotTransition - Inverse of @canTransition
+        Blade::directive('cannotTransition', function ($expression) {
+            return "<?php if(!workflow_can({$expression})): ?>";
+        });
+
+        Blade::directive('endCannotTransition', function () {
+            return '<?php endif; ?>';
+        });
+
+        // @workflowMarkedPlaces - Display marked places
+        Blade::directive('workflowMarkedPlaces', function ($expression) {
+            return "<?php echo implode(', ', array_keys(workflow_marked_places({$expression}))); ?>";
+        });
+
+        // @workflowHasMarkedPlace - Check if has marked place
+        Blade::directive('workflowHasMarkedPlace', function ($expression) {
+            return "<?php if(workflow_has_marked_place({$expression})): ?>";
+        });
+
+        Blade::directive('endWorkflowHasMarkedPlace', function () {
+            return '<?php endif; ?>';
+        });
     }
 
     protected function registerAssetPublishing(): void
