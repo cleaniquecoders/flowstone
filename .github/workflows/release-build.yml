@@ -24,7 +24,7 @@ jobs:
         run: npm run build
 
       - name: Upload dist artifacts to release
-        uses: softprops/action-gh-release@v1
+        uses: softprops/action-gh-release@v2
         with:
           files: |
             dist/flowstone-ui.js
