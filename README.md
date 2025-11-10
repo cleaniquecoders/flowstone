@@ -15,6 +15,35 @@
 - **⚡ Performance Optimized** - Workflow configuration caching and efficient queries
 - **🎯 Multiple Workflow Types** - Support for both State Machines and Workflows
 
+## 💡 Why Flowstone?
+
+### Laravel-Native Workflow Integration
+
+Unlike Symfony's configuration-based approach, Flowstone uses **Laravel traits** for better developer experience:
+
+```php
+// ✅ Flowstone way - Full IDE support!
+class Document extends Model implements WorkflowContract
+{
+    use InteractsWithWorkflow;  // Get 50+ workflow methods instantly
+
+    // IDE autocomplete ✅ | Type hints ✅ | Dynamic workflows ✅
+}
+
+// ❌ Symfony way - Config-based, no IDE support
+'supports' => [App\Models\Document::class],  // Hard-coded in config
+```
+
+**Benefits:**
+
+- ✅ **Full IDE Autocomplete** - IntelliSense for all workflow methods
+- ✅ **Type Safety** - Compile-time type checking
+- ✅ **Dynamic Workflows** - Choose workflows at runtime
+- ✅ **Self-Documenting** - Just look at the model to see workflow support
+- ✅ **Better Testing** - Mock workflow behavior directly
+
+See [detailed comparison in docs](docs/02-configuration/01-configuration.md#model-integration-trait-vs-supports-configuration).
+
 ## Table of Contents
 
 - [Installation](#installation)

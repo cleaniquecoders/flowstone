@@ -2,6 +2,15 @@
 
 This directory contains practical examples of implementing workflows using Flowstone in Laravel applications.
 
+> **💡 About These Examples**: All examples use Flowstone's trait-based approach (`InteractsWithWorkflow`) instead of Symfony's `supports` configuration. This provides:
+>
+> - ✅ Full IDE autocomplete and type hints
+> - ✅ Type safety via the `WorkflowContract` interface
+> - ✅ Better Laravel developer experience
+> - ✅ Dynamic workflow selection at runtime
+>
+> See [Configuration Guide](../docs/02-configuration/01-configuration.md#model-integration-trait-vs-supports-configuration) for detailed comparison.
+
 ## Examples Overview
 
 1. **[Document Approval Workflow](document-approval/)** - Classic approval process with roles and permissions

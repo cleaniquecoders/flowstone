@@ -2,6 +2,8 @@
 
 Issue management workflow for development teams with priority handling and resolution tracking.
 
+> **💡 Note**: This example uses Flowstone's trait-based approach (`InteractsWithWorkflow`) for better IDE support and type safety. See [Configuration Guide](../../docs/02-configuration/01-configuration.md#model-integration-trait-vs-supports-configuration) for why this is better than Symfony's `supports` config.
+
 ## Workflow: New → Assigned → In Progress → Testing → Resolved/Closed
 
 ### Bug Model

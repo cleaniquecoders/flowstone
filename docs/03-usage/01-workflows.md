@@ -22,6 +22,17 @@ Below is a practical usage guide for adding workflow support to your models.
 
 Every model that uses workflows must implement the `Workflow` contract and use the `InteractsWithWorkflow` trait:
 
+> **💡 Why Traits Instead of `supports` Config?**
+>
+> Flowstone uses a trait-based approach (not Symfony's `supports` configuration) for better Laravel developer experience. You get:
+>
+> - ✅ Full IDE autocomplete and type hints
+> - ✅ Type safety via the `WorkflowContract` interface
+> - ✅ Dynamic workflow selection at runtime
+> - ✅ Self-documenting code
+>
+> See [detailed comparison in Configuration Guide](../02-configuration/01-configuration.md#model-integration-trait-vs-supports-configuration).
+
 ```php
 <?php
 

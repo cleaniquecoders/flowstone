@@ -83,10 +83,11 @@ Flowstone is a powerful Laravel package that integrates the robust Symfony Workf
 ## Quick Example
 
 ```php
-// Define a model with workflow
+// Define a model with workflow using the trait-based approach
+// (Flowstone uses traits instead of Symfony's 'supports' config)
 class Document extends Model implements WorkflowContract
 {
-    use InteractsWithWorkflow;
+    use InteractsWithWorkflow;  // ✅ Full IDE support & type safety!
 
     public function workflowType(): Attribute
     {
@@ -98,13 +99,15 @@ class Document extends Model implements WorkflowContract
 $document = new Document();
 $document->marking = Status::DRAFT->value;
 
-// Check available transitions
+// Check available transitions - with full autocomplete!
 $transitions = $document->getEnabledToTransitions();
 
 // Perform transition (through Symfony Workflow)
 $workflow = $document->getWorkflow();
 $workflow->apply($document, 'submit_for_review');
 ```
+
+> **💡 Why Traits?** Flowstone uses Laravel traits for better developer experience than Symfony's `supports` configuration. You get IDE autocomplete, type safety, and dynamic workflows. See [Configuration Guide](02-configuration/01-configuration.md#model-integration-trait-vs-supports-configuration).
 
 ## Quick Links
 

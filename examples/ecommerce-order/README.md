@@ -2,6 +2,8 @@
 
 A comprehensive order processing workflow for e-commerce applications demonstrating order lifecycle management from cart to delivery.
 
+> **💡 Note**: This example uses Flowstone's trait-based approach (`InteractsWithWorkflow`) for better IDE support and type safety. See [Configuration Guide](../../docs/02-configuration/01-configuration.md#model-integration-trait-vs-supports-configuration) for why this is better than Symfony's `supports` config.
+
 ## Workflow Overview
 
 **Cart → Pending → Confirmed → Processing → Shipped → Delivered**

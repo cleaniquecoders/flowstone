@@ -2,6 +2,8 @@
 
 A comprehensive document approval workflow demonstrating the classic approval process with role-based permissions.
 
+> **💡 Note**: This example uses Flowstone's trait-based approach (`InteractsWithWorkflow`) instead of Symfony's `supports` configuration. This provides full IDE autocomplete, type safety, and better Laravel developer experience. See [Configuration Guide](../../docs/02-configuration/01-configuration.md#model-integration-trait-vs-supports-configuration) for details.
+
 ## Overview
 
 This example implements a document management system with the following workflow:

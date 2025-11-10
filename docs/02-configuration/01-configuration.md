@@ -64,9 +64,11 @@ Choose between two workflow types:
 - Complex scenarios
 - Example: Multi-step form (step1 + step2 + step3)
 
-### Supported Models
+### Supported Models (Symfony Compatibility)
 
-Define which models can use workflows:
+> **⚠️ Important**: While Flowstone supports Symfony's `supports` configuration for compatibility, we **strongly recommend using the trait-based approach** instead. See the section below for details.
+
+The `supports` configuration defines which model classes can use a specific workflow:
 
 ```php
 'supports' => [
@@ -75,6 +77,247 @@ Define which models can use workflows:
     App\Models\Task::class,
 ],
 ```
+
+**However, this is NOT the recommended approach for Laravel applications!** Continue reading to understand why.
+
+## Model Integration: Trait vs Supports Configuration
+
+Flowstone provides two ways to integrate workflows with your models. Understanding the difference is crucial for a better developer experience.
+
+### ❌ Symfony's Way: `supports` Configuration
+
+In Symfony, you configure which classes can use a workflow in the config file:
+
+```php
+// config/flowstone.php
+'custom' => [
+    'document_approval' => [
+        'type' => 'state_machine',
+        'supports' => [
+            App\Models\Document::class,
+        ],
+        'places' => [...],
+        'transitions' => [...],
+    ],
+],
+```
+
+**Limitations of this approach:**
+
+- ❌ Models must be hardcoded in config files
+- ❌ No IDE autocomplete for workflow methods
+- ❌ No type safety or type hints
+- ❌ Less flexible - can't dynamically switch workflows
+- ❌ Requires config cache clear when adding new models
+- ❌ No method discovery in your IDE
+- ❌ More verbose and scattered configuration
+
+### ✅ Laravel's Way: `InteractsWithWorkflow` Trait (Recommended)
+
+Flowstone uses a trait-based approach that's more idiomatic for Laravel:
+
+```php
+<?php
+
+namespace App\Models;
+
+use CleaniqueCoders\Flowstone\Concerns\InteractsWithWorkflow;
+use CleaniqueCoders\Flowstone\Contracts\Workflow as WorkflowContract;
+use Illuminate\Database\Eloquent\Casts\Attribute;
+use Illuminate\Database\Eloquent\Model;
+
+class Document extends Model implements WorkflowContract
+{
+    use InteractsWithWorkflow;
+
+    protected $fillable = ['title', 'content', 'status', 'workflow_type'];
+
+    // Define which workflow this model uses
+    public function workflowType(): Attribute
+    {
+        return Attribute::make(
+            get: fn () => $this->workflow_type ?? 'document-approval'
+        );
+    }
+
+    // Define the field name that stores the workflow type
+    public function workflowTypeField(): Attribute
+    {
+        return Attribute::make(get: fn () => 'workflow_type');
+    }
+
+    // Get current workflow state
+    public function getMarking(): string
+    {
+        return $this->status ?? 'draft';
+    }
+
+    // Set workflow state
+    public function setMarking(string $marking): void
+    {
+        $this->status = $marking;
+    }
+}
+```
+
+**Advantages of the trait approach:**
+
+- ✅ **Full IDE support** - Autocomplete, type hints, and method discovery
+- ✅ **Type safety** - Enforced by the `WorkflowContract` interface
+- ✅ **More flexible** - Models can dynamically choose workflows at runtime
+- ✅ **Laravel-native** - Uses traits like Laravel's native features
+- ✅ **Better DX** - All workflow methods available directly on model
+- ✅ **Self-documenting** - Just look at the model to see it has workflows
+- ✅ **No config management** - No need to maintain class lists
+- ✅ **Easier testing** - Mock workflow behavior directly on model
+- ✅ **Runtime flexibility** - Switch workflows based on conditions
+
+### Comparison Example
+
+**Symfony's `supports` approach:**
+
+```php
+// ❌ Config file - no autocomplete, no type safety
+'supports' => [App\Models\Document::class],
+
+// In your code - no IDE help
+$document = new Document();
+// How do I know what methods are available? 🤔
+// IDE shows no workflow methods!
+```
+
+**Flowstone's trait approach:**
+
+```php
+// ✅ In your model
+class Document extends Model implements WorkflowContract
+{
+    use InteractsWithWorkflow;
+}
+
+// In your code - full IDE support
+$document = new Document();
+$document->getWorkflow();           // ✅ Autocomplete works!
+$document->getEnabledTransitions(); // ✅ Type hints work!
+$document->canApplyTransition('approve'); // ✅ Parameter hints work!
+// IDE shows all 50+ workflow methods! 🎉
+```
+
+### Dynamic Workflow Selection
+
+The trait approach allows powerful runtime workflow selection:
+
+```php
+class Document extends Model implements WorkflowContract
+{
+    use InteractsWithWorkflow;
+
+    public function workflowType(): Attribute
+    {
+        return Attribute::make(
+            get: function () {
+                // Choose workflow based on document type
+                return match ($this->type) {
+                    'invoice' => 'invoice-approval',
+                    'contract' => 'contract-review',
+                    'report' => 'report-publishing',
+                    default => 'document-approval',
+                };
+            }
+        );
+    }
+}
+
+// Same model, different workflows!
+$invoice = Document::create(['type' => 'invoice']);
+$invoice->getWorkflow(); // Uses 'invoice-approval' workflow
+
+$contract = Document::create(['type' => 'contract']);
+$contract->getWorkflow(); // Uses 'contract-review' workflow
+```
+
+This flexibility is impossible with the `supports` configuration approach!
+
+### When to Use `supports` Configuration
+
+The `supports` configuration is primarily for:
+
+1. **Symfony compatibility** - If migrating from Symfony
+2. **Legacy code** - If you have existing Symfony workflows
+3. **Third-party packages** - That expect Symfony's configuration
+
+**For new Laravel projects, always use the trait approach!**
+
+### Migration from `supports` to Trait
+
+If you have existing code using `supports`, here's how to migrate:
+
+**Before (Symfony style):**
+
+```php
+// config/flowstone.php
+'document_approval' => [
+    'supports' => [App\Models\Document::class],
+    // ... rest of config
+],
+
+// Model
+class Document extends Model
+{
+    // No workflow integration
+}
+```
+
+**After (Laravel style):**
+
+```php
+// config/flowstone.php
+'document_approval' => [
+    // Remove 'supports' - not needed!
+    // ... rest of config
+],
+
+// Model
+class Document extends Model implements WorkflowContract
+{
+    use InteractsWithWorkflow;
+
+    public function workflowType(): Attribute
+    {
+        return Attribute::make(get: fn () => 'document-approval');
+    }
+
+    public function workflowTypeField(): Attribute
+    {
+        return Attribute::make(get: fn () => 'workflow_type');
+    }
+
+    public function getMarking(): string
+    {
+        return $this->status ?? 'draft';
+    }
+
+    public function setMarking(string $marking): void
+    {
+        $this->status = $marking;
+    }
+}
+```
+
+### Summary: Best Practices
+
+| Aspect | Symfony's `supports` | Flowstone's Trait | Recommendation |
+|--------|---------------------|-------------------|----------------|
+| **IDE Support** | ❌ None | ✅ Full autocomplete | Use trait |
+| **Type Safety** | ❌ Runtime only | ✅ Compile-time | Use trait |
+| **Flexibility** | ❌ Static config | ✅ Dynamic runtime | Use trait |
+| **DX** | ❌ Poor | ✅ Excellent | Use trait |
+| **Laravel Style** | ❌ Foreign | ✅ Native | Use trait |
+| **Testability** | ⚠️ Moderate | ✅ Easy | Use trait |
+| **Documentation** | ❌ Separate | ✅ Self-documenting | Use trait |
+| **Use Case** | Legacy/Symfony compat | New Laravel projects | Use trait |
+
+**🎯 Bottom Line:** Use `InteractsWithWorkflow` trait for all new Laravel projects. Only use `supports` configuration if you absolutely need Symfony compatibility.
 
 ### Marking Store Configuration
 
@@ -450,6 +693,7 @@ Customize where the UI is accessible:
 ```
 
 **Examples**:
+
 - Default: `http://your-app.test/flowstone`
 - Custom path: Set `FLOWSTONE_UI_PATH=admin/workflows`
 - Custom domain: Set `FLOWSTONE_UI_DOMAIN=workflows.your-app.test`

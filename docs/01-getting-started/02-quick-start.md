@@ -15,6 +15,8 @@ This guide will show you how to:
 
 Let's create a document approval workflow as an example.
 
+> **💡 Important**: Flowstone uses a trait-based approach (not Symfony's `supports` config). This gives you full IDE support, type safety, and better DX. See [Configuration Guide](../02-configuration/01-configuration.md#model-integration-trait-vs-supports-configuration) for details.
+
 ### Generate the Model
 
 ```bash

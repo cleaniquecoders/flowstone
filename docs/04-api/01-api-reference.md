@@ -68,6 +68,8 @@ The main trait that adds workflow functionality to your models.
 CleaniqueCoders\Flowstone\Concerns\InteractsWithWorkflow
 ```
 
+> **💡 Recommended Approach**: Use this trait instead of Symfony's `supports` configuration for better Laravel developer experience. You get full IDE autocomplete, type safety, and dynamic workflow selection. See [Configuration Guide](../02-configuration/01-configuration.md#model-integration-trait-vs-supports-configuration) for detailed comparison.
+
 #### Required Methods
 
 Models using this trait must implement:
@@ -334,6 +336,8 @@ Interface that workflow-enabled models must implement.
 ```php
 CleaniqueCoders\Flowstone\Contracts\Workflow
 ```
+
+> **💡 Design Pattern**: This contract ensures type safety and IDE support. When combined with `InteractsWithWorkflow` trait, you get the best developer experience - much better than Symfony's `supports` array configuration.
 
 #### Required Methods
 
