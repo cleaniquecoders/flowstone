@@ -17,8 +17,8 @@ trait InteractsWithWorkflow
 
         // If model has getSymfonyConfig method (like Workflow model), use it
         if (method_exists($this, 'getSymfonyConfig')) {
-            // Ensure relationships are loaded before generating config
-            if (method_exists($this, 'relationLoaded')) {
+            // Ensure relationships are loaded before generating config (only for models with these relationships)
+            if (method_exists($this, 'relationLoaded') && method_exists($this, 'places') && method_exists($this, 'transitions')) {
                 if (! $this->relationLoaded('places') || ! $this->relationLoaded('transitions')) {
                     $this->load(['places', 'transitions']);
                 }
@@ -38,8 +38,8 @@ trait InteractsWithWorkflow
 
         $this->refresh();
 
-        // Reload relationships after refresh to ensure they're available
-        if (method_exists($this, 'load')) {
+        // Reload relationships after refresh to ensure they're available (only for models with these relationships)
+        if (method_exists($this, 'load') && method_exists($this, 'places') && method_exists($this, 'transitions')) {
             $this->load(['places', 'transitions']);
         }
 
