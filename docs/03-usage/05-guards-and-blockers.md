@@ -12,6 +12,27 @@ Guards allow you to:
 - **Implement complex conditions** using expressions
 - **Combine multiple checks** for robust validation
 
+### Key Features
+
+✅ **Multiple Guards Supported** - Configure multiple guards per transition
+✅ **All Must Pass** - Every guard must return `true` for transition to be allowed
+✅ **Flexible Configuration** - Single guard or array of guards
+✅ **Auto-Detection** - Automatically detects `roles`, `permission`, `permissions` keys
+✅ **Detailed Feedback** - Get specific blockers for each failed guard
+
+## Quick Answer
+
+**Q: Does Flowstone support single or multiple guards?**
+
+✅ **Both!** You can configure:
+
+- **Single guard**: `'guard' => ...`
+- **Multiple guards**: `'guards' => [...]`
+- **Auto-detected**: `'roles'`, `'permission'`, `'permissions'`
+- **Mixed**: Combine any of the above
+
+**ALL configured guards must pass** for the transition to be allowed.
+
 ## Table of Contents
 
 - [Basic Usage](#basic-usage)
@@ -120,25 +141,20 @@ Restrict transitions based on Laravel permissions/abilities.
 ]
 ```
 
-**How Multiple Permissions Work:**
-
-Each permission in the `permissions` array is checked separately, and the user needs to have **at least one** of them:
+**Important: `permission` vs `permissions`**
 
 ```php
-// This creates TWO separate permission guards
-'permissions' => ['perm-a', 'perm-b']
+// Single permission - user needs THIS permission
+'permission' => 'approve-documents'
 
-// User passes if they have perm-a OR perm-b (or both)
+// Single permission with array - user needs ANY of these (OR logic)
+'permission' => ['edit-documents', 'approve-documents']  // edit OR approve
+
+// Multiple permissions - user needs ALL of these (AND logic)
+'permissions' => ['view-documents', 'approve-documents']  // view AND approve
 ```
 
-To require **all** permissions, use the `guards` array instead:
-
-```php
-'guards' => [
-    ['type' => 'permission', 'value' => 'perm-a'],  // Must have perm-a
-    ['type' => 'permission', 'value' => 'perm-b'],  // AND must have perm-b
-]
-```
+The `permissions` (plural) key creates **separate guards for each permission**, so ALL must pass.
 
 **How it works:**
 
@@ -328,6 +344,21 @@ class DocumentApproval extends Component
 
 ## Guard Configuration
 
+### Single vs Multiple Guards
+
+Flowstone supports **both single and multiple guards** per transition:
+
+| Configuration | Syntax | Behavior |
+|---------------|--------|----------|
+| **Single Guard** | `'guard' => ...` | One guard condition |
+| **Multiple Guards** | `'guards' => [...]` | Array of guards - **ALL must pass** |
+| **Mixed** | Both `guard` and `guards` | All conditions must pass |
+| **Auto-Detected** | `'roles'`, `'permission'`, `'permissions'` | Automatically converted to guards |
+
+**Important:** When multiple guards are configured, **ALL guards must pass** for the transition to be allowed. If any guard fails, the transition is blocked.
+
+### Configuration Methods
+
 Guards can be configured either in code (when defining workflows) or in the database (when using the Workflow model).
 
 ### Configuration via Code
@@ -348,10 +379,12 @@ When defining workflows in configuration files:
 
 When using the `Workflow` and `WorkflowTransition` models:
 
+#### Example 1: Single Guard
+
 ```php
 use CleaniqueCoders\Flowstone\Models\WorkflowTransition;
 
-// Single guard
+// Single role guard
 WorkflowTransition::create([
     'workflow_id' => $workflow->id,
     'name' => 'approve',
@@ -361,8 +394,12 @@ WorkflowTransition::create([
         'guard' => "is_granted('approve-documents')",
     ],
 ]);
+```
 
-// Multiple guards (all must pass)
+#### Example 2: Multiple Guards (ALL Must Pass)
+
+```php
+// Multiple guards using 'guards' array
 WorkflowTransition::create([
     'workflow_id' => $workflow->id,
     'name' => 'approve',
@@ -370,54 +407,110 @@ WorkflowTransition::create([
     'to_place' => 'approved',
     'meta' => [
         'guards' => [
-            ['type' => 'role', 'value' => ['ROLE_APPROVER']],
-            ['type' => 'permission', 'value' => 'approve-documents'],
-            ['type' => 'method', 'value' => 'hasMinimumReviews'],
+            ['type' => 'role', 'value' => ['ROLE_APPROVER']],        // Must have role
+            ['type' => 'permission', 'value' => 'approve-documents'], // AND permission
+            ['type' => 'method', 'value' => 'hasMinimumReviews'],    // AND pass method
         ],
     ],
 ]);
 
-// Combined configuration
+// Result: User needs ROLE_APPROVER AND approve-documents AND hasMinimumReviews() === true
+```
+
+#### Example 3: Auto-Detected Multiple Guards
+
+```php
+// These keys are automatically detected and converted to guards
 WorkflowTransition::create([
     'workflow_id' => $workflow->id,
     'name' => 'publish',
     'from_place' => 'approved',
     'to_place' => 'published',
     'meta' => [
-        // Role check - user must have one of these roles
-        'roles' => ['ROLE_PUBLISHER', 'ROLE_ADMIN'],
+        'roles' => ['ROLE_PUBLISHER', 'ROLE_ADMIN'],  // User needs ONE of these roles
+        'permission' => 'publish-content',             // AND this permission
+        'permissions' => ['edit-articles', 'edit-documents'], // AND ONE of these
+    ],
+]);
 
-        // Permission check - single permission
-        'permission' => 'publish-content',
+// All three conditions must pass!
+```
 
-        // Multiple permissions - user must have at least one
-        'permissions' => ['publish-articles', 'publish-documents'],
+#### Example 4: Mixed Configuration
 
-        // Custom method check
-        'guard' => [
-            'type' => 'method',
-            'value' => 'isReadyForPublication',
+```php
+// You can mix single 'guard' with auto-detected guards
+WorkflowTransition::create([
+    'workflow_id' => $workflow->id,
+    'name' => 'approve',
+    'from_place' => 'review',
+    'to_place' => 'approved',
+    'meta' => [
+        'roles' => ['ROLE_MANAGER'],                          // Auto-detected
+        'permission' => 'approve-documents',                   // Auto-detected
+        'guard' => ['type' => 'method', 'value' => 'isReady'], // Explicit guard
+        'guards' => [                                          // Multiple explicit guards
+            ['type' => 'method', 'value' => 'hasMinimumReviews'],
         ],
     ],
 ]);
+
+// All guards above will be combined and evaluated
+// User needs: ROLE_MANAGER AND approve-documents AND isReady() AND hasMinimumReviews()
 ```
 
-### How Guards Are Evaluated
+#### Understanding AND vs OR Logic
 
-All guards configured for a transition must pass for the transition to be allowed:
+This is important to understand for proper guard configuration:
 
-1. **Role guards** (`roles`) - User must have **any** of the listed roles
-2. **Permission guards** (`permission`/`permissions`) - User must have the permission(s)
-3. **Custom guards** (`guard`/`guards`) - All custom guards must return `true`
+| Configuration | Number of Guards | Logic | Example Result |
+|---------------|------------------|-------|----------------|
+| `'roles' => ['A', 'B']` | 1 guard | User needs **A OR B** | ANY role |
+| `'permission' => 'x'` | 1 guard | User needs **x** | Specific permission |
+| `'permission' => ['x', 'y']` | 1 guard | User needs **x OR y** | ANY permission |
+| `'permissions' => ['x', 'y']` | 2 guards | User needs **x AND y** | ALL permissions |
+
+**Key Points:**
+
+- `permission` (singular) = 1 guard, array uses OR logic
+- `permissions` (plural) = multiple guards, each must pass (AND logic)
+- All guard types combined = AND logic
+- Within `roles` or single `permission` array = OR logic
+
+**Example 1: OR within, AND across**
 
 ```php
-// Example: This transition requires BOTH role AND permission
 'meta' => [
-    'roles' => ['ROLE_MANAGER'],      // User needs this role
-    'permission' => 'approve-docs',   // AND this permission
+    'roles' => ['MANAGER', 'ADMIN'],        // Guard 1: MANAGER OR ADMIN
+    'permission' => ['edit', 'publish'],    // Guard 2: edit OR publish
 ]
+// User needs: (MANAGER OR ADMIN) AND (edit OR publish)
+```
 
-// If either check fails, the transition is blocked
+**Example 2: Requiring ALL permissions**
+
+```php
+'meta' => [
+    'permissions' => ['view-docs', 'approve-docs', 'publish-docs'],  // 3 separate guards
+]
+// User needs: view-docs AND approve-docs AND publish-docs (all 3)
+```
+
+**Example 3: Complex combination**
+
+```php
+'meta' => [
+    'roles' => ['MANAGER', 'ADMIN'],           // Guard 1: MANAGER OR ADMIN (any)
+    'permission' => 'approve-docs',             // Guard 2: approve-docs (must have)
+    'permissions' => ['view-docs', 'edit-docs'], // Guard 3 & 4: view-docs AND edit-docs (both)
+    'guard' => ['type' => 'method', 'value' => 'isReady'], // Guard 5: isReady() === true
+]
+// User needs ALL 5 guards to pass:
+// 1. (MANAGER OR ADMIN) AND
+// 2. approve-docs AND
+// 3. view-docs AND
+// 4. edit-docs AND
+// 5. isReady() === true
 ```
 
 ## How Guards Work Internally
@@ -1010,6 +1103,7 @@ Additional methods available on the `Workflow` model:
 | `getTransitionGuardConfig(string $name)` | `array` | Get simplified guard configuration for display |
 
 **Example:**
+
 ```php
 $guards = $workflow->getTransitionGuardConfig('approve');
 // Returns: ['roles' => ['ROLE_APPROVER'], 'permission' => 'approve-docs']
