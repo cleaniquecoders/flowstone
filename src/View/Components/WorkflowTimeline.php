@@ -49,13 +49,8 @@ class WorkflowTimeline extends Component
             return collect();
         }
 
-        $query = $this->model->getAuditTrail();
-
-        if ($this->limit) {
-            $query->limit($this->limit);
-        }
-
-        return $query->get();
+        // getAuditTrail() already returns a Collection and handles limit
+        return $this->model->getAuditTrail($this->limit);
     }
 
     /**

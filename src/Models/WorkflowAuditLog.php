@@ -2,14 +2,16 @@
 
 namespace CleaniqueCoders\Flowstone\Models;
 
+use CleaniqueCoders\Flowstone\Database\Factories\WorkflowAuditLogFactory;
 use CleaniqueCoders\Traitify\Concerns\InteractsWithUuid;
+use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\MorphTo;
 
 class WorkflowAuditLog extends Model
 {
-    use InteractsWithUuid;
+    use HasFactory, InteractsWithUuid;
 
     /**
      * Indicates if the model should be timestamped.
@@ -51,6 +53,14 @@ class WorkflowAuditLog extends Model
         'metadata' => 'array',
         'created_at' => 'datetime',
     ];
+
+    /**
+     * Create a new factory instance for the model.
+     */
+    protected static function newFactory(): WorkflowAuditLogFactory
+    {
+        return WorkflowAuditLogFactory::new();
+    }
 
     /**
      * Get the workflow that this audit log belongs to.

@@ -39,7 +39,7 @@ beforeEach(function () {
 
     // Regenerate config
     $this->workflow->refresh();
-    $this->workflow->setWorkflow();
+    $this->workflow->setWorkflow(true);
 });
 
 test('transition blocker can be created with message and code', function () {
@@ -94,10 +94,24 @@ test('can apply transition returns true when no guards are set', function () {
 });
 
 test('can apply transition returns false when transition is not enabled', function () {
-    expect($this->workflow->canApplyTransition('approve'))->toBeFalse();
+    // Try to apply a transition that doesn't exist
+    expect($this->workflow->canApplyTransition('nonexistent'))->toBeFalse();
 });
 
 test('get transition blockers returns blocker when transition not enabled', function () {
+    // Create approve transition but don't move to review state
+    WorkflowTransition::factory()->create([
+        'workflow_id' => $this->workflow->id,
+        'name' => 'approve',
+        'from_place' => 'review',
+        'to_place' => 'approved',
+    ]);
+
+    $this->workflow->load(['transitions', 'places']);
+    $this->workflow->setWorkflow(true);
+    $this->workflow->refresh();
+
+    // We're still in 'draft', so 'approve' (which requires 'review') is not available
     $blockers = $this->workflow->getTransitionBlockers('approve');
 
     expect($blockers)->toHaveCount(1);
@@ -112,95 +126,77 @@ test('get transition blockers returns empty array when no blockers', function ()
 });
 
 test('role guard blocks transition when user lacks role', function () {
-    // Add transition with role guard
     WorkflowTransition::factory()->create([
         'workflow_id' => $this->workflow->id,
         'name' => 'approve',
         'from_place' => 'review',
         'to_place' => 'approved',
-        'meta' => [
-            'roles' => ['ROLE_APPROVER'],
-        ],
+        'meta' => ['roles' => ['ROLE_APPROVER']],
     ]);
 
+    $this->workflow->load(['transitions', 'places']);
+    $this->workflow->setWorkflow(true);
     $this->workflow->update(['marking' => 'review']);
     $this->workflow->refresh();
-    $this->workflow->setWorkflow();
 
-    // No user authenticated
     expect($this->workflow->canApplyTransition('approve'))->toBeFalse();
-
     $blockers = $this->workflow->getTransitionBlockers('approve');
     expect($blockers)->toHaveCount(1);
     expect($blockers[0]->getCode())->toBe(TransitionBlocker::BLOCKED_BY_ROLE);
 });
 
 test('permission guard blocks transition when user lacks permission', function () {
-    // Add transition with permission guard
     WorkflowTransition::factory()->create([
         'workflow_id' => $this->workflow->id,
         'name' => 'approve',
         'from_place' => 'review',
         'to_place' => 'approved',
-        'meta' => [
-            'permission' => 'approve-documents',
-        ],
+        'meta' => ['permission' => 'approve-documents'],
     ]);
 
+    $this->workflow->load(['transitions', 'places']);
+    $this->workflow->setWorkflow(true);
     $this->workflow->update(['marking' => 'review']);
     $this->workflow->refresh();
-    $this->workflow->setWorkflow();
 
-    // No user authenticated
     expect($this->workflow->canApplyTransition('approve'))->toBeFalse();
-
     $blockers = $this->workflow->getTransitionBlockers('approve');
     expect($blockers)->toHaveCount(1);
     expect($blockers[0]->getCode())->toBe(TransitionBlocker::BLOCKED_BY_PERMISSION);
 });
 
 test('method guard calls custom method on model', function () {
-    // Add transition with method guard
     WorkflowTransition::factory()->create([
         'workflow_id' => $this->workflow->id,
         'name' => 'approve',
         'from_place' => 'review',
         'to_place' => 'approved',
-        'meta' => [
-            'guard' => [
-                'type' => 'method',
-                'value' => 'canBeApproved',
-            ],
-        ],
+        'meta' => ['guard' => ['type' => 'method', 'value' => 'canBeApproved']],
     ]);
 
+    $this->workflow->load(['transitions', 'places']);
+    $this->workflow->setWorkflow(true);
     $this->workflow->update(['marking' => 'review']);
     $this->workflow->refresh();
-    $this->workflow->setWorkflow();
 
-    // Method doesn't exist, so it should be blocked
     expect($this->workflow->canApplyTransition('approve'))->toBeFalse();
 });
 
 test('expression guard with is_granted pattern', function () {
-    // Add transition with expression guard
     WorkflowTransition::factory()->create([
         'workflow_id' => $this->workflow->id,
         'name' => 'approve',
         'from_place' => 'review',
         'to_place' => 'approved',
-        'meta' => [
-            'guard' => "is_granted('approve-documents')",
-        ],
+        'meta' => ['guard' => "is_granted('approve-documents')"],
     ]);
 
+    $this->workflow->load(['transitions', 'places']);
+    $this->workflow->setWorkflow(true);
     $this->workflow->update(['marking' => 'review']);
     $this->workflow->refresh();
-    $this->workflow->setWorkflow();
 
-    // No user authenticated
     expect($this->workflow->canApplyTransition('approve'))->toBeFalse();
-
     $blockers = $this->workflow->getTransitionBlockers('approve');
     expect($blockers)->toHaveCount(1);
     expect($blockers[0]->getCode())->toBe(TransitionBlocker::BLOCKED_BY_EXPRESSION_GUARD);
@@ -212,18 +208,15 @@ test('get transition blocker messages returns array of strings', function () {
         'name' => 'approve',
         'from_place' => 'review',
         'to_place' => 'approved',
-        'meta' => [
-            'roles' => ['ROLE_APPROVER'],
-            'permission' => 'approve-documents',
-        ],
+        'meta' => ['roles' => ['ROLE_APPROVER'], 'permission' => 'approve-documents'],
     ]);
 
+    $this->workflow->load(['transitions', 'places']);
+    $this->workflow->setWorkflow(true);
     $this->workflow->update(['marking' => 'review']);
     $this->workflow->refresh();
-    $this->workflow->setWorkflow();
 
     $messages = $this->workflow->getTransitionBlockerMessages('approve');
-
     expect($messages)->toBeArray();
     expect($messages)->toHaveCount(2);
     expect($messages[0])->toBeString();
@@ -244,18 +237,17 @@ test('multiple guards can be configured', function () {
         ],
     ]);
 
+    $this->workflow->load(['transitions', 'places']);
+    $this->workflow->setWorkflow(true);
     $this->workflow->update(['marking' => 'review']);
     $this->workflow->refresh();
-    $this->workflow->setWorkflow();
 
     $blockers = $this->workflow->getTransitionBlockers('approve');
-
-    // Should have 2 blockers since no user is authenticated
     expect($blockers)->toHaveCount(2);
 });
 
 test('get transition guards returns empty array when no guards configured', function () {
-    $guards = $this->workflow->getTransitionGuards('submit');
+    $guards = $this->workflow->getTransitionGuardConfig('submit');
 
     expect($guards)->toBeArray();
     expect($guards)->toBeEmpty();
@@ -275,17 +267,14 @@ test('supports multiple permissions in array', function () {
         'name' => 'approve',
         'from_place' => 'review',
         'to_place' => 'approved',
-        'meta' => [
-            'permissions' => ['view-documents', 'approve-documents'],
-        ],
+        'meta' => ['permissions' => ['view-documents', 'approve-documents']],
     ]);
 
+    $this->workflow->load(['transitions', 'places']);
+    $this->workflow->setWorkflow(true);
     $this->workflow->update(['marking' => 'review']);
     $this->workflow->refresh();
-    $this->workflow->setWorkflow();
 
     $blockers = $this->workflow->getTransitionBlockers('approve');
-
-    // Should have 2 blockers for the 2 permissions
     expect($blockers)->toHaveCount(2);
 });

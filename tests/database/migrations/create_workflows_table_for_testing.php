@@ -15,12 +15,37 @@ return new class extends Migration
 
             $table->string('name');
             $table->text('description')->nullable();
+
+            // Organization fields
+            $table->string('group')->nullable()->index();
+            $table->string('category')->nullable()->index();
+            $table->json('tags')->nullable();
+
             $table->enum('type', ['state_machine', 'workflow'])->default('state_machine');
+
+            // Marking store configuration
+            $table->string('marking_store_type')->nullable();
+            $table->string('marking_store_property')->nullable();
+
             $table->string('initial_marking')->nullable();
             $table->string('marking')->nullable(); // Current workflow state
             $table->json('config')->nullable(); // Cached workflow configuration
+            $table->json('designer')->nullable(); // Visual designer layout
 
             $table->boolean('is_enabled')->default(true);
+            $table->boolean('audit_trail_enabled')->default(false);
+
+            // Event configuration
+            $table->json('event_listeners')->nullable();
+            $table->json('events_to_dispatch')->nullable();
+            $table->boolean('dispatch_guard_events')->default(true);
+            $table->boolean('dispatch_leave_events')->default(true);
+            $table->boolean('dispatch_transition_events')->default(true);
+            $table->boolean('dispatch_enter_events')->default(true);
+            $table->boolean('dispatch_entered_events')->default(true);
+            $table->boolean('dispatch_completed_events')->default(true);
+            $table->boolean('dispatch_announce_events')->default(true);
+
             $table->json('meta')->nullable();
 
             $table->timestamps();
@@ -72,10 +97,48 @@ return new class extends Migration
             $table->json('workflow')->nullable(); // Cached workflow configuration
             $table->timestamps();
         });
+
+        // Workflow audit logs table
+        Schema::create('workflow_audit_logs', function (Blueprint $table) {
+            $table->id();
+            $table->uuid()->unique()->index();
+
+            // Workflow reference
+            $table->foreignId('workflow_id')
+                ->nullable()
+                ->constrained('workflows')
+                ->nullOnDelete();
+
+            // Subject (the model that underwent the transition)
+            $table->string('subject_type')->index();
+            $table->unsignedBigInteger('subject_id')->index();
+
+            // Transition details
+            $table->string('from_place')->nullable()->index();
+            $table->string('to_place')->index();
+            $table->string('transition')->index();
+
+            // User who performed the transition
+            $table->unsignedBigInteger('user_id')->nullable()->index();
+
+            // Additional context and metadata
+            $table->json('context')->nullable();
+            $table->json('metadata')->nullable();
+
+            // Timestamp
+            $table->timestamp('created_at')->index();
+
+            // Composite indexes for common queries
+            $table->index(['subject_type', 'subject_id']);
+            $table->index(['workflow_id', 'created_at']);
+            $table->index(['subject_type', 'subject_id', 'created_at']);
+            $table->index(['user_id', 'created_at']);
+        });
     }
 
     public function down()
     {
+        Schema::dropIfExists('workflow_audit_logs');
         Schema::dropIfExists('articles');
         Schema::dropIfExists('workflow_transitions');
         Schema::dropIfExists('workflow_places');

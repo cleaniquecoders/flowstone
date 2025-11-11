@@ -8,20 +8,51 @@ use Symfony\Component\Workflow\Workflow;
 
 trait InteractsWithWorkflow
 {
-    public function setWorkflow(): self
+    public function setWorkflow(bool $force = false): self
     {
-        if (! empty(data_get($this, 'config'))) {
+        // Don't rebuild if config exists and not forced
+        if (! $force && ! empty(data_get($this, 'config'))) {
             return $this;
         }
 
-        $this->update([
-            'config' => get_workflow_config(
-                $this->workflow_type,
-                $this->workflow_type_field
-            ),
-        ]);
+        // If model has getSymfonyConfig method (like Workflow model), use it
+        if (method_exists($this, 'getSymfonyConfig')) {
+            // Ensure relationships are loaded before generating config
+            if (method_exists($this, 'relationLoaded')) {
+                if (! $this->relationLoaded('places') || ! $this->relationLoaded('transitions')) {
+                    $this->load(['places', 'transitions']);
+                }
+            }
+
+            $this->update([
+                'config' => $this->getSymfonyConfig(),
+            ]);
+        } else {
+            $this->update([
+                'config' => get_workflow_config(
+                    $this->workflow_type,
+                    $this->workflow_type_field
+                ),
+            ]);
+        }
 
         $this->refresh();
+
+        // Reload relationships after refresh to ensure they're available
+        if (method_exists($this, 'load')) {
+            $this->load(['places', 'transitions']);
+        }
+
+        // Clear all workflow-related caches when forcing rebuild
+        if ($force) {
+            Cache::forget($this->getWorkflowKey());
+            // Also clear any config-related caches
+            if (method_exists($this, 'getKeyName') && $this->{$this->getKeyName()}) {
+                Cache::forget("workflow.config.{$this->{$this->getKeyName()}}");
+                Cache::forget("workflow.config.{$this->type}");
+                Cache::forget("workflow.config.{$this->name}");
+            }
+        }
 
         return $this;
     }
@@ -67,6 +98,11 @@ trait InteractsWithWorkflow
     public function getMarking(): string
     {
         return $this->marking;
+    }
+
+    public function setMarking($marking, array $context = []): void
+    {
+        $this->marking = (string) $marking;
     }
 
     public function getEnabledTransitions(): array
@@ -145,6 +181,12 @@ trait InteractsWithWorkflow
         // If this model is a Workflow model itself, check its audit_trail_enabled field
         if ($this instanceof \CleaniqueCoders\Flowstone\Models\Workflow) {
             return $this->audit_trail_enabled ?? false;
+        }
+
+        // Check the model's own config first for audit_trail_enabled
+        $config = $this->config ?? [];
+        if (isset($config['audit_trail_enabled'])) {
+            return (bool) $config['audit_trail_enabled'];
         }
 
         // For other models, find the workflow configuration and check its setting
@@ -337,12 +379,13 @@ trait InteractsWithWorkflow
 
         // Support permission-based guards
         if (isset($metadata['permission'])) {
-            $guards[] = ['type' => 'permission', 'value' => $metadata['permission']];
+            $permission = $metadata['permission'];
+            $guards[] = ['type' => 'permission', 'value' => is_array($permission) ? $permission : [$permission]];
         }
 
         if (isset($metadata['permissions']) && is_array($metadata['permissions'])) {
             foreach ($metadata['permissions'] as $permission) {
-                $guards[] = ['type' => 'permission', 'value' => $permission];
+                $guards[] = ['type' => 'permission', 'value' => is_array($permission) ? $permission : [$permission]];
             }
         }
 
@@ -352,11 +395,16 @@ trait InteractsWithWorkflow
     /**
      * Check if a guard condition is met.
      *
-     * @param  array  $guard  The guard configuration
+     * @param  array|string  $guard  The guard configuration (array) or expression (string)
      * @return bool True if guard passes, false otherwise
      */
-    protected function checkGuard(array $guard): bool
+    protected function checkGuard(array|string $guard): bool
     {
+        // If guard is a string, treat as expression
+        if (is_string($guard)) {
+            return $this->checkExpressionGuard($guard);
+        }
+
         $type = $guard['type'] ?? 'expression';
         $value = $guard['value'] ?? null;
 
@@ -364,20 +412,14 @@ trait InteractsWithWorkflow
             return true;
         }
 
-        switch ($type) {
-            case 'role':
-                return $this->checkRoleGuard($value);
+        $result = match ($type) {
+            'role' => $this->checkRoleGuard($value),
+            'permission' => $this->checkPermissionGuard($value),
+            'method' => $this->checkMethodGuard($value),
+            default => $this->checkExpressionGuard($value),
+        };
 
-            case 'permission':
-                return $this->checkPermissionGuard($value);
-
-            case 'method':
-                return $this->checkMethodGuard($value);
-
-            case 'expression':
-            default:
-                return $this->checkExpressionGuard($value);
-        }
+        return $result;
     }
 
     /**
@@ -385,16 +427,24 @@ trait InteractsWithWorkflow
      */
     protected function checkRoleGuard(array|string $roles): bool
     {
+        // Must be authenticated to have a role
         if (! auth()->check()) {
+            return false;
+        }
+
+        $user = auth()->user();
+        if (! $user) {
             return false;
         }
 
         $roles = is_array($roles) ? $roles : [$roles];
 
         // Check if user has any of the required roles
-        foreach ($roles as $role) {
-            if (auth()->user()->hasRole($role)) {
-                return true;
+        if (method_exists($user, 'hasRole')) {
+            foreach ($roles as $role) {
+                if ($user->hasRole($role)) {
+                    return true;
+                }
             }
         }
 
@@ -404,25 +454,50 @@ trait InteractsWithWorkflow
     /**
      * Check permission-based guard.
      */
-    protected function checkPermissionGuard(string $permission): bool
+    protected function checkPermissionGuard(string|array $permission): bool
     {
+        // Must be authenticated to have permissions
         if (! auth()->check()) {
             return false;
         }
 
-        // Try common permission checking methods
         $user = auth()->user();
+        if (! $user) {
+            return false;
+        }
 
+        // Handle multiple permissions
+        $permissions = is_array($permission) ? $permission : [$permission];
+
+        // Try common permission checking methods
         if (method_exists($user, 'hasPermissionTo')) {
-            return $user->hasPermissionTo($permission);
+            foreach ($permissions as $perm) {
+                if ($user->hasPermissionTo($perm)) {
+                    return true;
+                }
+            }
+
+            return false;
         }
 
         if (method_exists($user, 'can')) {
-            return $user->can($permission);
+            foreach ($permissions as $perm) {
+                if ($user->can($perm)) {
+                    return true;
+                }
+            }
+
+            return false;
         }
 
         // Fallback to Laravel's Gate
-        return \Illuminate\Support\Facades\Gate::allows($permission, $this);
+        foreach ($permissions as $perm) {
+            if (\Illuminate\Support\Facades\Gate::allows($perm, $this)) {
+                return true;
+            }
+        }
+
+        return false;
     }
 
     /**
@@ -671,7 +746,11 @@ trait InteractsWithWorkflow
     /**
      * Check method guard with context parameter.
      */
-    protected function checkMethodGuardWithContext(string $method, array $context = []): bool
+    /**
+     * Check method guard with context support.
+     * Useful for guards that need to evaluate based on transition context.
+     */
+    public function checkMethodGuardWithContext(string $method, array $context = []): bool
     {
         if (! method_exists($this, $method)) {
             return false;

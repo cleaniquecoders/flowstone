@@ -6,37 +6,82 @@ use CleaniqueCoders\Flowstone\Tests\Models\Article;
 use Illuminate\Support\Facades\Blade;
 
 beforeEach(function () {
-    // Create a test workflow
-    $this->workflow = Workflow::factory()
-        ->hasPlaces(3, function (array $attributes, Workflow $workflow) {
-            return [
-                ['name' => 'draft', 'sort_order' => 1],
-                ['name' => 'review', 'sort_order' => 2],
-                ['name' => 'published', 'sort_order' => 3],
-            ][$attributes['sort_order'] - 1];
-        })
-        ->hasTransitions(2, function (array $attributes, Workflow $workflow) {
-            return [
-                [
-                    'name' => 'submit',
-                    'from' => ['draft'],
+    // Create a test workflow with proper config
+    $this->workflow = Workflow::factory()->create([
+        'name' => 'document-workflow',
+        'type' => 'state_machine',
+        'config' => [
+            'type' => 'state_machine',
+            'supports' => [\CleaniqueCoders\Flowstone\Tests\Models\Article::class],
+            'places' => ['draft', 'review', 'published'],
+            'transitions' => [
+                'submit' => [
+                    'from' => 'draft',
                     'to' => 'review',
-                    'sort_order' => 1,
                 ],
-                [
-                    'name' => 'publish',
-                    'from' => ['review'],
+                'publish' => [
+                    'from' => 'review',
                     'to' => 'published',
-                    'sort_order' => 2,
                 ],
-            ][$attributes['sort_order'] - 1];
-        })
-        ->create(['name' => 'document-workflow']);
+            ],
+        ],
+    ]);
+
+    // Manually create places to avoid factory sequence issues
+    \CleaniqueCoders\Flowstone\Models\WorkflowPlace::factory()->create([
+        'workflow_id' => $this->workflow->id,
+        'name' => 'draft',
+        'sort_order' => 1,
+    ]);
+
+    \CleaniqueCoders\Flowstone\Models\WorkflowPlace::factory()->create([
+        'workflow_id' => $this->workflow->id,
+        'name' => 'review',
+        'sort_order' => 2,
+    ]);
+
+    \CleaniqueCoders\Flowstone\Models\WorkflowPlace::factory()->create([
+        'workflow_id' => $this->workflow->id,
+        'name' => 'published',
+        'sort_order' => 3,
+    ]);
+
+    // Manually create transitions
+    \CleaniqueCoders\Flowstone\Models\WorkflowTransition::factory()->create([
+        'workflow_id' => $this->workflow->id,
+        'name' => 'submit',
+        'from_place' => 'draft',
+        'to_place' => 'review',
+        'sort_order' => 1,
+    ]);
+
+    \CleaniqueCoders\Flowstone\Models\WorkflowTransition::factory()->create([
+        'workflow_id' => $this->workflow->id,
+        'name' => 'publish',
+        'from_place' => 'review',
+        'to_place' => 'published',
+        'sort_order' => 2,
+    ]);
 
     $this->document = new Article([
         'title' => 'Test Document',
-        'type' => 'document-workflow',
+        'workflow_type' => 'document-workflow',
         'marking' => 'draft',
+        'config' => [
+            'type' => 'state_machine',
+            'supports' => [\CleaniqueCoders\Flowstone\Tests\Models\Article::class],
+            'places' => ['draft', 'review', 'published'],
+            'transitions' => [
+                'submit' => [
+                    'from' => 'draft',
+                    'to' => 'review',
+                ],
+                'publish' => [
+                    'from' => 'review',
+                    'to' => 'published',
+                ],
+            ],
+        ],
     ]);
 });
 

@@ -127,16 +127,22 @@ if (! function_exists('workflow_transition')) {
 if (! function_exists('workflow_marked_places')) {
     /**
      * Get the current marked places for the model.
+     * Returns an associative array where keys are place names and values are integers (usually 1).
      */
     function workflow_marked_places($model): array
     {
-        if (! method_exists($model, 'getMarking')) {
+        if (! method_exists($model, 'getWorkflow')) {
             return [];
         }
 
-        $marking = $model->getMarking();
+        try {
+            $workflow = $model->getWorkflow();
+            $marking = $workflow->getMarking($model);
 
-        return $marking ? $marking->getPlaces() : [];
+            return $marking->getPlaces();
+        } catch (\Exception $e) {
+            return [];
+        }
     }
 }
 

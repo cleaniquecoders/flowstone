@@ -105,11 +105,38 @@ test('audit log stores metadata', function () {
 });
 
 test('audit log stores user id when authenticated', function () {
-    $user = new class
+    $user = new class implements \Illuminate\Contracts\Auth\Authenticatable
     {
+        public function getAuthIdentifierName()
+        {
+            return 'id';
+        }
+
         public function getAuthIdentifier()
         {
             return 123;
+        }
+
+        public function getAuthPassword()
+        {
+            return 'password';
+        }
+
+        public function getRememberToken()
+        {
+            return null;
+        }
+
+        public function setRememberToken($value) {}
+
+        public function getRememberTokenName()
+        {
+            return null;
+        }
+
+        public function getAuthPasswordName()
+        {
+            return 'password';
         }
     };
 
@@ -193,11 +220,38 @@ test('audit log scope for subject', function () {
 });
 
 test('audit log scope by user', function () {
-    $user = new class
+    $user = new class implements \Illuminate\Contracts\Auth\Authenticatable
     {
+        public function getAuthIdentifierName()
+        {
+            return 'id';
+        }
+
         public function getAuthIdentifier()
         {
             return 456;
+        }
+
+        public function getAuthPassword()
+        {
+            return 'password';
+        }
+
+        public function getRememberToken()
+        {
+            return null;
+        }
+
+        public function setRememberToken($value) {}
+
+        public function getRememberTokenName()
+        {
+            return null;
+        }
+
+        public function getAuthPasswordName()
+        {
+            return 'password';
         }
     };
 

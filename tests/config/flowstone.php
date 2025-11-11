@@ -53,4 +53,8 @@ return [
             ],
         ],
     ],
+
+    'ui' => [
+        'enabled' => true,
+    ],
 ];

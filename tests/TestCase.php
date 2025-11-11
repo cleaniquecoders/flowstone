@@ -37,6 +37,9 @@ class TestCase extends Orchestra
             'prefix' => '',
         ]);
 
+        // Set app key for encryption
+        config()->set('app.key', 'base64:'.base64_encode(random_bytes(32)));
+
         // Load test configuration
         $app['config']->set('flowstone', include __DIR__.'/config/flowstone.php');
 
@@ -49,7 +52,7 @@ class TestCase extends Orchestra
         \Illuminate\Support\Facades\Schema::create('articles', function ($table) {
             $table->id();
             $table->string('title');
-            $table->text('content');
+            $table->text('content')->nullable();
             $table->string('marking')->nullable();
             $table->string('workflow_type')->nullable();
             $table->json('config')->nullable();

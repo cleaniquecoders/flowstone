@@ -92,10 +92,15 @@ class TransitionBlocker
     /**
      * Create a blocker for permission issues.
      */
-    public static function createBlockedByPermission(string $permission): self
+    public static function createBlockedByPermission(string|array $permission): self
     {
+        $permissionList = is_array($permission) ? implode(', ', $permission) : $permission;
+        $message = is_array($permission)
+            ? "You need one of these permissions: {$permissionList}."
+            : "You do not have the required permission: {$permission}.";
+
         return new self(
-            "You do not have the required permission: {$permission}.",
+            $message,
             self::BLOCKED_BY_PERMISSION,
             ['permission' => $permission]
         );

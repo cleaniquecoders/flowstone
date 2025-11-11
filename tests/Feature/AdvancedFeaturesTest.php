@@ -5,77 +5,119 @@ use CleaniqueCoders\Flowstone\Tests\Models\Article;
 
 beforeEach(function () {
     // Create a state machine workflow
-    $this->stateMachineWorkflow = Workflow::factory()
-        ->hasPlaces(3, function (array $attributes, Workflow $workflow) {
-            return [
-                ['name' => 'draft', 'sort_order' => 1],
-                ['name' => 'review', 'sort_order' => 2],
-                ['name' => 'published', 'sort_order' => 3],
-            ][$attributes['sort_order'] - 1];
-        })
-        ->hasTransitions(2, function (array $attributes, Workflow $workflow) {
-            return [
-                [
-                    'name' => 'submit',
-                    'from' => ['draft'],
-                    'to' => 'review',
-                    'sort_order' => 1,
-                ],
-                [
-                    'name' => 'publish',
-                    'from' => ['review'],
-                    'to' => 'published',
-                    'sort_order' => 2,
-                ],
-            ][$attributes['sort_order'] - 1];
-        })
-        ->create([
-            'name' => 'article-state-machine',
-            'type' => 'state_machine',
-        ]);
+    $this->stateMachineWorkflow = Workflow::factory()->create([
+        'name' => 'article-state-machine',
+        'type' => 'state_machine',
+        'audit_trail_enabled' => true,
+    ]);
+
+    // Manually create places
+    \CleaniqueCoders\Flowstone\Models\WorkflowPlace::factory()->create([
+        'workflow_id' => $this->stateMachineWorkflow->id,
+        'name' => 'draft',
+        'sort_order' => 1,
+    ]);
+    \CleaniqueCoders\Flowstone\Models\WorkflowPlace::factory()->create([
+        'workflow_id' => $this->stateMachineWorkflow->id,
+        'name' => 'review',
+        'sort_order' => 2,
+    ]);
+    \CleaniqueCoders\Flowstone\Models\WorkflowPlace::factory()->create([
+        'workflow_id' => $this->stateMachineWorkflow->id,
+        'name' => 'published',
+        'sort_order' => 3,
+    ]);
+
+    // Manually create transitions
+    \CleaniqueCoders\Flowstone\Models\WorkflowTransition::factory()->create([
+        'workflow_id' => $this->stateMachineWorkflow->id,
+        'name' => 'submit',
+        'from_place' => 'draft',
+        'to_place' => 'review',
+        'sort_order' => 1,
+    ]);
+    \CleaniqueCoders\Flowstone\Models\WorkflowTransition::factory()->create([
+        'workflow_id' => $this->stateMachineWorkflow->id,
+        'name' => 'publish',
+        'from_place' => 'review',
+        'to_place' => 'published',
+        'sort_order' => 2,
+    ]);
 
     // Create a workflow (supports multiple states)
-    $this->multiStateWorkflow = Workflow::factory()
-        ->hasPlaces(4, function (array $attributes, Workflow $workflow) {
-            return [
-                ['name' => 'editing', 'sort_order' => 1],
-                ['name' => 'reviewing', 'sort_order' => 2],
-                ['name' => 'testing', 'sort_order' => 3],
-                ['name' => 'published', 'sort_order' => 4],
-            ][$attributes['sort_order'] - 1];
-        })
-        ->hasTransitions(3, function (array $attributes, Workflow $workflow) {
-            return [
-                [
-                    'name' => 'start_review',
-                    'from' => ['editing'],
-                    'to' => 'reviewing',
-                    'sort_order' => 1,
-                ],
-                [
-                    'name' => 'start_testing',
-                    'from' => ['reviewing'],
-                    'to' => 'testing',
-                    'sort_order' => 2,
-                ],
-                [
-                    'name' => 'publish',
-                    'from' => ['testing'],
-                    'to' => 'published',
-                    'sort_order' => 3,
-                ],
-            ][$attributes['sort_order'] - 1];
-        })
-        ->create([
-            'name' => 'article-workflow',
-            'type' => 'workflow',
-        ]);
+    $this->multiStateWorkflow = Workflow::factory()->create([
+        'name' => 'article-workflow',
+        'type' => 'workflow',
+    ]);
+
+    // Manually create places for multiStateWorkflow
+    \CleaniqueCoders\Flowstone\Models\WorkflowPlace::factory()->create([
+        'workflow_id' => $this->multiStateWorkflow->id,
+        'name' => 'editing',
+        'sort_order' => 1,
+    ]);
+    \CleaniqueCoders\Flowstone\Models\WorkflowPlace::factory()->create([
+        'workflow_id' => $this->multiStateWorkflow->id,
+        'name' => 'reviewing',
+        'sort_order' => 2,
+    ]);
+    \CleaniqueCoders\Flowstone\Models\WorkflowPlace::factory()->create([
+        'workflow_id' => $this->multiStateWorkflow->id,
+        'name' => 'testing',
+        'sort_order' => 3,
+    ]);
+    \CleaniqueCoders\Flowstone\Models\WorkflowPlace::factory()->create([
+        'workflow_id' => $this->multiStateWorkflow->id,
+        'name' => 'published',
+        'sort_order' => 4,
+    ]);
+
+    // Manually create transitions for multiStateWorkflow
+    \CleaniqueCoders\Flowstone\Models\WorkflowTransition::factory()->create([
+        'workflow_id' => $this->multiStateWorkflow->id,
+        'name' => 'start_review',
+        'from_place' => 'editing',
+        'to_place' => 'reviewing',
+        'sort_order' => 1,
+    ]);
+    \CleaniqueCoders\Flowstone\Models\WorkflowTransition::factory()->create([
+        'workflow_id' => $this->multiStateWorkflow->id,
+        'name' => 'start_testing',
+        'from_place' => 'reviewing',
+        'to_place' => 'testing',
+        'sort_order' => 2,
+    ]);
+    \CleaniqueCoders\Flowstone\Models\WorkflowTransition::factory()->create([
+        'workflow_id' => $this->multiStateWorkflow->id,
+        'name' => 'publish',
+        'from_place' => 'testing',
+        'to_place' => 'published',
+        'sort_order' => 3,
+    ]);
 
     $this->article = new Article([
         'title' => 'Test Article',
-        'type' => 'article-state-machine',
+        'content' => 'Test content',
+        'workflow_type' => 'article-state-machine',
         'marking' => 'draft',
+        'config' => [
+            'type' => 'state_machine',
+            'supports' => [\CleaniqueCoders\Flowstone\Tests\Models\Article::class],
+            'places' => ['draft', 'review', 'published'],
+            'transitions' => [
+                'submit' => [
+                    'from' => 'draft',
+                    'to' => 'review',
+                ],
+                'publish' => [
+                    'from' => 'review',
+                    'to' => 'published',
+                ],
+            ],
+            'audit_trail_enabled' => true,
+        ],
     ]);
+    $this->article->save();
 });
 
 describe('Multiple State Support', function () {
@@ -88,6 +130,16 @@ describe('Multiple State Support', function () {
             'title' => 'Test',
             'type' => 'article-workflow',
             'marking' => 'editing',
+            'config' => [
+                'type' => 'workflow',
+                'places' => [
+                    'editing' => null,
+                    'reviewing' => null,
+                    'published' => null,
+                ],
+                'transitions' => [],
+                'initial_marking' => 'editing',
+            ],
         ]);
 
         expect($article->supportsMultipleStates())->toBeTrue();
@@ -197,40 +249,51 @@ describe('Context Support', function () {
 describe('Metadata Support', function () {
     beforeEach(function () {
         // Create workflow with metadata
-        $this->workflowWithMetadata = Workflow::factory()
-            ->hasPlaces(2, function (array $attributes, Workflow $workflow) {
-                return [
-                    [
-                        'name' => 'draft',
-                        'sort_order' => 1,
-                        'meta' => ['color' => 'gray', 'icon' => 'draft-icon'],
-                    ],
-                    [
-                        'name' => 'published',
-                        'sort_order' => 2,
-                        'meta' => ['color' => 'green', 'icon' => 'check-icon'],
-                    ],
-                ][$attributes['sort_order'] - 1];
-            })
-            ->hasTransitions(1, function (array $attributes, Workflow $workflow) {
-                return [
-                    'name' => 'publish',
-                    'from' => ['draft'],
-                    'to' => 'published',
-                    'sort_order' => 1,
-                    'meta' => ['requires_approval' => true, 'notification' => 'email'],
-                ];
-            })
-            ->create([
-                'name' => 'article-with-metadata',
-                'type' => 'state_machine',
-                'meta' => ['department' => 'editorial', 'priority' => 'high'],
-            ]);
+        $this->workflowWithMetadata = Workflow::factory()->create([
+            'name' => 'article-with-metadata',
+            'type' => 'state_machine',
+            'meta' => ['department' => 'editorial', 'priority' => 'high'],
+        ]);
+
+        // Manually create places with metadata
+        \CleaniqueCoders\Flowstone\Models\WorkflowPlace::factory()->create([
+            'workflow_id' => $this->workflowWithMetadata->id,
+            'name' => 'draft',
+            'sort_order' => 1,
+            'meta' => ['color' => 'gray', 'icon' => 'draft-icon'],
+        ]);
+        \CleaniqueCoders\Flowstone\Models\WorkflowPlace::factory()->create([
+            'workflow_id' => $this->workflowWithMetadata->id,
+            'name' => 'published',
+            'sort_order' => 2,
+            'meta' => ['color' => 'green', 'icon' => 'check-icon'],
+        ]);
+
+        // Manually create transition with metadata
+        \CleaniqueCoders\Flowstone\Models\WorkflowTransition::factory()->create([
+            'workflow_id' => $this->workflowWithMetadata->id,
+            'name' => 'publish',
+            'from_place' => 'draft',
+            'to_place' => 'published',
+            'sort_order' => 1,
+            'meta' => ['requires_approval' => true, 'notification' => 'email'],
+        ]);
 
         $this->articleWithMeta = new Article([
             'title' => 'Test Article',
-            'type' => 'article-with-metadata',
+            'workflow_type' => 'article-with-metadata',
             'marking' => 'draft',
+            'config' => [
+                'type' => 'state_machine',
+                'supports' => [\CleaniqueCoders\Flowstone\Tests\Models\Article::class],
+                'places' => ['draft', 'published'],
+                'transitions' => [
+                    'publish' => [
+                        'from' => 'draft',
+                        'to' => 'published',
+                    ],
+                ],
+            ],
         ]);
     });
 
@@ -326,7 +389,18 @@ describe('Advanced Feature Integration', function () {
             'title' => 'Test',
             'type' => 'article-workflow',
             'marking' => 'editing',
+            'config' => [
+                'type' => 'workflow',
+                'places' => [
+                    'editing' => null,
+                    'reviewing' => null,
+                    'published' => null,
+                ],
+                'transitions' => [],
+                'initial_marking' => 'editing',
+            ],
         ]);
+        $article->save();
 
         expect($article->supportsMultipleStates())->toBeTrue()
             ->and($article->getMarkedPlaces())->toBeArray();

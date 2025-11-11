@@ -36,8 +36,10 @@ class FlowstoneServiceProvider extends PackageServiceProvider
             ->hasMigration('create_workflows_table')
             ->hasMigration('add_designer_column_to_workflows_table')
             ->hasMigration('add_organization_fields_to_workflows_table')
+            ->hasMigration('add_marking_store_to_workflows_table')
             ->hasMigration('create_workflow_audit_logs_table')
             ->hasMigration('add_audit_trail_to_workflows_table')
+            ->hasMigration('add_event_configuration_to_workflows_table')
             ->hasCommands([
                 FlowstoneCommand::class,
                 CreateWorkflowCommand::class,

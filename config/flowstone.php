@@ -92,6 +92,74 @@ return [
         |
         */
         'transitions' => null, // null = use default transitions
+
+        /*
+        |--------------------------------------------------------------------------
+        | Event Configuration
+        |--------------------------------------------------------------------------
+        |
+        | Configure which events are dispatched and which event listeners
+        | are registered for this workflow.
+        |
+        */
+        'event_listeners' => [
+            // Add your custom event listener classes here
+            // Example:
+            // App\Listeners\Workflow\SendNotificationOnApproval::class,
+            // App\Listeners\Workflow\LogWorkflowTransition::class,
+            // App\Listeners\Workflow\UpdateRelatedModels::class,
+        ],
+
+        /*
+        |--------------------------------------------------------------------------
+        | Events to Dispatch
+        |--------------------------------------------------------------------------
+        |
+        | Specify which workflow event types should be dispatched.
+        | Leave empty to dispatch all events, or specify specific event names.
+        |
+        | Available event types:
+        | - workflow.guard          (Before transition validation)
+        | - workflow.leave          (Before leaving a place)
+        | - workflow.transition     (During transition)
+        | - workflow.enter          (Before entering a place, before marking update)
+        | - workflow.entered        (After entering a place, after marking update)
+        | - workflow.completed      (After transition completes)
+        | - workflow.announce       (When new transitions become available)
+        |
+        | You can also use workflow-specific events:
+        | - workflow.{workflow_name}.guard
+        | - workflow.{workflow_name}.{transition_name}.completed
+        |
+        */
+        'events_to_dispatch' => [
+            // Leave empty to dispatch all events, or specify:
+            // 'workflow.guard',
+            // 'workflow.completed',
+            // 'workflow.entered',
+        ],
+
+        /*
+        |--------------------------------------------------------------------------
+        | Event Dispatch Flags
+        |--------------------------------------------------------------------------
+        |
+        | Fine-grained control over which event types are dispatched.
+        | These boolean flags provide a simpler alternative to specifying
+        | event names in the events_to_dispatch array.
+        |
+        | Set to false to disable specific event types for performance.
+        | For example, if you don't need announce events (which can be frequent),
+        | set dispatch_announce_events to false.
+        |
+        */
+        'dispatch_guard_events' => true,
+        'dispatch_leave_events' => true,
+        'dispatch_transition_events' => true,
+        'dispatch_enter_events' => true,
+        'dispatch_entered_events' => true,
+        'dispatch_completed_events' => true,
+        'dispatch_announce_events' => true,
     ],
 
     /*

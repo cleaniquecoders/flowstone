@@ -8,6 +8,7 @@ The Flowstone package provides a comprehensive event system that allows you to h
 - [Event Firing Order](#event-firing-order)
 - [Available Event Listeners](#available-event-listeners)
 - [Creating Custom Event Listeners](#creating-custom-event-listeners)
+- [Event Configuration](#event-configuration)
 - [Guard Events](#guard-events)
 - [Leave Events](#leave-events)
 - [Transition Events](#transition-events)
@@ -106,7 +107,49 @@ class DocumentPublishedListener extends EnteredEventListener
 
 ### Registering Event Listeners
 
-**Method 1: Register in Service Provider**
+#### Method 1: Database Configuration (Recommended)
+
+You can register event listeners directly in the workflow database configuration:
+
+```php
+use App\Workflow\Listeners\DocumentPublishedListener;
+use App\Workflow\Listeners\SendEmailOnApprovalListener;
+
+$workflow = Workflow::find($id);
+$workflow->addEventListener(DocumentPublishedListener::class);
+$workflow->addEventListener(SendEmailOnApprovalListener::class);
+$workflow->save();
+```
+
+Or configure multiple listeners at once:
+
+```php
+$workflow->update([
+    'event_listeners' => [
+        DocumentPublishedListener::class,
+        SendEmailOnApprovalListener::class,
+        LogWorkflowTransitionListener::class,
+    ],
+]);
+```
+
+#### Method 2: Config File Configuration
+
+Configure default event listeners in your config file:
+
+```php
+// config/flowstone.php
+'default' => [
+    'event_listeners' => [
+        \App\Workflow\Listeners\DocumentPublishedListener::class,
+        \App\Workflow\Listeners\SendEmailOnApprovalListener::class,
+    ],
+],
+```
+
+#### Method 3: Service Provider Registration
+
+Register listeners globally in your service provider:
 
 ```php
 // app/Providers/AppServiceProvider.php
@@ -122,18 +165,166 @@ public function boot()
 }
 ```
 
-**Method 2: Via Workflow Configuration (Coming in Phase 2)**
+## Event Configuration
 
-In the future, you'll be able to register listeners in the workflow configuration:
+Flowstone provides powerful event configuration options that allow you to control which events are dispatched and which listeners are registered per workflow.
+
+### Configuring Event Listeners
+
+#### Add Event Listeners to a Workflow
 
 ```php
-// config/flowstone.php
-'default' => [
-    'event_listeners' => [
-        \App\Workflow\Listeners\DocumentPublishedListener::class,
-        \App\Workflow\Listeners\SendEmailOnApprovalListener::class,
+$workflow = Workflow::find($id);
+
+// Add a listener
+$workflow->addEventListener(\App\Listeners\SendNotificationOnApproval::class);
+$workflow->save();
+
+// Check if a listener is registered
+if ($workflow->hasEventListener(\App\Listeners\SendNotificationOnApproval::class)) {
+    // Listener is registered
+}
+
+// Remove a listener
+$workflow->removeEventListener(\App\Listeners\SendNotificationOnApproval::class);
+$workflow->save();
+```
+
+### Controlling Which Events are Dispatched
+
+You can control which event types are dispatched for a specific workflow using two approaches:
+
+#### Approach 1: Boolean Flags (Simple)
+
+Use boolean flags for simple on/off control of event types:
+
+```php
+$workflow->update([
+    'dispatch_guard_events' => true,
+    'dispatch_leave_events' => true,
+    'dispatch_transition_events' => true,
+    'dispatch_enter_events' => true,
+    'dispatch_entered_events' => true,
+    'dispatch_completed_events' => true,
+    'dispatch_announce_events' => false, // Disable announce events for performance
+]);
+```
+
+#### Approach 2: Event Name Array (Advanced)
+
+Specify exactly which events to dispatch:
+
+```php
+$workflow->update([
+    'events_to_dispatch' => [
+        'workflow.guard',
+        'workflow.completed',
+        'workflow.entered',
     ],
-],
+]);
+```
+
+You can also use workflow-specific or transition-specific patterns:
+
+```php
+$workflow->update([
+    'events_to_dispatch' => [
+        'workflow.document_approval.guard',
+        'workflow.document_approval.publish.completed',
+    ],
+]);
+```
+
+### Checking Event Dispatch Configuration
+
+```php
+// Check if a specific event type should be dispatched
+if ($workflow->shouldDispatchEvent('guard')) {
+    // Guard events are enabled
+}
+
+if ($workflow->shouldDispatchEvent('announce')) {
+    // Announce events are enabled
+}
+
+// Get complete event configuration
+$config = $workflow->getEventConfiguration();
+/*
+Returns:
+[
+    'event_listeners' => ['App\\Listeners\\...'],
+    'events_to_dispatch' => ['workflow.guard', 'workflow.completed'],
+    'dispatch_flags' => [
+        'guard' => true,
+        'leave' => true,
+        'transition' => true,
+        'enter' => true,
+        'entered' => true,
+        'completed' => true,
+        'announce' => false,
+    ],
+]
+*/
+```
+
+### Configuration in Symfony Config
+
+Event configuration is automatically included in the Symfony workflow configuration:
+
+```php
+$symfonyConfig = $workflow->getSymfonyConfig();
+/*
+Returns:
+[
+    'type' => 'state_machine',
+    'places' => [...],
+    'transitions' => [...],
+    'event_listeners' => [
+        'App\\Listeners\\SendNotificationOnApproval',
+    ],
+    'events_to_dispatch' => [
+        'workflow.guard',
+        'workflow.completed',
+    ],
+]
+*/
+```
+
+### Database Configuration
+
+The event configuration is stored in these database fields:
+
+- `event_listeners` (JSON) - Array of listener class names
+- `events_to_dispatch` (JSON) - Array of event names to dispatch
+- `dispatch_guard_events` (boolean) - Enable/disable guard events
+- `dispatch_leave_events` (boolean) - Enable/disable leave events
+- `dispatch_transition_events` (boolean) - Enable/disable transition events
+- `dispatch_enter_events` (boolean) - Enable/disable enter events
+- `dispatch_entered_events` (boolean) - Enable/disable entered events
+- `dispatch_completed_events` (boolean) - Enable/disable completed events
+- `dispatch_announce_events` (boolean) - Enable/disable announce events
+
+### Performance Optimization
+
+Disable unnecessary events for better performance:
+
+```php
+// Disable announce events if you don't need them
+// Announce events fire frequently (after every transition for every available transition)
+$workflow->update([
+    'dispatch_announce_events' => false,
+]);
+
+// Only enable the events you actually need
+$workflow->update([
+    'dispatch_guard_events' => true,  // For validation
+    'dispatch_completed_events' => true,  // For notifications
+    'dispatch_entered_events' => false,  // Don't need these
+    'dispatch_leave_events' => false,  // Don't need these
+    'dispatch_transition_events' => false,  // Don't need these
+    'dispatch_enter_events' => false,  // Don't need these
+    'dispatch_announce_events' => false,  // Don't need these
+]);
 ```
 
 ## Guard Events
