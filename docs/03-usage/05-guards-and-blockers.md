@@ -110,13 +110,33 @@ Restrict transitions based on Laravel permissions/abilities.
     ],
 ]
 
-// Multiple permissions (all must pass)
+// Multiple permissions (user needs at least one)
 'publish' => [
     'from' => 'approved',
     'to' => 'published',
     'metadata' => [
         'permissions' => ['edit-documents', 'publish-documents'],
     ],
+]
+```
+
+**How Multiple Permissions Work:**
+
+Each permission in the `permissions` array is checked separately, and the user needs to have **at least one** of them:
+
+```php
+// This creates TWO separate permission guards
+'permissions' => ['perm-a', 'perm-b']
+
+// User passes if they have perm-a OR perm-b (or both)
+```
+
+To require **all** permissions, use the `guards` array instead:
+
+```php
+'guards' => [
+    ['type' => 'permission', 'value' => 'perm-a'],  // Must have perm-a
+    ['type' => 'permission', 'value' => 'perm-b'],  // AND must have perm-b
 ]
 ```
 
@@ -308,7 +328,11 @@ class DocumentApproval extends Component
 
 ## Guard Configuration
 
-### Single Guard
+Guards can be configured either in code (when defining workflows) or in the database (when using the Workflow model).
+
+### Configuration via Code
+
+When defining workflows in configuration files:
 
 ```php
 'approve' => [
@@ -320,34 +344,54 @@ class DocumentApproval extends Component
 ]
 ```
 
-### Multiple Guards (All Must Pass)
+### Configuration via Database
+
+When using the `Workflow` and `WorkflowTransition` models:
 
 ```php
-'approve' => [
-    'from' => 'review',
-    'to' => 'approved',
-    'metadata' => [
+use CleaniqueCoders\Flowstone\Models\WorkflowTransition;
+
+// Single guard
+WorkflowTransition::create([
+    'workflow_id' => $workflow->id,
+    'name' => 'approve',
+    'from_place' => 'review',
+    'to_place' => 'approved',
+    'meta' => [
+        'guard' => "is_granted('approve-documents')",
+    ],
+]);
+
+// Multiple guards (all must pass)
+WorkflowTransition::create([
+    'workflow_id' => $workflow->id,
+    'name' => 'approve',
+    'from_place' => 'review',
+    'to_place' => 'approved',
+    'meta' => [
         'guards' => [
             ['type' => 'role', 'value' => ['ROLE_APPROVER']],
             ['type' => 'permission', 'value' => 'approve-documents'],
             ['type' => 'method', 'value' => 'hasMinimumReviews'],
         ],
     ],
-]
-```
+]);
 
-### Combined Configuration
-
-```php
-'publish' => [
-    'from' => 'approved',
-    'to' => 'published',
-    'metadata' => [
-        // Role check
+// Combined configuration
+WorkflowTransition::create([
+    'workflow_id' => $workflow->id,
+    'name' => 'publish',
+    'from_place' => 'approved',
+    'to_place' => 'published',
+    'meta' => [
+        // Role check - user must have one of these roles
         'roles' => ['ROLE_PUBLISHER', 'ROLE_ADMIN'],
 
-        // Permission check
+        // Permission check - single permission
         'permission' => 'publish-content',
+
+        // Multiple permissions - user must have at least one
+        'permissions' => ['publish-articles', 'publish-documents'],
 
         // Custom method check
         'guard' => [
@@ -355,7 +399,94 @@ class DocumentApproval extends Component
             'value' => 'isReadyForPublication',
         ],
     ],
+]);
+```
+
+### How Guards Are Evaluated
+
+All guards configured for a transition must pass for the transition to be allowed:
+
+1. **Role guards** (`roles`) - User must have **any** of the listed roles
+2. **Permission guards** (`permission`/`permissions`) - User must have the permission(s)
+3. **Custom guards** (`guard`/`guards`) - All custom guards must return `true`
+
+```php
+// Example: This transition requires BOTH role AND permission
+'meta' => [
+    'roles' => ['ROLE_MANAGER'],      // User needs this role
+    'permission' => 'approve-docs',   // AND this permission
 ]
+
+// If either check fails, the transition is blocked
+```
+
+## How Guards Work Internally
+
+Understanding the guard evaluation process can help with debugging and advanced usage.
+
+### Evaluation Flow
+
+When you call `canApplyTransition()` or `getTransitionBlockers()`:
+
+1. **Check Marking** - Verify the transition is available from the current state
+   - If not available → Return `BLOCKED_BY_MARKING` blocker
+   - If available → Continue to guard checks
+
+2. **Extract Guards** - Parse transition metadata to extract guard configurations
+   - Looks for `roles`, `permission`, `permissions`, `guard`, `guards` keys
+   - Normalizes them into a uniform format
+
+3. **Evaluate Each Guard** - Check each guard condition
+   - **Role guards**: Calls `auth()->user()->hasRole($role)`
+   - **Permission guards**: Tries `hasPermissionTo()`, `can()`, then `Gate::allows()`
+   - **Method guards**: Calls the specified method on the model
+   - **Expression guards**: Parses and evaluates the expression
+
+4. **Collect Blockers** - If any guard fails, create a `TransitionBlocker`
+   - Blocker includes the reason (code) and helpful message
+   - All failed guards produce blockers
+
+5. **Return Result**
+   - `canApplyTransition()` returns `true` if no blockers, `false` otherwise
+   - `getTransitionBlockers()` returns array of `TransitionBlocker` instances
+
+### Guard Resolution Order
+
+Guards are stored in the transition's `metadata` field and resolved in this order:
+
+```php
+// From transition metadata
+[
+    'roles' => ['ROLE_MANAGER'],           // Checked first
+    'permission' => 'approve',              // Checked second
+    'permissions' => ['approve', 'edit'],   // Each checked as separate guard
+    'guard' => 'canApprove',                // Checked as expression/method
+    'guards' => [                           // Each checked in order
+        ['type' => 'role', 'value' => ['ROLE_ADMIN']],
+        ['type' => 'method', 'value' => 'customCheck'],
+    ],
+]
+```
+
+**All guards must pass** for the transition to be allowed.
+
+### Guard Type Detection
+
+The system automatically detects guard types based on the metadata structure:
+
+```php
+// Detected as role guard
+'roles' => ['ROLE_X']
+
+// Detected as permission guard
+'permission' => 'perm-name'
+'permissions' => ['perm1', 'perm2']
+
+// Detected by explicit type
+'guard' => ['type' => 'method', 'value' => 'methodName']
+
+// String guards are treated as expressions
+'guard' => "is_granted('permission')"
 ```
 
 ## Advanced Usage
@@ -395,8 +526,12 @@ class Order extends Model
 
 ### Dynamic Guards
 
+You can update guards at runtime and the changes will take effect after regenerating the workflow configuration:
+
 ```php
-// You can update guards at runtime
+use CleaniqueCoders\Flowstone\Models\WorkflowTransition;
+
+// Update guard configuration
 $transition = WorkflowTransition::where('name', 'approve')->first();
 
 $transition->update([
@@ -406,9 +541,23 @@ $transition->update([
     ],
 ]);
 
-// Refresh workflow cache
-$document->getWorkflow(); // Will pick up new guards
+// Regenerate the workflow configuration
+$workflow = $transition->workflow;
+$workflow->setWorkflow(true); // Force regeneration
+
+// Clear cache to ensure changes are picked up
+Cache::forget($workflow->getWorkflowKey());
+
+// Now the new guards will be active
+$document = Document::find(1);
+$document->canApplyTransition('approve'); // Uses new guards
 ```
+
+**Important Notes:**
+
+- Changes to guards require regenerating the workflow config with `setWorkflow(true)`
+- Cache must be cleared for immediate effect
+- Consider the impact on in-flight workflows when changing guards
 
 ### Audit Trail with Guards
 
@@ -546,6 +695,189 @@ test('regular user cannot approve documents', function () {
 @endif
 ```
 
+## Common Usage Patterns
+
+### Pattern 1: Admin Override
+
+Allow admins to bypass certain restrictions:
+
+```php
+class Document extends Model
+{
+    use InteractsWithWorkflow;
+
+    public function canBePublished(): bool
+    {
+        // Admins can always publish
+        if (auth()->user()?->hasRole('ROLE_ADMIN')) {
+            return true;
+        }
+
+        // Others must meet criteria
+        return $this->reviews()->approved()->count() >= 2
+            && $this->word_count >= 500;
+    }
+}
+
+// In transition config
+'publish' => [
+    'metadata' => [
+        'guard' => ['type' => 'method', 'value' => 'canBePublished'],
+    ],
+]
+```
+
+### Pattern 2: Time-Based Guards
+
+Restrict actions based on time conditions:
+
+```php
+class Order extends Model
+{
+    use InteractsWithWorkflow;
+
+    public function canBeCancelled(): bool
+    {
+        // Can only cancel within 24 hours
+        return $this->created_at->diffInHours(now()) < 24;
+    }
+
+    public function canBeRefunded(): bool
+    {
+        // Can only refund within 30 days after delivery
+        return $this->delivered_at
+            && $this->delivered_at->diffInDays(now()) < 30;
+    }
+}
+```
+
+### Pattern 3: Relationship-Based Guards
+
+Check related models before allowing transitions:
+
+```php
+class Article extends Model
+{
+    use InteractsWithWorkflow;
+
+    public function canBePublished(): bool
+    {
+        return $this->author !== null
+            && $this->category !== null
+            && $this->featuredImage !== null
+            && $this->tags()->count() > 0;
+    }
+
+    public function hasMinimumReviews(): bool
+    {
+        return $this->reviews()
+            ->where('status', 'approved')
+            ->count() >= 2;
+    }
+}
+```
+
+### Pattern 4: Hierarchical Approval
+
+Different approval levels based on value:
+
+```php
+class PurchaseOrder extends Model
+{
+    use InteractsWithWorkflow;
+
+    public function canBeApprovedByManager(): bool
+    {
+        return $this->total_amount < 10000;
+    }
+
+    public function requiresDirectorApproval(): bool
+    {
+        return $this->total_amount >= 10000
+            && $this->total_amount < 50000;
+    }
+
+    public function requiresCEOApproval(): bool
+    {
+        return $this->total_amount >= 50000;
+    }
+}
+
+// Different transitions based on amount
+'approve_manager' => [
+    'metadata' => [
+        'roles' => ['ROLE_MANAGER'],
+        'guard' => ['type' => 'method', 'value' => 'canBeApprovedByManager'],
+    ],
+]
+
+'approve_director' => [
+    'metadata' => [
+        'roles' => ['ROLE_DIRECTOR'],
+        'guard' => ['type' => 'method', 'value' => 'requiresDirectorApproval'],
+    ],
+]
+```
+
+### Pattern 5: Combined Role and Business Logic
+
+Mix authorization with business rules:
+
+```php
+class Invoice extends Model
+{
+    use InteractsWithWorkflow;
+
+    public function canBeSentToCustomer(): bool
+    {
+        // Business logic checks
+        return $this->line_items()->count() > 0
+            && $this->total > 0
+            && $this->customer_email !== null
+            && !$this->hasErrors();
+    }
+}
+
+// Transition requires both role AND business logic
+'send' => [
+    'metadata' => [
+        'roles' => ['ROLE_ACCOUNTANT', 'ROLE_BILLING'],  // Must have role
+        'guard' => [
+            'type' => 'method',
+            'value' => 'canBeSentToCustomer',  // AND pass business checks
+        ],
+    ],
+]
+```
+
+### Pattern 6: Context-Aware Guards
+
+Guards that consider additional context:
+
+```php
+class Document extends Model
+{
+    use InteractsWithWorkflow;
+
+    public function canBeApproved(array $context = []): bool
+    {
+        // Check if this is a fast-track approval
+        if ($context['fast_track'] ?? false) {
+            // Fast-track requires admin role
+            return auth()->user()?->hasRole('ROLE_ADMIN');
+        }
+
+        // Normal approval flow
+        return $this->reviews()->approved()->count() >= 2;
+    }
+}
+
+// Usage with context
+if ($document->canApplyTransition('approve')) {
+    $document->applyTransition('approve', ['fast_track' => true]);
+}
+```
+
 ## Integration with Spatie Laravel Permission
 
 If you're using [Spatie Laravel Permission](https://spatie.be/docs/laravel-permission), guards integrate seamlessly:
@@ -579,22 +911,50 @@ if ($article->canApplyTransition('publish')) {
 
 1. **Check transition is enabled first**:
 
+   Guards are only evaluated if the transition is available from the current marking.
+
    ```php
    $transitions = $model->getEnabledTransitions();
    // Make sure your transition is in the list
+
+   // Check current marking
+   dd($model->marking, $model->getMarkedPlaces());
    ```
 
 2. **Verify guard configuration**:
 
+   For Workflow models, check the guard configuration:
+
    ```php
-   $guards = $model->getTransitionGuards('approve');
-   dd($guards); // Check what guards are configured
+   // For Workflow model instances
+   $guards = $workflow->getTransitionGuardConfig('approve');
+   dd($guards); // ['roles' => [...], 'permission' => '...']
+
+   // Check the full config
+   dd($workflow->config['transitions']['approve']['metadata']);
    ```
 
 3. **Check authentication**:
 
+   Role and permission guards require an authenticated user:
+
    ```php
-   dd(auth()->check()); // User must be authenticated for role/permission guards
+   dd(auth()->check()); // Must be true
+   dd(auth()->user()); // Must have hasRole() or hasPermissionTo() methods
+   ```
+
+4. **Debug blockers**:
+
+   Get detailed information about why a transition is blocked:
+
+   ```php
+   $blockers = $model->getTransitionBlockers('approve');
+
+   foreach ($blockers as $blocker) {
+       echo "Code: " . $blocker->getCode() . "\n";
+       echo "Message: " . $blocker->getMessage() . "\n";
+       echo "Params: " . json_encode($blocker->getParameters()) . "\n";
+   }
    ```
 
 ### Custom Guard Method Not Called
@@ -629,24 +989,54 @@ class User extends Authenticatable
 
 ## API Reference
 
-### Model Methods
+### InteractsWithWorkflow Trait Methods
+
+These methods are available on any model using the `InteractsWithWorkflow` trait:
 
 | Method | Returns | Description |
 |--------|---------|-------------|
-| `canApplyTransition(string $name)` | `bool` | Check if transition can be applied |
-| `getTransitionBlockers(string $name)` | `array<TransitionBlocker>` | Get all blockers |
-| `getTransitionBlockerMessages(string $name)` | `array<string>` | Get blocker messages |
-| `getTransitionGuards(string $name)` | `array` | Get guard configurations |
+| `canApplyTransition(string $name)` | `bool` | Check if transition can be applied (checks marking + guards) |
+| `getTransitionBlockers(string $name)` | `array<TransitionBlocker>` | Get all blockers preventing the transition |
+| `getTransitionBlockerMessages(string $name)` | `array<string>` | Get user-friendly blocker messages |
+| `applyTransition(string $name, array $context = [])` | `Marking` | Apply a transition (throws exception if blocked) |
+| `getEnabledTransitions()` | `array<Transition>` | Get all transitions available from current marking |
+
+### Workflow Model Methods
+
+Additional methods available on the `Workflow` model:
+
+| Method | Returns | Description |
+|--------|---------|-------------|
+| `getTransitionGuardConfig(string $name)` | `array` | Get simplified guard configuration for display |
+
+**Example:**
+```php
+$guards = $workflow->getTransitionGuardConfig('approve');
+// Returns: ['roles' => ['ROLE_APPROVER'], 'permission' => 'approve-docs']
+```
 
 ### TransitionBlocker Class
 
+The `TransitionBlocker` class represents a reason why a transition is blocked:
+
 | Method | Returns | Description |
 |--------|---------|-------------|
-| `getMessage()` | `string` | Get blocker message |
-| `getCode()` | `string` | Get blocker code constant |
-| `getParameters()` | `array` | Get additional parameters |
-| `toArray()` | `array` | Convert to array |
-| `__toString()` | `string` | Convert to string (message) |
+| `getMessage()` | `string` | Get human-readable blocker message |
+| `getCode()` | `string` | Get blocker code constant (e.g., `BLOCKED_BY_ROLE`) |
+| `getParameters()` | `array` | Get additional parameters (e.g., required roles) |
+| `toArray()` | `array` | Convert to array representation |
+| `__toString()` | `string` | Convert to string (returns message) |
+
+**Static Factory Methods:**
+
+```php
+TransitionBlocker::createBlockedByMarking(string $message = null)
+TransitionBlocker::createBlockedByRole(array $roles)
+TransitionBlocker::createBlockedByPermission(string|array $permission)
+TransitionBlocker::createBlockedByExpressionGuard(string $expression)
+TransitionBlocker::createBlockedByCustomGuard(string $message)
+TransitionBlocker::createUnknown(string $message = null)
+```
 
 ## See Also
 
