@@ -46,12 +46,26 @@ See [detailed comparison in docs](docs/02-configuration/01-configuration.md#mode
 
 ## Table of Contents
 
+- [Requirements](#requirements)
 - [Installation](#installation)
 - [Documentation](#documentation)
 - [Examples](#examples)
 - [Testing](#testing)
 - [Contributing](#contributing)
 - [License](#license)
+
+## Requirements
+
+- **PHP**: 8.2, 8.3, or 8.4
+- **Laravel**: 9.x, 10.x, 11.x, or 12.x
+- **Database**: MySQL, PostgreSQL, SQLite, or SQL Server
+
+### Version Compatibility
+
+| Flowstone | PHP     | Laravel   | Symfony Workflow | Livewire |
+|-----------|---------|-----------|------------------|----------|
+| 1.3.1+    | 8.2-8.4 | 9.x-12.x  | 6.4-7.x          | 3.0+     |
+| 1.3.0     | 8.4     | 11.x-12.x | 7.3+             | 3.6+     |
 
 ## Installation
 

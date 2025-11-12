@@ -1,7 +1,13 @@
 {
   "permissions": {
     "allow": [
-      "Bash(vendor/bin/pest:*)"
+      "Bash(vendor/bin/pest:*)",
+      "Bash(cloc:*)",
+      "Bash(find:*)",
+      "Bash(php -v:*)",
+      "Bash(composer show:*)",
+      "WebSearch",
+      "Bash(composer update:*)"
     ],
     "deny": [],
     "ask": []

@@ -6,10 +6,23 @@ This guide will walk you through installing Flowstone in your Laravel applicatio
 
 Before installing Flowstone, ensure your system meets these requirements:
 
-- **PHP**: ^8.4
-- **Laravel**: ^11.0 || ^12.0
+- **PHP**: ^8.2 (PHP 8.2, 8.3, or 8.4)
+- **Laravel**: ^9.0 || ^10.0 || ^11.0 || ^12.0
 - **Database**: MySQL, PostgreSQL, SQLite, or SQL Server
 - **Composer**: Latest version recommended
+
+### Version Compatibility Matrix
+
+| Flowstone | PHP Version | Laravel Version | Symfony Workflow | Livewire |
+|-----------|-------------|-----------------|------------------|----------|
+| 1.3.1+    | 8.2 - 8.4   | 9.x - 12.x      | 6.4 - 7.x        | 3.0+     |
+| 1.3.0     | 8.4         | 11.x - 12.x     | 7.3+             | 3.6+     |
+
+**Recommended Combinations:**
+- Laravel 9.x: PHP 8.2, Symfony 6.4, Livewire 3.0+
+- Laravel 10.x: PHP 8.2+, Symfony 6.4/7.0, Livewire 3.0+
+- Laravel 11.x: PHP 8.2+, Symfony 7.0+, Livewire 3.0+
+- Laravel 12.x: PHP 8.2+, Symfony 7.0+, Livewire 3.0+
 
 ## Installation Steps
 
