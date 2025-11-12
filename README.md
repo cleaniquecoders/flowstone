@@ -57,15 +57,17 @@ See [detailed comparison in docs](docs/02-configuration/01-configuration.md#mode
 ## Requirements
 
 - **PHP**: 8.2, 8.3, or 8.4
-- **Laravel**: 9.x, 10.x, 11.x, or 12.x
+- **Laravel**: 10.x, 11.x, or 12.x
 - **Database**: MySQL, PostgreSQL, SQLite, or SQL Server
 
 ### Version Compatibility
 
 | Flowstone | PHP     | Laravel   | Symfony Workflow | Livewire |
 |-----------|---------|-----------|------------------|----------|
-| 1.3.1+    | 8.2-8.4 | 9.x-12.x  | 6.4-7.x          | 3.0+     |
+| 1.3.1+    | 8.2-8.4 | 10.x-12.x | 6.4-7.x          | 3.0+     |
 | 1.3.0     | 8.4     | 11.x-12.x | 7.3+             | 3.6+     |
+
+> **Note:** Laravel 9 is not supported due to dependency requirements. Laravel 9 reached end-of-life in February 2024.
 
 ## Installation
 
