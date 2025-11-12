@@ -6,6 +6,31 @@ use Illuminate\Database\Eloquent\Casts\Attribute;
 use Illuminate\Support\Facades\Cache;
 use Symfony\Component\Workflow\Workflow;
 
+/**
+ * Trait InteractsWithWorkflow
+ *
+ * This trait provides workflow functionality to Eloquent models.
+ *
+ * Required properties in the using class:
+ *
+ * @property array|null $config Workflow configuration
+ * @property string $type Workflow type
+ * @property string|null $name Workflow name
+ * @property string $marking Current workflow marking/state
+ *
+ * Optional methods in the using class:
+ *
+ * @method array|null getSymfonyConfig() Get Symfony workflow configuration
+ * @method bool relationLoaded(string $relation) Check if relation is loaded
+ * @method \Illuminate\Database\Eloquent\Relations\HasMany places() Places relationship
+ * @method \Illuminate\Database\Eloquent\Relations\HasMany transitions() Transitions relationship
+ * @method static load(array $relations) Load relationships
+ *
+ * Provided accessors:
+ *
+ * @property-read string $workflow_type Accessor for workflow type
+ * @property-read string $workflow_type_field Field name for workflow type
+ */
 trait InteractsWithWorkflow
 {
     public function setWorkflow(bool $force = false): self
@@ -16,9 +41,9 @@ trait InteractsWithWorkflow
         }
 
         // If model has getSymfonyConfig method (like Workflow model), use it
-        if (method_exists($this, 'getSymfonyConfig')) {
+        if (method_exists($this, 'getSymfonyConfig')) { // @phpstan-ignore function.alreadyNarrowedType
             // Ensure relationships are loaded before generating config (only for models with these relationships)
-            if (method_exists($this, 'relationLoaded') && method_exists($this, 'places') && method_exists($this, 'transitions')) {
+            if (method_exists($this, 'relationLoaded') && method_exists($this, 'places') && method_exists($this, 'transitions')) { // @phpstan-ignore function.alreadyNarrowedType
                 if (! $this->relationLoaded('places') || ! $this->relationLoaded('transitions')) {
                     $this->load(['places', 'transitions']);
                 }
@@ -30,8 +55,8 @@ trait InteractsWithWorkflow
         } else {
             $this->update([
                 'config' => get_workflow_config(
-                    $this->workflow_type,
-                    $this->workflow_type_field
+                    $this->workflow_type, // @phpstan-ignore property.notFound
+                    $this->workflow_type_field // @phpstan-ignore property.notFound
                 ),
             ]);
         }
@@ -39,7 +64,7 @@ trait InteractsWithWorkflow
         $this->refresh();
 
         // Reload relationships after refresh to ensure they're available (only for models with these relationships)
-        if (method_exists($this, 'load') && method_exists($this, 'places') && method_exists($this, 'transitions')) {
+        if (method_exists($this, 'load') && method_exists($this, 'places') && method_exists($this, 'transitions')) { // @phpstan-ignore function.alreadyNarrowedType
             $this->load(['places', 'transitions']);
         }
 
@@ -49,8 +74,8 @@ trait InteractsWithWorkflow
             // Also clear any config-related caches
             if (method_exists($this, 'getKeyName') && $this->{$this->getKeyName()}) {
                 Cache::forget("workflow.config.{$this->{$this->getKeyName()}}");
-                Cache::forget("workflow.config.{$this->type}");
-                Cache::forget("workflow.config.{$this->name}");
+                Cache::forget("workflow.config.{$this->type}"); // @phpstan-ignore property.notFound
+                Cache::forget("workflow.config.{$this->name}"); // @phpstan-ignore property.notFound
             }
         }
 
@@ -97,12 +122,12 @@ trait InteractsWithWorkflow
 
     public function getMarking(): string
     {
-        return $this->marking;
+        return $this->marking; // @phpstan-ignore property.notFound
     }
 
     public function setMarking($marking, array $context = []): void
     {
-        $this->marking = (string) $marking;
+        $this->marking = (string) $marking; // @phpstan-ignore property.notFound
     }
 
     public function getEnabledTransitions(): array
@@ -700,7 +725,7 @@ trait InteractsWithWorkflow
     {
         $lastLog = $this->auditLogs()->latest()->first();
 
-        return $lastLog?->context;
+        return $lastLog?->context; // @phpstan-ignore property.notFound
     }
 
     /**
@@ -713,7 +738,7 @@ trait InteractsWithWorkflow
             ->latest()
             ->first();
 
-        return $log?->context;
+        return $log?->context; // @phpstan-ignore property.notFound
     }
 
     /**

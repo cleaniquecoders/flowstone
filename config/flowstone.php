@@ -229,11 +229,11 @@ return [
         |
         */
     'ui' => [
-        'enabled' => env('FLOWSTONE_UI_ENABLED', true),
+        'enabled' => env('FLOWSTONE_UI_ENABLED', true), // @phpstan-ignore larastan.noEnvCallsOutsideOfConfig
 
         // UI base path and optional domain
-        'path' => env('FLOWSTONE_UI_PATH', 'flowstone'),
-        'domain' => env('FLOWSTONE_UI_DOMAIN', null),
+        'path' => env('FLOWSTONE_UI_PATH', 'flowstone'), // @phpstan-ignore larastan.noEnvCallsOutsideOfConfig
+        'domain' => env('FLOWSTONE_UI_DOMAIN', null), // @phpstan-ignore larastan.noEnvCallsOutsideOfConfig
 
         // Middleware stack for all UI routes
         'middleware' => [
@@ -241,7 +241,7 @@ return [
         ],
 
         // Gate used to authorize viewing the UI (like Telescope)
-        'gate' => env('FLOWSTONE_UI_GATE', 'viewFlowstone'),
+        'gate' => env('FLOWSTONE_UI_GATE', 'viewFlowstone'), // @phpstan-ignore larastan.noEnvCallsOutsideOfConfig
 
         // Allow-list fallback when not local (emails, ids, etc.)
         'allowed' => [
@@ -249,7 +249,7 @@ return [
         ],
 
         // Asset base URL if you ship compiled JS/CSS
-        'asset_url' => env('FLOWSTONE_UI_ASSET_URL', '/vendor/flowstone'),
+        'asset_url' => env('FLOWSTONE_UI_ASSET_URL', '/vendor/flowstone'), // @phpstan-ignore larastan.noEnvCallsOutsideOfConfig
 
         /*
         |--------------------------------------------------------------------------
@@ -262,6 +262,6 @@ return [
         |
         */
 
-        'inline_assets' => env('FLOWSTONE_INLINE_ASSETS', true),
+        'inline_assets' => env('FLOWSTONE_INLINE_ASSETS', true), // @phpstan-ignore larastan.noEnvCallsOutsideOfConfig
     ],
 ];

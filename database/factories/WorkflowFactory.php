@@ -54,7 +54,7 @@ class WorkflowFactory extends Factory
 
     public function withPlacesAndTransitions(): static
     {
-        return $this->afterCreating(function (Workflow $workflow) {
+        return $this->afterCreating(function (Workflow $workflow): void { // @phpstan-ignore argument.type
             // Create places
             $workflow->places()->createMany([
                 [

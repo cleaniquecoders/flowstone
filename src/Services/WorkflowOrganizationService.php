@@ -17,7 +17,7 @@ class WorkflowOrganizationService
             ->groupBy('group')
             ->orderBy('group')
             ->get()
-            ->mapWithKeys(fn ($item) => [$item->group => $item->count]);
+            ->mapWithKeys(fn ($item) => [$item->group => $item->count]); // @phpstan-ignore property.notFound
     }
 
     /**
@@ -30,7 +30,7 @@ class WorkflowOrganizationService
             ->groupBy('category')
             ->orderBy('category')
             ->get()
-            ->mapWithKeys(fn ($item) => [$item->category => $item->count]);
+            ->mapWithKeys(fn ($item) => [$item->category => $item->count]); // @phpstan-ignore property.notFound
     }
 
     /**

@@ -8,7 +8,8 @@
       "Bash(composer show:*)",
       "WebSearch",
       "Bash(composer update:*)",
-      "Bash(composer require:*)"
+      "Bash(composer require:*)",
+      "Bash(vendor/bin/phpstan analyse:*)"
     ],
     "deny": [],
     "ask": []

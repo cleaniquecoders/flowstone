@@ -9,6 +9,17 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
+/**
+ * @property int $id
+ * @property int $workflow_id
+ * @property string $name
+ * @property string $from_place
+ * @property string $to_place
+ * @property int|null $sort_order
+ * @property array|null $meta
+ * @property \Illuminate\Support\Carbon $created_at
+ * @property \Illuminate\Support\Carbon $updated_at
+ */
 class WorkflowTransition extends Model
 {
     use HasFactory, InteractsWithMeta, InteractsWithUuid;

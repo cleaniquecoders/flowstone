@@ -7,6 +7,9 @@ use Illuminate\Contracts\View\View;
 use Livewire\Component;
 use Livewire\WithPagination;
 
+/**
+ * @property-read \Illuminate\Contracts\Pagination\LengthAwarePaginator $auditLogs
+ */
 class AuditLogViewer extends Component
 {
     use WithPagination;

@@ -14,6 +14,40 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\SoftDeletes;
 
+/**
+ * @property int $id
+ * @property string $uuid
+ * @property string $name
+ * @property string|null $description
+ * @property string|null $group
+ * @property string|null $category
+ * @property array $tags
+ * @property string $type
+ * @property string|null $marking_store_type
+ * @property string|null $marking_store_property
+ * @property string|null $initial_marking
+ * @property string|null $marking
+ * @property array|null $config
+ * @property array|null $designer
+ * @property bool $is_enabled
+ * @property bool $audit_trail_enabled
+ * @property array|null $event_listeners
+ * @property array|null $events_to_dispatch
+ * @property bool $dispatch_guard_events
+ * @property bool $dispatch_leave_events
+ * @property bool $dispatch_transition_events
+ * @property bool $dispatch_enter_events
+ * @property bool $dispatch_entered_events
+ * @property bool $dispatch_completed_events
+ * @property bool $dispatch_announce_events
+ * @property array|null $meta
+ * @property \Illuminate\Support\Carbon $created_at
+ * @property \Illuminate\Support\Carbon $updated_at
+ * @property \Illuminate\Support\Carbon|null $deleted_at
+ * @property-read \Illuminate\Database\Eloquent\Collection<int, \CleaniqueCoders\Flowstone\Models\WorkflowPlace> $places
+ * @property-read \Illuminate\Database\Eloquent\Collection<int, \CleaniqueCoders\Flowstone\Models\WorkflowTransition> $transitions
+ * @property-read \Illuminate\Database\Eloquent\Collection<int, \CleaniqueCoders\Flowstone\Models\WorkflowAuditLog> $auditLogs
+ */
 class Workflow extends Model implements WorkflowContract
 {
     use HasFactory, InteractsWithMeta, InteractsWithTags, InteractsWithUuid, InteractsWithWorkflow, SoftDeletes;

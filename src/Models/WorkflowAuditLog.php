@@ -9,6 +9,20 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\MorphTo;
 
+/**
+ * @property int $id
+ * @property int|null $workflow_id
+ * @property string $subject_type
+ * @property int $subject_id
+ * @property string|null $from_place
+ * @property string $to_place
+ * @property string $transition
+ * @property int|null $user_id
+ * @property array|null $context
+ * @property array|null $metadata
+ * @property \Illuminate\Support\Carbon $created_at
+ * @property-read string $description
+ */
 class WorkflowAuditLog extends Model
 {
     use HasFactory, InteractsWithUuid;
@@ -28,7 +42,7 @@ class WorkflowAuditLog extends Model
     /**
      * The attributes that are mass assignable.
      *
-     * @var array<string>
+     * @var list<string>
      */
     protected $fillable = [
         'workflow_id',
@@ -83,7 +97,7 @@ class WorkflowAuditLog extends Model
      */
     public function user(): BelongsTo
     {
-        $userModel = config('auth.providers.users.model', \App\Models\User::class);
+        $userModel = config('auth.providers.users.model', \App\Models\User::class); // @phpstan-ignore class.notFound
 
         return $this->belongsTo($userModel, 'user_id');
     }

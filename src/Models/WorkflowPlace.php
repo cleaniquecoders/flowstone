@@ -9,6 +9,15 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
+/**
+ * @property int $id
+ * @property int $workflow_id
+ * @property string $name
+ * @property int|null $sort_order
+ * @property array|null $meta
+ * @property \Illuminate\Support\Carbon $created_at
+ * @property \Illuminate\Support\Carbon $updated_at
+ */
 class WorkflowPlace extends Model
 {
     use HasFactory, InteractsWithMeta, InteractsWithUuid;

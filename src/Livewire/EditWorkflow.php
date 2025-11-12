@@ -70,7 +70,7 @@ class EditWorkflow extends Component
         $this->description = $this->workflow->description ?? '';
         $this->group = $this->workflow->group ?? '';
         $this->category = $this->workflow->category ?? '';
-        $this->tags = is_array($this->workflow->tags) ? implode(', ', $this->workflow->tags) : '';
+        $this->tags = is_array($this->workflow->tags) ? implode(', ', $this->workflow->tags) : ''; // @phpstan-ignore function.alreadyNarrowedType
         $this->type = $this->workflow->type;
         $this->is_enabled = $this->workflow->is_enabled;
         $this->audit_trail_enabled = $this->workflow->audit_trail_enabled ?? false;
