@@ -66,7 +66,7 @@
         "test": "vendor/bin/pest",
         "test-coverage": "vendor/bin/pest --coverage",
         "format": "vendor/bin/pint",
-        "clear": "@php vendor/bin/testbench package:purge-skeleton --ansi",
+        "clear": "sh -c 'php vendor/bin/testbench list | grep -q \"package:purge-skeleton\" && php vendor/bin/testbench package:purge-skeleton --ansi || echo \"[flowstone] Skipping purge-skeleton (command not available)\"'",
         "build": "@php vendor/bin/testbench workbench:build --ansi",
         "serve": [
             "Composer\\Config::disableProcessTimeout",
