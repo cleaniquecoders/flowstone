@@ -231,6 +231,19 @@ return [
     'ui' => [
         'enabled' => env('FLOWSTONE_UI_ENABLED', true), // @phpstan-ignore larastan.noEnvCallsOutsideOfConfig
 
+        /*
+        |--------------------------------------------------------------------------
+        | Livewire Version
+        |--------------------------------------------------------------------------
+        |
+        | Configure which Livewire version's component registration to use.
+        | - 'auto': Automatically detect based on available Livewire features
+        | - 'v3': Force Livewire 3 style (individual component registration)
+        | - 'v4': Force Livewire 4 style (namespace-based registration)
+        |
+        */
+        'livewire' => env('FLOWSTONE_UI_LIVEWIRE', 'auto'), // @phpstan-ignore larastan.noEnvCallsOutsideOfConfig
+
         // UI base path and optional domain
         'path' => env('FLOWSTONE_UI_PATH', 'flowstone'), // @phpstan-ignore larastan.noEnvCallsOutsideOfConfig
         'domain' => env('FLOWSTONE_UI_DOMAIN', null), // @phpstan-ignore larastan.noEnvCallsOutsideOfConfig

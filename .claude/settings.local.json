@@ -9,7 +9,8 @@
       "WebSearch",
       "Bash(composer update:*)",
       "Bash(composer require:*)",
-      "Bash(vendor/bin/phpstan analyse:*)"
+      "Bash(vendor/bin/phpstan analyse:*)",
+      "Bash(composer analyse:*)"
     ],
     "deny": [],
     "ask": []

@@ -6,6 +6,7 @@ use CleaniqueCoders\Flowstone\Models\WorkflowPlace;
 use Illuminate\Contracts\View\View;
 use Illuminate\Support\Facades\Log;
 use Livewire\Attributes\Layout;
+use Livewire\Attributes\On;
 use Livewire\Component;
 
 #[Layout('flowstone::components.layout')]
@@ -39,10 +40,6 @@ class ManagePlaceMetadata extends Component
         'color' => 'Color',
     ];
 
-    protected $listeners = [
-        'open-place-metadata-modal' => 'openModal',
-    ];
-
     public function mount(WorkflowPlace $place): void
     {
         $this->place = $place;
@@ -54,6 +51,7 @@ class ManagePlaceMetadata extends Component
         $this->metadata = $this->place->meta ?? [];
     }
 
+    #[On('open-place-metadata-modal')]
     public function openModal(int $placeId): void
     {
         // Only open modal if this is the correct place component

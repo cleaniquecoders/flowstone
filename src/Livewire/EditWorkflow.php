@@ -5,6 +5,7 @@ namespace CleaniqueCoders\Flowstone\Livewire;
 use CleaniqueCoders\Flowstone\Models\Workflow;
 use Illuminate\Contracts\View\View;
 use Livewire\Attributes\Layout;
+use Livewire\Attributes\On;
 use Livewire\Component;
 
 #[Layout('flowstone::components.layout')]
@@ -115,10 +116,7 @@ class EditWorkflow extends Component
         $this->dispatch('workflow-updated');
     }
 
-    protected $listeners = [
-        'open-edit-modal' => 'handleOpenEditModal',
-    ];
-
+    #[On('open-edit-modal')]
     public function handleOpenEditModal($workflowId): void
     {
         if ((int) $workflowId === $this->workflow->id) {

@@ -5,6 +5,7 @@ namespace CleaniqueCoders\Flowstone;
 use CleaniqueCoders\Flowstone\Commands\CreateWorkflowCommand;
 use CleaniqueCoders\Flowstone\Commands\FlowstoneCommand;
 use CleaniqueCoders\Flowstone\Commands\PublishAssetsCommand;
+use CleaniqueCoders\Flowstone\Livewire\AuditLogViewer;
 use CleaniqueCoders\Flowstone\Livewire\CreateWorkflow;
 use CleaniqueCoders\Flowstone\Livewire\Dashboard;
 use CleaniqueCoders\Flowstone\Livewire\EditWorkflow;
@@ -91,14 +92,35 @@ class FlowstoneServiceProvider extends PackageServiceProvider
             return;
         }
 
-        Livewire::component('flowstone.dashboard', Dashboard::class);
-        Livewire::component('flowstone.workflows-index', WorkflowIndex::class);
-        Livewire::component('flowstone.workflow-show', WorkflowShow::class);
-        Livewire::component('flowstone.create-workflow', CreateWorkflow::class);
-        Livewire::component('flowstone.edit-workflow', EditWorkflow::class);
-        Livewire::component('flowstone.manage-workflow-metadata', ManageWorkflowMetadata::class);
-        Livewire::component('flowstone.manage-place-metadata', ManagePlaceMetadata::class);
-        Livewire::component('flowstone.manage-transition-metadata', ManageTransitionMetadata::class);
+        $version = config('flowstone.ui.livewire', 'auto');
+
+        if ($this->shouldUseLivewire4($version)) {
+            // Livewire 4: Register by namespace for cleaner component discovery
+            Livewire::addNamespace('flowstone', classNamespace: 'CleaniqueCoders\\Flowstone\\Livewire');
+        } else {
+            // Livewire 3: Register components individually
+            Livewire::component('flowstone.dashboard', Dashboard::class);
+            Livewire::component('flowstone.workflows-index', WorkflowIndex::class);
+            Livewire::component('flowstone.workflow-show', WorkflowShow::class);
+            Livewire::component('flowstone.create-workflow', CreateWorkflow::class);
+            Livewire::component('flowstone.edit-workflow', EditWorkflow::class);
+            Livewire::component('flowstone.manage-workflow-metadata', ManageWorkflowMetadata::class);
+            Livewire::component('flowstone.manage-place-metadata', ManagePlaceMetadata::class);
+            Livewire::component('flowstone.manage-transition-metadata', ManageTransitionMetadata::class);
+            Livewire::component('flowstone.audit-log-viewer', AuditLogViewer::class);
+        }
+    }
+
+    /**
+     * Determine if Livewire 4's namespace-based registration should be used.
+     */
+    protected function shouldUseLivewire4(string $version): bool
+    {
+        return match ($version) {
+            'v4' => true,
+            'v3' => false,
+            default => method_exists(Livewire::getFacadeRoot(), 'addNamespace'),
+        };
     }
 
     protected function registerBladeComponents(): void

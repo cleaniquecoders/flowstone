@@ -5,6 +5,7 @@ namespace CleaniqueCoders\Flowstone\Livewire;
 use CleaniqueCoders\Flowstone\Models\Workflow;
 use Illuminate\Contracts\View\View;
 use Livewire\Attributes\Layout;
+use Livewire\Attributes\On;
 use Livewire\Component;
 
 #[Layout('flowstone::components.layout')]
@@ -37,10 +38,6 @@ class ManageWorkflowMetadata extends Component
         'array' => 'Array (JSON)',
     ];
 
-    protected $listeners = [
-        'open-metadata-modal' => 'openModal',
-    ];
-
     public function mount(Workflow $workflow): void
     {
         $this->workflow = $workflow;
@@ -52,6 +49,7 @@ class ManageWorkflowMetadata extends Component
         $this->metadata = $this->workflow->meta ?? [];
     }
 
+    #[On('open-metadata-modal')]
     public function openModal(): void
     {
         $this->loadMetadata();

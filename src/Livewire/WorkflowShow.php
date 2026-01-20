@@ -6,6 +6,7 @@ use CleaniqueCoders\Flowstone\Models\Workflow;
 use CleaniqueCoders\Flowstone\Processors\WorkflowGraphBuilder;
 use Illuminate\Contracts\View\View;
 use Livewire\Attributes\Layout;
+use Livewire\Attributes\On;
 use Livewire\Component;
 
 #[Layout('flowstone::components.layout')]
@@ -32,9 +33,11 @@ class WorkflowShow extends Component
         $this->dispatch('flowstone:graph:update', graph: $this->graph);
     }
 
-    protected $listeners = [
-        'workflow-updated' => '$refresh',
-    ];
+    #[On('workflow-updated')]
+    public function refresh(): void
+    {
+        // Livewire will automatically refresh the component
+    }
 
     public function render(): View
     {

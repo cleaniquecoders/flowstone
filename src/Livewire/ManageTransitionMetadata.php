@@ -6,6 +6,7 @@ use CleaniqueCoders\Flowstone\Models\WorkflowTransition;
 use Illuminate\Contracts\View\View;
 use Illuminate\Support\Facades\Log;
 use Livewire\Attributes\Layout;
+use Livewire\Attributes\On;
 use Livewire\Component;
 
 #[Layout('flowstone::components.layout')]
@@ -40,10 +41,6 @@ class ManageTransitionMetadata extends Component
         'guard' => 'Guard Expression',
     ];
 
-    protected $listeners = [
-        'open-transition-metadata-modal' => 'openModal',
-    ];
-
     public function mount(WorkflowTransition $transition): void
     {
         $this->transition = $transition;
@@ -55,6 +52,7 @@ class ManageTransitionMetadata extends Component
         $this->metadata = $this->transition->meta ?? [];
     }
 
+    #[On('open-transition-metadata-modal')]
     public function openModal(int $transitionId): void
     {
         // Only open modal if this is the correct transition component
