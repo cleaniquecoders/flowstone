@@ -2,6 +2,44 @@
 
 All notable changes to `flowstone` will be documented in this file.
 
+## Added Support Livewire 4 - 2026-01-21
+
+### Release Notes
+
+#### v1.4.0 - 2026-01-21
+
+##### Added
+
+- **Livewire 4 Support**: Added full compatibility with Livewire 4 while maintaining backward compatibility with Livewire 3
+- **Configurable Livewire Version**: New `flowstone.ui.livewire` configuration option to control component registration
+  strategy (`auto`, `v3`, or `v4`)
+- **Namespace-based Component Registration**: Livewire 4 uses `Livewire::addNamespace()` for cleaner component discovery
+
+##### Changed
+
+- **Component Naming Convention**: Updated all Livewire component references from dot notation (`flowstone.`) to namespace
+  notation (`flowstone::`) for consistency across both Livewire versions
+- **Route Registration**: Enhanced routing logic to detect and use Livewire 4's `Route::livewire()` macro when available
+- **Event Listeners**: Migrated Livewire components from deprecated `$listeners` property to `#[On()]` attributes:
+  - `EditWorkflow`
+  - `ManagePlaceMetadata`
+  - `ManageTransitionMetadata`
+  - `ManageWorkflowMetadata`
+  - `WorkflowShow`
+  
+
+##### Updated
+
+- **Dependencies**: Extended Livewire version constraint to support both `^3.0` and `^4.0`
+
+##### Migration Guide
+
+If upgrading from a previous version:
+
+1. Update your Livewire component references in custom views from `flowstone.component-name` to `flowstone::component-name`
+2. The package auto-detects your Livewire version by default. To force a specific version, set `FLOWSTONE_UI_LIVEWIRE=v3` or
+   `FLOWSTONE_UI_LIVEWIRE=v4` in your environment
+
 ## Patch release focused on CI/install robustness  - 2025-11-12
 
 ### Flowstone v1.3.1 — 2025-11-12
@@ -16,12 +54,14 @@ Patch release focused on CI/install robustness and accurate dependency minimums.
 #### What’s changed
 
 - Dependency floor
+  
   - Bump minimum for cleaniquecoders/traitify to ^1.2.1 so InteractsWithTags is guaranteed to exist.
   - Fixes PHP fatal error during tests and installs:
     - Trait "CleaniqueCoders\Traitify\Concerns\InteractsWithTags" not found
     
   
 - Composer scripts hardening
+  
   - Guard the clear script to only run purge-skeleton if the command is available:
     - Prevents “Command package:purge-skeleton is not defined” during post-autoload-dump on environments where Testbench commands aren’t bootstrapped yet.
     
@@ -44,6 +84,7 @@ Patch release focused on CI/install robustness and accurate dependency minimums.
 
 ```zsh
 composer update cleaniquecoders/flowstone
+
 
 ```
 - If you maintain a prefer-lowest CI job:
@@ -126,6 +167,7 @@ class SendApprovalEmail extends GuardEventListener
 }
 
 
+
 ```
 #### 2. ⚙️ Event Configuration Support
 
@@ -159,6 +201,7 @@ php artisan vendor:publish --tag=flowstone-migrations
 php artisan migrate
 
 
+
 ```
 **Usage Example:**
 
@@ -176,6 +219,7 @@ $workflow->update([
 if ($workflow->shouldDispatchEvent('guard')) {
     // Event will fire
 }
+
 
 
 ```
@@ -211,6 +255,7 @@ php artisan vendor:publish --tag=flowstone-migrations
 php artisan migrate
 
 
+
 ```
 **Usage Example:**
 
@@ -221,6 +266,7 @@ $workflow = Workflow::create([
     'marking_store_type' => 'multiple_state',
     'marking_store_property' => 'currentPlaces',
 ]);
+
 
 
 ```
@@ -467,6 +513,7 @@ php artisan vendor:publish --tag=flowstone-migrations
 php artisan migrate
 
 
+
 ```
 #### Upgrading from 1.2.x
 
@@ -474,6 +521,7 @@ php artisan migrate
 composer update cleaniquecoders/flowstone
 php artisan vendor:publish --tag=flowstone-migrations
 php artisan migrate
+
 
 
 ```
@@ -588,6 +636,7 @@ Complete audit trail implementation for tracking all workflow state changes.
 
 
 
+
 ```
 **Usage Examples:**
 
@@ -601,6 +650,7 @@ $recent = $model->recentAuditLogs(10);
 
 // In views
 <x-flowstone::workflow-timeline :model="$document" :limit="10" />
+
 
 
 
@@ -652,6 +702,7 @@ $messages = $document->getTransitionBlockerMessages('approve');
 
 
 
+
 ```
 **UI Integration:**
 
@@ -691,6 +742,7 @@ Comprehensive Blade integration with custom directives, components, and helper f
 
 
 
+
 ```
 ###### 3.2 Blade Components (4 components)
 
@@ -718,6 +770,7 @@ Comprehensive Blade integration with custom directives, components, and helper f
 
 
 
+
 ```
 ###### 3.3 Global Helper Functions (7 functions)
 
@@ -742,6 +795,7 @@ workflow_transition_blockers($model, 'approve')
 
 // Get metadata
 workflow_metadata($model, 'color', 'place', 'draft')
+
 
 
 
@@ -775,6 +829,7 @@ if ($model->supportsMultipleStates()) {
 
 
 
+
 ```
 ###### 4.2 Context Support
 
@@ -802,6 +857,7 @@ public function canBeApproved(array $context = []): bool
 
 
 
+
 ```
 ###### 4.3 Enhanced Metadata Support
 
@@ -818,6 +874,7 @@ $approveIcon = $model->getTransitionMetadata('approve', 'icon');
 // Bulk metadata retrieval
 $allPlaces = $model->getPlacesWithMetadata();
 $allTransitions = $model->getTransitionsWithMetadata();
+
 
 
 
@@ -863,6 +920,7 @@ WorkflowFactory::new()
     ->singleState()
     ->withMarkingStore('property', 'approval_status')
     ->create();
+
 
 
 
@@ -1084,6 +1142,7 @@ php artisan migrate
 
 
 
+
 ```
 All migrations maintain **backward compatibility** with existing installations.
 
@@ -1126,6 +1185,7 @@ No action needed - all features work out of the box with sensible defaults.
    
    
    
+   
    ```
 2. **Publish and run migrations:**
    
@@ -1135,12 +1195,14 @@ No action needed - all features work out of the box with sensible defaults.
    
    
    
+   
    ```
 3. **Clear caches:**
    
    ```bash
    php artisan cache:clear
    php artisan view:clear
+   
    
    
    
@@ -1283,7 +1345,6 @@ No breaking changes. No runtime code changes. Safe to update.
 ##### Enhanced Workflow Schema
 - **Designer Column** - New `designer` JSON column in workflows table for storing visual layout data
 - **Visual Configuration** - Store node positions and graph metadata for the UI designer
-
 ##### Developer Experience
 
 - **Asset Publishing** - New command to publish UI assets: `php artisan flowstone:publish-assets`
@@ -1296,6 +1357,7 @@ Update your composer dependencies:
 
 ```bash
 composer require cleaniquecoders/flowstone:^1.1.0
+
 
 
 
@@ -1314,6 +1376,7 @@ php artisan migrate
 
 
 
+
 ```
 #### 🎨 UI Setup
 
@@ -1321,6 +1384,7 @@ To use the Flowstone UI, publish the frontend assets:
 
 ```bash
 php artisan flowstone:publish-assets
+
 
 
 
@@ -1384,6 +1448,7 @@ We're excited to announce the first stable release of **Flowstone**, a powerful 
 
 ```bash
 composer require cleaniquecoders/flowstone
+
 
 
 
