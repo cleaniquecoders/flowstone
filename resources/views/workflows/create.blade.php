@@ -10,7 +10,7 @@
                 <h1 class="text-2xl font-bold text-gray-900 mb-2">Create New Workflow</h1>
                 <p class="text-gray-600 mb-8">Get started by defining the basic properties of your workflow.</p>
 
-                @livewire('flowstone.create-workflow')
+                @livewire('flowstone::create-workflow')
             </div>
         </div>
     </div>

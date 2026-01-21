@@ -476,9 +476,9 @@
     </div>
 
     {{-- Edit Workflow Modal --}}
-    @livewire('flowstone.edit-workflow', ['workflow' => $workflow], key('edit-workflow-' . $workflow->id))
+    @livewire('flowstone::edit-workflow', ['workflow' => $workflow], key('edit-workflow-' . $workflow->id))
 
     {{-- Manage Metadata Modal --}}
-    @livewire('flowstone.manage-workflow-metadata', ['workflow' => $workflow], key('manage-metadata-' . $workflow->id))
+    @livewire('flowstone::manage-workflow-metadata', ['workflow' => $workflow], key('manage-metadata-' . $workflow->id))
 
 </div>

@@ -92,22 +92,22 @@ class FlowstoneServiceProvider extends PackageServiceProvider
             return;
         }
 
-        $version = config('flowstone.ui.livewire', 'auto');
+        $version = config('flowstone.ui.livewire', 'v4');
 
         if ($this->shouldUseLivewire4($version)) {
             // Livewire 4: Register by namespace for cleaner component discovery
             Livewire::addNamespace('flowstone', classNamespace: 'CleaniqueCoders\\Flowstone\\Livewire');
         } else {
-            // Livewire 3: Register components individually
-            Livewire::component('flowstone.dashboard', Dashboard::class);
-            Livewire::component('flowstone.workflows-index', WorkflowIndex::class);
-            Livewire::component('flowstone.workflow-show', WorkflowShow::class);
-            Livewire::component('flowstone.create-workflow', CreateWorkflow::class);
-            Livewire::component('flowstone.edit-workflow', EditWorkflow::class);
-            Livewire::component('flowstone.manage-workflow-metadata', ManageWorkflowMetadata::class);
-            Livewire::component('flowstone.manage-place-metadata', ManagePlaceMetadata::class);
-            Livewire::component('flowstone.manage-transition-metadata', ManageTransitionMetadata::class);
-            Livewire::component('flowstone.audit-log-viewer', AuditLogViewer::class);
+            // Livewire 3: Register components individually (using :: notation for consistency)
+            Livewire::component('flowstone::dashboard', Dashboard::class);
+            Livewire::component('flowstone::workflow-index', WorkflowIndex::class);
+            Livewire::component('flowstone::workflow-show', WorkflowShow::class);
+            Livewire::component('flowstone::create-workflow', CreateWorkflow::class);
+            Livewire::component('flowstone::edit-workflow', EditWorkflow::class);
+            Livewire::component('flowstone::manage-workflow-metadata', ManageWorkflowMetadata::class);
+            Livewire::component('flowstone::manage-place-metadata', ManagePlaceMetadata::class);
+            Livewire::component('flowstone::manage-transition-metadata', ManageTransitionMetadata::class);
+            Livewire::component('flowstone::audit-log-viewer', AuditLogViewer::class);
         }
     }
 

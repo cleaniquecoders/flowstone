@@ -97,11 +97,11 @@
 
     {{-- Metadata Management Modals --}}
     @foreach($workflow->places as $place)
-        @livewire('flowstone.manage-place-metadata', ['place' => $place], key('place-metadata-' . $place->id))
+        @livewire('flowstone::manage-place-metadata', ['place' => $place], key('place-metadata-' . $place->id))
     @endforeach
 
     @foreach($workflow->transitions as $transition)
-        @livewire('flowstone.manage-transition-metadata', ['transition' => $transition], key('transition-metadata-' . $transition->id))
+        @livewire('flowstone::manage-transition-metadata', ['transition' => $transition], key('transition-metadata-' . $transition->id))
     @endforeach
 
     @push('scripts')

@@ -10,7 +10,9 @@
       "Bash(composer update:*)",
       "Bash(composer require:*)",
       "Bash(vendor/bin/phpstan analyse:*)",
-      "Bash(composer analyse:*)"
+      "Bash(composer analyse:*)",
+      "Bash(./vendor/bin/testbench migrate:*)",
+      "Bash(./vendor/bin/testbench config:show:*)"
     ],
     "deny": [],
     "ask": []

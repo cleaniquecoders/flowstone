@@ -181,5 +181,5 @@
     @endif
 
     {{-- Create Workflow Modal (Hidden, triggered from header) --}}
-    @livewire('flowstone.create-workflow')
+    @livewire('flowstone::create-workflow')
 </div>
