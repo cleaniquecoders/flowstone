@@ -2,6 +2,24 @@
 
 All notable changes to `flowstone` will be documented in this file.
 
+## 1.5.0 - 2026-03-31
+
+### What's Changed
+
+#### Added
+
+- Laravel 13 support (illuminate constraints include `^13.0`)
+- PHPUnit 12 compatibility
+- Pest 4 support
+
+#### Changed
+
+- Updated `phpunit.xml.dist` for PHPUnit 12
+- Standardized CI workflow (Laravel 12 + PHP 8.4/8.3)
+- Updated dev dependencies (larastan, phpstan plugins, collision)
+
+**Full Changelog**: https://github.com/cleaniquecoders/flowstone/compare/1.4.0...1.5.0
+
 ## Added Support Livewire 4 - 2026-01-21
 
 ### Release Notes
@@ -86,6 +104,7 @@ Patch release focused on CI/install robustness and accurate dependency minimums.
 composer update cleaniquecoders/flowstone
 
 
+
 ```
 - If you maintain a prefer-lowest CI job:
   - Keep it enabled; this release aligns the declared minimums with actual runtime requirements.
@@ -168,6 +187,7 @@ class SendApprovalEmail extends GuardEventListener
 
 
 
+
 ```
 #### 2. ⚙️ Event Configuration Support
 
@@ -202,6 +222,7 @@ php artisan migrate
 
 
 
+
 ```
 **Usage Example:**
 
@@ -219,6 +240,7 @@ $workflow->update([
 if ($workflow->shouldDispatchEvent('guard')) {
     // Event will fire
 }
+
 
 
 
@@ -256,6 +278,7 @@ php artisan migrate
 
 
 
+
 ```
 **Usage Example:**
 
@@ -266,6 +289,7 @@ $workflow = Workflow::create([
     'marking_store_type' => 'multiple_state',
     'marking_store_property' => 'currentPlaces',
 ]);
+
 
 
 
@@ -514,6 +538,7 @@ php artisan migrate
 
 
 
+
 ```
 #### Upgrading from 1.2.x
 
@@ -521,6 +546,7 @@ php artisan migrate
 composer update cleaniquecoders/flowstone
 php artisan vendor:publish --tag=flowstone-migrations
 php artisan migrate
+
 
 
 
@@ -637,6 +663,7 @@ Complete audit trail implementation for tracking all workflow state changes.
 
 
 
+
 ```
 **Usage Examples:**
 
@@ -650,6 +677,7 @@ $recent = $model->recentAuditLogs(10);
 
 // In views
 <x-flowstone::workflow-timeline :model="$document" :limit="10" />
+
 
 
 
@@ -703,6 +731,7 @@ $messages = $document->getTransitionBlockerMessages('approve');
 
 
 
+
 ```
 **UI Integration:**
 
@@ -743,6 +772,7 @@ Comprehensive Blade integration with custom directives, components, and helper f
 
 
 
+
 ```
 ###### 3.2 Blade Components (4 components)
 
@@ -771,6 +801,7 @@ Comprehensive Blade integration with custom directives, components, and helper f
 
 
 
+
 ```
 ###### 3.3 Global Helper Functions (7 functions)
 
@@ -795,6 +826,7 @@ workflow_transition_blockers($model, 'approve')
 
 // Get metadata
 workflow_metadata($model, 'color', 'place', 'draft')
+
 
 
 
@@ -830,6 +862,7 @@ if ($model->supportsMultipleStates()) {
 
 
 
+
 ```
 ###### 4.2 Context Support
 
@@ -858,6 +891,7 @@ public function canBeApproved(array $context = []): bool
 
 
 
+
 ```
 ###### 4.3 Enhanced Metadata Support
 
@@ -874,6 +908,7 @@ $approveIcon = $model->getTransitionMetadata('approve', 'icon');
 // Bulk metadata retrieval
 $allPlaces = $model->getPlacesWithMetadata();
 $allTransitions = $model->getTransitionsWithMetadata();
+
 
 
 
@@ -920,6 +955,7 @@ WorkflowFactory::new()
     ->singleState()
     ->withMarkingStore('property', 'approval_status')
     ->create();
+
 
 
 
@@ -1143,6 +1179,7 @@ php artisan migrate
 
 
 
+
 ```
 All migrations maintain **backward compatibility** with existing installations.
 
@@ -1186,6 +1223,7 @@ No action needed - all features work out of the box with sensible defaults.
    
    
    
+   
    ```
 2. **Publish and run migrations:**
    
@@ -1196,12 +1234,14 @@ No action needed - all features work out of the box with sensible defaults.
    
    
    
+   
    ```
 3. **Clear caches:**
    
    ```bash
    php artisan cache:clear
    php artisan view:clear
+   
    
    
    
@@ -1346,7 +1386,6 @@ No breaking changes. No runtime code changes. Safe to update.
 - **Designer Column** - New `designer` JSON column in workflows table for storing visual layout data
 - **Visual Configuration** - Store node positions and graph metadata for the UI designer
 ##### Developer Experience
-
 - **Asset Publishing** - New command to publish UI assets: `php artisan flowstone:publish-assets`
 - **Build Configuration** - Vite setup for frontend asset compilation
 - **React Integration** - UMD bundle with React Flow for visual workflow editing
@@ -1357,6 +1396,7 @@ Update your composer dependencies:
 
 ```bash
 composer require cleaniquecoders/flowstone:^1.1.0
+
 
 
 
@@ -1377,6 +1417,7 @@ php artisan migrate
 
 
 
+
 ```
 #### 🎨 UI Setup
 
@@ -1384,6 +1425,7 @@ To use the Flowstone UI, publish the frontend assets:
 
 ```bash
 php artisan flowstone:publish-assets
+
 
 
 
@@ -1448,6 +1490,7 @@ We're excited to announce the first stable release of **Flowstone**, a powerful 
 
 ```bash
 composer require cleaniquecoders/flowstone
+
 
 
 
